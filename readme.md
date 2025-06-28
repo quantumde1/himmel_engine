@@ -40,6 +40,9 @@ Next, run
 - Adding savestates in-engine
 - Adding backlog and menus
 
+## Documentation
+
+You can see documentation on Himmel's [wiki](https://underlevel.ddns.net/git/quantumde1/Himmel_Engine/wiki) page. It contains cheatsheet and some useful examples for getting started with development.
 
 ## License
 
