@@ -2,6 +2,31 @@
 
 Himmel(equal to Heaven, but in German) is an engine for Visual Novels, written using Dlang and Lua.
 
+## Getting Started
+
+### Getting needed components(besides VLC)
+
+Build system currently assumes POSIX like system. For building, you need first install next components on:
+
+1. __FreeBSD:__
+```
+sudo pkg install ldc vlc dub lua53
+```
+
+2. __Alpine:__
+```
+doas apk add ldc2 dub vlc-dev vlc lua5.3-dev 
+```
+
+3. __Debian:__
+```
+sudo apt install dub ldc vlc-dev liblua5.3-dev vlc lua
+```
+
+Next, run 
+```./build.sh```
+. Everything will be done automatically!
+
 ## Features
 
 - Multiple characters on screen
@@ -14,3 +39,14 @@ Himmel(equal to Heaven, but in German) is an engine for Visual Novels, written u
 - Adding lipsync
 - Adding savestates in-engine
 - Adding backlog and menus
+
+
+## License
+
+raylib([raylib.com](https://raylib.com)) uses zlib/libpng license
+
+himmel engine uses MIT license
+
+VLC([videolan.org](https://videolan.org)) uses LGPL license
+
+lua([lua.org](https://www.lua.org)) uses MIT license

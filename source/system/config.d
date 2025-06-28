@@ -44,13 +44,7 @@ nothrow char parseConf(string filename, string type)
     }
     catch (Exception e)
     {
-        try
-        {
-            debugWriteln("Error parsing config: " ~ e.msg);
-        }
-        catch (Exception e)
-        {
-        }
+        debugWriteln(e.msg);
     }
     return 'E';
 }

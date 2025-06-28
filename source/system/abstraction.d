@@ -12,7 +12,7 @@ nothrow void debugWriteln(A...)(A args)
         }
         catch (Exception e)
         {
-
+            debugWriteln(e.msg);
         }
     }
 }

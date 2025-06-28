@@ -103,6 +103,7 @@ extern (C) nothrow int luaL_load2Dbackground(lua_State* L)
     }
     catch (Exception e)
     {
+        debugWriteln(e.msg);
     }
     return 0;
 }
@@ -116,6 +117,7 @@ extern (C) nothrow int luaL_draw2Dbackground(lua_State* L)
     }
     catch (Exception e)
     {
+        debugWriteln(e.msg);
     }
     return 0;
 }
@@ -143,6 +145,7 @@ extern (C) nothrow int luaL_load2Dcharacter(lua_State *L) {
         characterTextures[count].drawTexture = false;
     }
     catch (Exception e) {
+        debugWriteln(e.msg);
     }
     return 0;
 }
@@ -157,7 +160,7 @@ extern (C) nothrow int luaL_draw2Dcharacter(lua_State* L)
         characterTextures[count].drawTexture = true;
         debugWriteln("Count: ", count, " drawTexture cond: ", characterTextures[count].drawTexture);
     } catch (Exception e) {
-        
+        debugWriteln(e.msg);
     }
     return 0;
 }
@@ -186,6 +189,7 @@ extern (C) nothrow int luaL_LoadMusic(lua_State* L)
     }
     catch (Exception e)
     {
+        debugWriteln(e.msg);
     }
     return 0;
 }
@@ -206,7 +210,7 @@ extern (C) nothrow int luaL_playSfx(lua_State *L) {
     try {
     playSfx(to!string(luaL_checkstring(L, 1)));
     } catch (Exception e) {
-
+        debugWriteln(e.msg);
     }
     return 0;
 }
@@ -226,6 +230,7 @@ extern (C) nothrow int luaL_playVideo(lua_State* L)
     }
     catch (Exception e)
     {
+        debugWriteln(e.msg);
     }
     return 0;
 }
@@ -244,6 +249,7 @@ extern (C) nothrow int luaL_moveCamera(lua_State *L) {
         cameraMoveSpeed = speed;
         isCameraMoving = true;
     } catch (Exception e) {
+        debugWriteln(e.msg);
     }
     return 0;
 }
@@ -261,7 +267,7 @@ extern (C) nothrow int luaL_loadUIAnimation(lua_State *L) {
             debug debugWriteln("frameDuration: ", frameDuration);
         }
     } catch (Exception e) {
-
+        debugWriteln(e.msg);
     }
     return 0;
 }
@@ -271,7 +277,7 @@ extern (C) nothrow int luaL_playUIAnimation(lua_State *L) {
     try {
         playAnimation = true;
     } catch (Exception e) {
-
+        debugWriteln(e.msg);
     }
     return 0;
 }
@@ -290,7 +296,7 @@ extern (C) nothrow int luaL_unloadUIAnimation(lua_State *L) {
             UnloadTexture(framesUI[i]);
         }
     } catch (Exception e) {
-
+        debugWriteln(e.msg);
     }
     return 0;
 }
@@ -365,7 +371,7 @@ extern (C) nothrow int luaL_isKeyPressed(lua_State* L)
     }
     catch (Exception e)
     {
-
+        debugWriteln(e.msg);
     }
     return 1;
 }
@@ -387,6 +393,7 @@ extern (C) nothrow int luaL_loadScript(lua_State* L)
     }
     catch (Exception e)
     {
+        debugWriteln(e.msg);
     }
     luaReload = true;
     return 0;
