@@ -35,32 +35,36 @@ extern (C) nothrow int luaL_showHint(lua_State* L)
 extern (C) nothrow int luaL_dialogBox(lua_State* L)
 {
     showDialog = true;
-    luaL_checktype(L, 2, LUA_TTABLE);
-    choicePage = cast(int)luaL_checkinteger(L, 4);
-    
-    int textTableLength = cast(int) lua_objlen(L, 2);
+
+    // parse table with text pages
+    luaL_checktype(L, 1, LUA_TTABLE);
+    int textTableLength = cast(int) lua_objlen(L, 1);
     messageGlobal = new string[](textTableLength); 
 
     for (int i = 0; i < textTableLength; i++) {
-        lua_rawgeti(L, 2, i + 1);
+        lua_rawgeti(L, 1, i + 1);
         messageGlobal[i] = luaL_checkstring(L, -1).to!string;
         lua_pop(L, 1);
     }
 
-    luaL_checktype(L, 5, LUA_TTABLE);
-    int choicesLength = cast(int) lua_objlen(L, 5);
+    //parse table with choices
+    luaL_checktype(L, 2, LUA_TTABLE);
+    int choicesLength = cast(int) lua_objlen(L, 2);
     choices = new string[choicesLength];
     for (int i = 0; i < choicesLength; i++)
     {
-        lua_rawgeti(L, 5, i + 1);
+        lua_rawgeti(L, 2, i + 1);
         choices[i] = luaL_checkstring(L, -1).to!string;
         lua_pop(L, 1);
     }
-    if (lua_gettop(L) == 7)
+    //get page on which choices must be shown
+    choicePage = cast(int)luaL_checkinteger(L, 3);
+    
+    //if provided, change speed of showing text
+    if (lua_gettop(L) == 4)
     {
         typingSpeed = cast(float) luaL_checknumber(L, 7);
     }
-
     return 0;
 }
 
@@ -153,6 +157,7 @@ extern (C) nothrow int luaL_load2Dcharacter(lua_State *L) {
 extern (C) nothrow int luaL_draw2Dcharacter(lua_State* L)
 {
     try {
+        //configuring needed parameters in characterTextures like coordinates, scale and drawTexture(its a boolean value which checks need this texture to be drawn or not)
         int count = to!int(luaL_checkinteger(L, 4));
         characterTextures[count].scale = luaL_checknumber(L, 3);
         characterTextures[count].y = cast(int) luaL_checkinteger(L, 2);
@@ -261,6 +266,7 @@ extern (C) nothrow int luaL_isCameraMoving(lua_State *L) {
 
 extern (C) nothrow int luaL_loadUIAnimation(lua_State *L) {
     try {
+        //loads from uifx folder HPFF files, in which png textures are stored
         framesUI = loadAnimationFramesUI("res/uifx/"~to!string(luaL_checkstring(L, 1)), to!string(luaL_checkstring(L, 2)));
         if (lua_gettop(L) == 3) {
             frameDuration = luaL_checknumber(L, 3);
