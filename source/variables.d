@@ -17,12 +17,6 @@ void resetAllScriptValues() {
 
 /* system */
 
-enum EngineExitCodes {
-    EXIT_FILE_NOT_FOUND = 2,
-    EXIT_SCRIPT_ERROR = 3,
-    EXIT_OK = 0,
-}
-
 struct SystemSettings {
     int sound_state;
     char right_button;
@@ -52,9 +46,15 @@ struct InterfaceAudio {
 }
 
 enum GameState {
-    MainMenu,
-    InGame,
-    Exit
+    MainMenu = 1,
+    InGame = 2,
+    Exit = 3
+}
+
+enum EngineExitCodes {
+    EXIT_FILE_NOT_FOUND = 2,
+    EXIT_SCRIPT_ERROR = 3,
+    EXIT_OK = 0,
 }
 
 Camera2D camera;
@@ -65,7 +65,7 @@ SystemSettings systemSettings;
 
 InterfaceAudio audio;
 
-GameState currentGameState;
+int currentGameState = 1;
 
 Font textFont;
 
@@ -74,11 +74,11 @@ Music music;
 
 /* booleans */
 
-bool hintNeeded;
+bool hintNeeded = false;
 
-bool playAnimation;
+bool playAnimation = false;
 
-bool audioEnabled;
+bool audioEnabled = false;
 
 bool sfxEnabled = true;
 
@@ -86,17 +86,17 @@ bool fullscreenEnabled = true;
 
 bool luaReload = true;
 
-bool videoFinished;
+bool videoFinished = false;
 
-bool neededDraw2D;
+bool neededDraw2D = false;
 
-bool isCameraMoving;
+bool isCameraMoving = false;
 
-bool neededCharacterDrawing;
+bool neededCharacterDrawing = false;
 
-bool showDialog;
+bool showDialog = false;
 
-bool isTextFullyDisplayed;
+bool isTextFullyDisplayed = false;
 
 
 /* strings */
@@ -106,6 +106,8 @@ string ver = "1.1.8";
 string[] messageGlobal;
 
 string[] choices;
+
+string[] backlogText;
 
 string luaExec;
 
@@ -143,7 +145,7 @@ int button;
 
 int selectedChoice = 0;
 
-int choicePage;
+int choicePage = -1;
 
 int currentFrame = 0;
 

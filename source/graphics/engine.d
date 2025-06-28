@@ -2,25 +2,38 @@
 module graphics.engine;
 
 import raylib;
-import graphics.playback;
+
+//dlang imports
 import std.stdio;
 import std.math;
 import std.file;
-import graphics.gamelogic;
+import std.array;
 import std.string;
 import std.conv;
-import variables;
+import std.typecons;
 import std.random;
 import std.datetime;
+
+//graphics
+import graphics.playback;
+import graphics.gamelogic;
 import ui.menu;
-import std.typecons;
-import system.abstraction;
-import system.config;
+
+//dialogs
 import dialogs.dialogbox;
+
+//scripting imports
 import scripts.lua;
-import std.array;
+
+//engine internal functions
+import system.config;
 import system.abstraction;
+import variables;
 import system.cleanup;
+
+//C bindings
+import core.stdc.stdlib;
+import core.stdc.time;
 
 void engine_loader(string window_name, int screenWidth, int screenHeight)
 {
@@ -49,21 +62,19 @@ void engine_loader(string window_name, int screenWidth, int screenHeight)
         {
         case GameState.MainMenu:
             debugWriteln("Showing menu.");
-            showMainMenu(currentGameState);
+            showMainMenu();
             break;
         case GameState.InGame:
-            import core.stdc.stdlib;
-            import core.stdc.time;
 
             gameInit();
             while (!WindowShouldClose())
             {
                 SetExitKey(0);
-                if (luaReload)
-                {
+                if (luaReload) {
                     int luaExecutionCode = luaInit(luaExec);
                     if (luaExecutionCode != EngineExitCodes.EXIT_OK) {
-                        debugWriteln("Engine stops execution according to error code: ", luaExecutionCode);
+                        debugWriteln("Engine stops execution according to error code: ", 
+                        luaExecutionCode.to!EngineExitCodes);
                         currentGameState = GameState.Exit;
                         break;
                     }
@@ -73,11 +84,12 @@ void engine_loader(string window_name, int screenWidth, int screenHeight)
                 BeginDrawing();
                 ClearBackground(Colors.BLACK);
                 // main logic
-                // effects logic
                 BeginMode2D(camera);
                 backgroundLogic();
+                // effects logic
                 effectsLogic();
                 EndMode2D();
+                //drawing dialogs
                 dialogLogic();
                 EndDrawing();
             }

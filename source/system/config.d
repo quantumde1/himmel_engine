@@ -14,8 +14,8 @@ nothrow char parseConf(string filename, string type)
     {
         auto file = File(filename);
         auto config = file.byLineCopy();
-
-        // Create a mapping of types to their corresponding prefixes
+        
+        //mappings
         auto typeMap = [
             "sound": "SOUND:",
             "backward": "BACKWARD:",
@@ -26,7 +26,6 @@ nothrow char parseConf(string filename, string type)
             "opmenu": "OPMENU:"
         ];
 
-        // Check if the provided type exists in the map
         if (type in typeMap)
         {
             auto prefix = typeMap[type];

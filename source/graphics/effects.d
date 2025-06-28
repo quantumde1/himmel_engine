@@ -25,8 +25,7 @@ Texture2D[] loadAnimationFramesUI(const string archivePath, const string animati
         debug debugWriteln(frameFileName);
         char* image_data = get_file_data_from_archive(toStringz(archivePath),
                 toStringz(frameFileName), &image_size);
-        if (image_data == null)
-        {
+        if (image_data == null) {
             debug debugWriteln("exiting from load anim UI");
             break;
         }

@@ -44,6 +44,7 @@ extern (C) nothrow int luaL_dialogBox(lua_State* L)
     for (int i = 0; i < textTableLength; i++) {
         lua_rawgeti(L, 1, i + 1);
         messageGlobal[i] = luaL_checkstring(L, -1).to!string;
+        backlogText ~= messageGlobal[i];
         lua_pop(L, 1);
     }
 
@@ -57,14 +58,18 @@ extern (C) nothrow int luaL_dialogBox(lua_State* L)
         choices[i] = luaL_checkstring(L, -1).to!string;
         lua_pop(L, 1);
     }
-    //get page on which choices must be shown
-    choicePage = cast(int)luaL_checkinteger(L, 3);
-    
+
+
+    //if provided, get page on which choices must be shown
+    if (lua_gettop(L) == 3) {
+        choicePage = cast(int)luaL_checkinteger(L, 3);
+    }
+
     //if provided, change speed of showing text
-    if (lua_gettop(L) == 4)
-    {
+    if (lua_gettop(L) == 4) {
         typingSpeed = cast(float) luaL_checknumber(L, 7);
     }
+
     return 0;
 }
 
@@ -93,14 +98,12 @@ extern (C) nothrow int luaL_load2Dbackground(lua_State* L)
     {
         int index = cast(int) luaL_checkinteger(L, 2);
         //if index too big, extending array
-        if (index >= backgrounds.length)
-        {
+        if (index >= backgrounds.length) {
             backgrounds.length = index + 1;
         }
 
         // if texture with same Index already loaded, unloading it
-        if (index < backgrounds.length && backgrounds[index].id != 0)
-        {
+        if (index < backgrounds.length && backgrounds[index].id != 0) {
             UnloadTexture(backgrounds[index]);
         }
         backgrounds[index] = LoadTexture(luaL_checkstring(L, 1));
@@ -126,6 +129,20 @@ extern (C) nothrow int luaL_draw2Dbackground(lua_State* L)
     return 0;
 }
 
+extern (C) nothrow int luaL_stopDraw2Dbackground(lua_State* L)
+{
+    try
+    {
+        backgroundTexture = Texture2D();
+        neededDraw2D = true;
+    }
+    catch (Exception e)
+    {
+        debugWriteln(e.msg);
+    }
+    return 0;
+}
+
 extern (C) nothrow int luaL_unload2Dbackground(lua_State* L)
 {
     UnloadTexture(backgrounds[cast(int) luaL_checkinteger(L, 1)]);
@@ -139,8 +156,7 @@ extern (C) nothrow int luaL_load2Dcharacter(lua_State *L) {
     {
         int count = cast(int) luaL_checkinteger(L, 2);
 
-        if (count >= characterTextures.length)
-        {
+        if (count >= characterTextures.length) {
             characterTextures.length = count + 1;
         }
         characterTextures[count].texture = LoadTexture(luaL_checkstring(L, 1));
@@ -267,7 +283,7 @@ extern (C) nothrow int luaL_isCameraMoving(lua_State *L) {
 extern (C) nothrow int luaL_loadUIAnimation(lua_State *L) {
     try {
         //loads from uifx folder HPFF files, in which png textures are stored
-        framesUI = loadAnimationFramesUI("res/uifx/"~to!string(luaL_checkstring(L, 1)), to!string(luaL_checkstring(L, 2)));
+        framesUI = loadAnimationFramesUI(to!string(luaL_checkstring(L, 1)), to!string(luaL_checkstring(L, 2)));
         if (lua_gettop(L) == 3) {
             frameDuration = luaL_checknumber(L, 3);
             debug debugWriteln("frameDuration: ", frameDuration);
@@ -344,6 +360,7 @@ extern (C) nothrow int luaL_setGameFont(lua_State* L)
     const char* x = luaL_checkstring(L, 1);
     debugWriteln("Setting custom font: ", x.to!string);
     int[512] codepoints = 0;
+    //configuring both cyrillic and latin fonts if available
     foreach (i; 0 .. 95)
     {
         codepoints[i] = 32 + i;
@@ -358,6 +375,7 @@ extern (C) nothrow int luaL_setGameFont(lua_State* L)
 
 extern (C) nothrow int luaL_getTime(lua_State* L)
 {
+    //getTime() returns current time.
     lua_pushnumber(L, GetTime());
     return 1;
 }
@@ -366,35 +384,30 @@ extern (C) nothrow int luaL_isKeyPressed(lua_State* L)
 {
     try
     {
-        if (IsKeyPressed(cast(int)(luaL_checkinteger(L, 1))))
-        {
-            lua_pushboolean(L, true);
-        }
-        else
-        {
-            lua_pushboolean(L, false);
-        }
+        int keyCode = cast(int)luaL_checkinteger(L, 1);
+        lua_pushboolean(L, IsKeyPressed(keyCode).to!bool);
+        return 1;
     }
     catch (Exception e)
     {
         debugWriteln(e.msg);
+        return 1;
     }
-    return 1;
 }
 
 extern (C) nothrow int luaL_loadScript(lua_State* L)
 {
-    for (int i = cast(int) characterTextures.length; i < characterTextures.length; i++)
+    for (int i = cast(int)characterTextures.length; i < characterTextures.length; i++)
     {
         UnloadTexture(characterTextures[i].texture);
     }
-    for (int i = cast(int) backgrounds.length; i < backgrounds.length; i++)
+    for (int i = cast(int)backgrounds.length; i < backgrounds.length; i++)
     {
         UnloadTexture(backgrounds[i]);
     }
     try
     {
-        luaExec = to!string(luaL_checkstring(L, 1));
+        luaExec = luaL_checkstring(L, 1).to!string;
         resetAllScriptValues();
     }
     catch (Exception e)
@@ -404,6 +417,148 @@ extern (C) nothrow int luaL_loadScript(lua_State* L)
     luaReload = true;
     return 0;
 }
+
+extern (C) nothrow int luaL_setGameState(lua_State *L) {
+    currentGameState = cast(int)luaL_checkinteger(L, 1);
+    return 0;
+}
+
+/* raylib direct bindings for graphics */
+
+/* basic */
+
+extern (C) nothrow int luaL_loadTexture(lua_State *L) {
+    const char* fileName = luaL_checkstring(L, 1);
+    Texture2D texture = LoadTexture(fileName);
+    
+    Texture2D* texturePtr = cast(Texture2D*)lua_newuserdata(L, Texture2D.sizeof);
+    *texturePtr = texture;
+    
+    if (luaL_newmetatable(L, "Texture")) {
+        lua_pushcfunction(L, &luaL_textureGC);
+        lua_setfield(L, -2, "__gc");
+    }
+    
+    lua_setmetatable(L, -2);
+    return 1;
+}
+
+extern (C) nothrow int luaL_textureGC(lua_State *L) {
+    Texture2D* texture = cast(Texture2D*)luaL_checkudata(L, 1, "Texture");
+    UnloadTexture(*texture);
+    return 0;
+}
+
+extern (C) nothrow int luaL_drawTexture(lua_State *L) {
+    Texture2D* texture = cast(Texture2D*)luaL_checkudata(L, 1, "Texture");
+    int x = cast(int)luaL_checkinteger(L, 2);
+    int y = cast(int)luaL_checkinteger(L, 3);
+    Color color = Colors.WHITE;
+    
+    if (lua_gettop(L) >= 4 && lua_istable(L, 4)) {
+        lua_getfield(L, 4, "r");
+        color.r = cast(ubyte)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        
+        lua_getfield(L, 4, "g");
+        color.g = cast(ubyte)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        
+        lua_getfield(L, 4, "b");
+        color.b = cast(ubyte)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        
+        lua_getfield(L, 4, "a");
+        color.a = cast(ubyte)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+    }
+    
+    DrawTexture(*texture, x, y, color);
+    return 0;
+}
+
+extern (C) nothrow int luaL_getTextureWidth(lua_State *L) {
+    Texture2D* texture = cast(Texture2D*)luaL_checkudata(L, 1, "Texture");
+    lua_pushinteger(L, texture.width);
+    return 1;
+}
+
+extern (C) nothrow int luaL_getTextureHeight(lua_State *L) {
+    Texture2D* texture = cast(Texture2D*)luaL_checkudata(L, 1, "Texture");
+    lua_pushinteger(L, texture.height);
+    return 1;
+}
+
+extern (C) nothrow int luaL_drawText(lua_State *L) {
+    const char* text = luaL_checkstring(L, 1);
+    int x = cast(int)luaL_checkinteger(L, 2);
+    int y = cast(int)luaL_checkinteger(L, 3);
+    int fontSize = cast(int)luaL_optinteger(L, 4, 20);
+    Color color = Colors.WHITE;
+    if (lua_istable(L, 5)) {
+        lua_getfield(L, 5, "r");
+        color.r = cast(ubyte)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        
+        lua_getfield(L, 5, "g");
+        color.g = cast(ubyte)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        
+        lua_getfield(L, 5, "b");
+        color.b = cast(ubyte)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        
+        lua_getfield(L, 5, "a");
+        color.a = cast(ubyte)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+    }
+    
+    DrawTextEx(textFont, text, Vector2(x, y), fontSize, 1.0f, color);
+    
+    return 0;
+}
+
+extern (C) nothrow int luaL_measureTextX(lua_State *L) {
+    lua_pushinteger(L, cast(int)MeasureTextEx(textFont, luaL_checkstring(L, 1), cast(int)luaL_checkinteger(L, 2), 1.0f).x);
+    return 1;
+}
+
+extern (C) nothrow int luaL_measureTextY(lua_State *L) {
+    lua_pushinteger(L, cast(int)MeasureTextEx(textFont, luaL_checkstring(L, 1), cast(int)luaL_checkinteger(L, 2), 1.0f).y);
+    return 1;
+}
+
+/* extended */
+
+extern (C) nothrow int luaL_drawTextureEx(lua_State *L) {
+    Texture2D* texture = cast(Texture2D*)luaL_checkudata(L, 1, "Texture");
+    float x = luaL_checknumber(L, 2);
+    float y = luaL_checknumber(L, 3);
+    float rotation = luaL_optnumber(L, 4, 0);
+    float scale = luaL_optnumber(L, 5, 1);
+    Color color = Colors.WHITE;
+    if (lua_istable(L, 6)) {
+        lua_getfield(L, 6, "r");
+        color.r = cast(ubyte)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        
+        lua_getfield(L, 6, "g");
+        color.g = cast(ubyte)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        
+        lua_getfield(L, 6, "b");
+        color.b = cast(ubyte)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        
+        lua_getfield(L, 6, "a");
+        color.a = cast(ubyte)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+    }
+    DrawTextureEx(*texture, Vector2(x, y), rotation, scale, color);
+    
+    return 0;
+}
+
 
 /* Register functions */
 
@@ -433,6 +588,7 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "unload2Dcharacter", &luaL_unload2Dcharacter);
     lua_register(L, "load2Dtexture", &luaL_load2Dbackground);
     lua_register(L, "draw2Dtexture", &luaL_draw2Dbackground);
+    lua_register(L, "stopDraw2Dtexture", &luaL_stopDraw2Dbackground);
     lua_register(L, "unload2Dtexture", &luaL_unload2Dbackground);
     lua_register(L, "getTime", &luaL_getTime);
     lua_register(L, "loadScript", &luaL_loadScript);
@@ -441,6 +597,16 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "getScreenWidth", &luaL_getScreenWidth);
     lua_register(L, "isKeyPressed", &luaL_isKeyPressed);
     lua_register(L, "getLanguage", &luaL_getUsedLanguage);
+    lua_register(L, "setGameState", &luaL_setGameState);
+    //raylib direct bindings
+    lua_register(L, "loadTexture", &luaL_loadTexture);
+    lua_register(L, "drawTexture", &luaL_drawTexture);
+    lua_register(L, "drawTextureEx", &luaL_drawTextureEx);
+    lua_register(L, "drawText", &luaL_drawText);
+    lua_register(L, "measureTextX", &luaL_measureTextX);
+    lua_register(L, "measureTextY", &luaL_measureTextY);
+    lua_register(L, "getTextureWidth", &luaL_getTextureWidth);
+    lua_register(L, "getTextureHeight", &luaL_getTextureHeight);
 }
 
 int luaInit(string luaExec)

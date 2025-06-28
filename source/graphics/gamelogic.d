@@ -57,8 +57,7 @@ void effectsLogic()
 }
 
 void backgroundLogic() {
-    if (neededDraw2D)
-    {
+    if (neededDraw2D) {
         DrawTexturePro(backgroundTexture, Rectangle(0, 0, cast(float) backgroundTexture.width, cast(
                 float) backgroundTexture.height), Rectangle(0, 0, cast(float) GetScreenWidth(), cast(
                 float) GetScreenHeight()), Vector2(0, 0), 0.0, Colors.WHITE);

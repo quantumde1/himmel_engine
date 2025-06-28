@@ -11,6 +11,9 @@ import std.string;
 import graphics.engine;
 import graphics.playback;
 import std.file;
+import scripts.lua;
+import std.conv;
+import graphics.gamelogic;
 
 enum
 {
@@ -39,18 +42,6 @@ void fadeEffect(float alpha, bool fadeIn, void delegate(float alpha) renderer)
     }
 }
 
-struct MenuState
-{
-    string[] options;
-    int selectedIndex;
-    float fadeAlpha;
-    float inactivityTimer;
-    Texture2D logoTexture;
-    Music menuMusic;
-    bool fromSave;
-    int logoX, logoY;
-}
-
 void renderText(float alpha, immutable(char)* text)
 {
     DrawTextEx(textFont, text,
@@ -62,15 +53,13 @@ void renderText(float alpha, immutable(char)* text)
 void renderLogo(float alpha, immutable(char)* name, bool fullscreen)
 {
     Texture2D companyLogo = LoadTexture(name);
-    if (fullscreen)
-    {
+    if (fullscreen) {
         DrawTexturePro(companyLogo,
             Rectangle(0, 0, cast(float) companyLogo.width, cast(float) companyLogo.height),
             Rectangle(0, 0, cast(float) GetScreenWidth(), cast(float) GetScreenHeight()),
             Vector2(0, 0), 0.0, Fade(Colors.WHITE, alpha));
     }
-    else
-    {
+    else {
         DrawTexture(companyLogo, GetScreenWidth() / 2, GetScreenHeight() / 2, Colors.WHITE);
     }
 }
@@ -81,14 +70,12 @@ void helloScreen()
     {
         bool play = false;
         debugWriteln("hello screen showing");
-        if (play == false)
-        {
+        if (play == false) {
             videoFinished = true;
             goto debug_lab;
         }
     }
-    else
-        {
+    else {
         fadeEffect(0.0f, true, (float alpha) {
             renderText(alpha, "powered by\n\nHimmel Engine");
         });
@@ -113,8 +100,7 @@ void helloScreen()
             debug debugWriteln("video found, playing");
             playVideo("/res/videos/soul_OP.moflex.mp4");
         }
-        else
-        {
+        else {
             debug debugWriteln("video not found, skipping");
             videoFinished = true;
         }
@@ -122,245 +108,25 @@ void helloScreen()
     debug_lab:
 }
 
-MenuState initMenuState()
-{
-    MenuState state;
-    state.fromSave = std.file.exists(getcwd() ~ "/save.txt");
-    state.options = [
-        "Start Game", 
-        "Sound: On",
-        "SFX: On",
-        "Fullscreen: On",
-        "Exit Game",
-    ];
-
-    if (state.fromSave)
-        state.options[MENU_ITEM_START] = "Continue";
-    if (!audioEnabled)
-        state.options[MENU_ITEM_SOUND] = "Sound: Off";
-
-    state.fadeAlpha = 0.0f;
-    state.inactivityTimer = 0.0f;
-    state.selectedIndex = 0;
-
-    state.logoTexture = LoadTexture("res/data/menu_logo.png");
-    state.logoX = (GetScreenWidth() - state.logoTexture.width) / 2;
-    state.logoY = (GetScreenHeight() - state.logoTexture.height) / 2 - 50;
-
-    state.menuMusic = LoadMusicStream("res/data/menu_music.mp3");
-    if (audioEnabled)
-    {
-        PlayMusicStream(state.menuMusic);
+int showMainMenu() {
+    int luaExecutionCode = luaInit("scripts/menu.lua");
+    if (luaExecutionCode != EngineExitCodes.EXIT_OK) {
+        debugWriteln("Engine stops execution according to error code: ", 
+        luaExecutionCode.to!EngineExitCodes);
+        currentGameState = GameState.Exit;
+        return luaExecutionCode;
     }
-    audio.declineSound = LoadSound("res/sfx/10002.wav");
-    audio.acceptSound = LoadSound("res/sfx/10003.wav");
-    audio.menuMoveSound = LoadSound("res/sfx/10004.wav");
-    audio.menuChangeSound = LoadSound("res/sfx/00152.wav");
-    audio.nonSound = LoadSound("res/sfx/00154.wav");
-    return state;
-}
-
-void cleanupMenu(ref MenuState state)
-{
-    UnloadTexture(state.logoTexture);
-    UnloadMusicStream(state.menuMusic);
-}
-
-void drawMenu(ref const MenuState state)
-{
-    BeginDrawing();
-    ClearBackground(Colors.BLACK);
-
-    DrawTextureEx(
-        state.logoTexture,
-        Vector2(state.logoX, state.logoY),
-        0.0f, 1.0f,
-        Fade(Colors.WHITE, state.fadeAlpha)
-    );
-
-    for (int i = 0; i < state.options.length; i++)
+    luaReload = false;
+    while (currentGameState == GameState.MainMenu)
     {
-        Color textColor = (i == state.selectedIndex) ? Colors.LIGHTGRAY : Colors.GRAY;
-        float textWidth = MeasureTextEx(textFont, toStringz(state.options[i]), 30, 0).x;
-        float textX = (GetScreenWidth() - textWidth) / 2;
-        int textY = state.logoY + state.logoTexture.height + 100 + (30 * i);
-
-        DrawTextEx(
-            textFont,
-            toStringz(state.options[i]),
-            Vector2(textX, textY),
-            30, 0,
-            Fade(textColor, state.fadeAlpha)
-        );
+        UpdateMusicStream(music);
+        luaEventLoop();
+        BeginDrawing();
+        BeginMode2D(camera);
+        backgroundLogic();
+        EndMode2D();
+        EndDrawing();
     }
-
-    EndDrawing();
-}
-
-void handleInactivity(ref MenuState state)
-{
-    state.inactivityTimer += GetFrameTime();
-
-    if (state.inactivityTimer >= INACTIVITY_TIMEOUT)
-    {
-        while (state.fadeAlpha > 0.0f)
-        {
-            state.fadeAlpha -= FADE_SPEED_OUT;
-            if (state.fadeAlpha < 0.0f)
-                state.fadeAlpha = 0.0f;
-            drawMenu(state);
-        }
-
-        StopMusicStream(state.menuMusic);
-        playVideo("/res/videos/opening_old.mp4");
-        if (audioEnabled)
-        {
-            PlayMusicStream(state.menuMusic);
-        }
-
-        state.inactivityTimer = 0.0f;
-
-        while (state.fadeAlpha < 1.0f)
-        {
-            state.fadeAlpha += FADE_SPEED_IN;
-            if (state.fadeAlpha > 1.0f)
-                state.fadeAlpha = 1.0f;
-            drawMenu(state);
-        }
-    }
-}
-
-void handleMenuNavigation(ref MenuState state)
-{
-    bool moved = false;
-
-    if (IsKeyPressed(KeyboardKey.KEY_DOWN))
-    {
-        state.selectedIndex = cast(int)((state.selectedIndex + 1) % state.options.length);
-        state.inactivityTimer = 0;
-        moved = true;
-    }
-
-    if (IsKeyPressed(KeyboardKey.KEY_UP))
-    {
-        state.selectedIndex = cast(int)(
-            (state.selectedIndex - 1 + state.options.length) % state.options.length);
-        state.inactivityTimer = 0;
-        moved = true;
-    }
-
-    if (moved && sfxEnabled)
-    {
-        PlaySound(audio.menuMoveSound);
-    }
-}
-
-void handleMenuSettings(ref MenuState state)
-{
-    bool leftPressed = IsKeyPressed(KeyboardKey.KEY_LEFT);
-    bool rightPressed = IsKeyPressed(KeyboardKey.KEY_RIGHT);
-
-    if (!leftPressed && !rightPressed)
-        return;
-
-    state.inactivityTimer = 0;
-
-    if (sfxEnabled) PlaySound(audio.menuChangeSound);
-
-    switch (state.selectedIndex)
-    {
-    case MENU_ITEM_SOUND:
-        audioEnabled = rightPressed ? false : true;
-        state.options[MENU_ITEM_SOUND] = audioEnabled ? "Sound: On" : "Sound: Off";
-
-        if (audioEnabled)
-        {
-            PlayMusicStream(state.menuMusic);
-        }
-        else
-        {
-            StopMusicStream(state.menuMusic);
-        }
-        break;
-    case MENU_ITEM_SFX:
-        sfxEnabled = rightPressed ? false : true;
-        state.options[MENU_ITEM_SFX] = sfxEnabled ? "SFX: On" : "SFX: Off";
-        break;
-
-    case MENU_ITEM_FULLSCREEN:
-        fullscreenEnabled = rightPressed ? false : true;
-        state.options[MENU_ITEM_FULLSCREEN] = fullscreenEnabled ? "Fullscreen: On" : "Fullscreen: Off";
-        if (fullscreenEnabled) {
-            if (!IsWindowFullscreen()) {
-                ToggleFullscreen();
-                HideCursor();
-                
-            }
-        } else if (fullscreenEnabled == false) {
-            if (IsWindowFullscreen()) {
-                ToggleFullscreen();
-                ShowCursor();
-            }
-        }
-        break;
-    default:
-        break;
-    }
-}
-
-void showMainMenu(ref GameState currentGameState)
-{
-    MenuState state = initMenuState();
-
-    while (state.fadeAlpha < 1.0f)
-    {
-        state.fadeAlpha += FADE_SPEED_IN;
-        if (state.fadeAlpha > 1.0f)
-            state.fadeAlpha = 1.0f;
-        drawMenu(state);
-    }
-
-    while (!WindowShouldClose())
-    {
-        UpdateMusicStream(state.menuMusic);
-
-
-        handleInactivity(state);
-        handleMenuNavigation(state);
-        handleMenuSettings(state);
-
-        if (IsKeyPressed(KeyboardKey.KEY_ENTER) ||
-            IsKeyPressed(KeyboardKey.KEY_SPACE))
-        {
-            if (sfxEnabled) PlaySound(audio.acceptSound);
-            switch (state.selectedIndex)
-            {
-            case MENU_ITEM_START:
-                while (state.fadeAlpha > 0.0f)
-                {
-                    state.fadeAlpha -= FADE_SPEED_OUT;
-                    if (state.fadeAlpha < 0.0f)
-                        state.fadeAlpha = 0.0f;
-                    drawMenu(state);
-                }
-
-                cleanupMenu(state);
-                currentGameState = GameState.InGame;
-                debug debugWriteln("getting into game...");
-                return;
-
-            case MENU_ITEM_EXIT:
-                cleanupMenu(state);
-                currentGameState = GameState.Exit;
-                return;
-
-            default:
-                break;
-            }
-        }
-
-        drawMenu(state);
-    }
-
-    cleanupMenu(state);
+    luaReload = true;
+    return 0;
 }
