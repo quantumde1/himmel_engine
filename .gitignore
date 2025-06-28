@@ -1,4 +1,6 @@
 log.txt
+raylib/
+hpff/
 .dub
 docs.json
 __dummy.html
