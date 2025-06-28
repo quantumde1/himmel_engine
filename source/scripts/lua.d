@@ -201,7 +201,7 @@ extern (C) nothrow int luaL_unload2Dcharacter(lua_State *L) {
 
 /* music and video */
 
-extern (C) nothrow int luaL_LoadMusic(lua_State* L)
+extern (C) nothrow int luaL_loadMusic(lua_State* L)
 {
     try
     {
@@ -215,15 +215,21 @@ extern (C) nothrow int luaL_LoadMusic(lua_State* L)
     return 0;
 }
 
-extern (C) nothrow int luaL_PlayMusic(lua_State* L)
+extern (C) nothrow int luaL_playMusic(lua_State* L)
 {
     PlayMusicStream(music);
     return 0;
 }
 
-extern (C) nothrow int luaL_StopMusic(lua_State* L)
+extern (C) nothrow int luaL_stopMusic(lua_State* L)
 {
     StopMusicStream(music);
+    return 0;
+}
+
+extern (C) nothrow int luaL_unloadMusic(lua_State* L)
+{
+    UnloadMusicStream(music);
     return 0;
 }
 
@@ -575,9 +581,10 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "moveCamera", &luaL_moveCamera);
     lua_register(L, "isCameraMoving", &luaL_isCameraMoving);
     lua_register(L, "playVideo", &luaL_playVideo);
-    lua_register(L, "loadMusic", &luaL_LoadMusic);
-    lua_register(L, "playMusic", &luaL_PlayMusic);
-    lua_register(L, "stopMusic", &luaL_StopMusic);
+    lua_register(L, "loadMusic", &luaL_loadMusic);
+    lua_register(L, "playMusic", &luaL_playMusic);
+    lua_register(L, "stopMusic", &luaL_stopMusic);
+    lua_register(L, "unloadMusic", &luaL_unloadMusic);
     lua_register(L, "playSfx", &luaL_playSfx);
     lua_register(L, "stopSfx", &luaL_stopSfx);
     lua_register(L, "Begin2D", &luaL_2dModeEnable);
