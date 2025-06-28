@@ -127,6 +127,8 @@ int showMainMenu() {
         EndMode2D();
         EndDrawing();
     }
+    StopMusicStream(music);
+    UnloadMusicStream(music);
     luaReload = true;
     return 0;
 }
