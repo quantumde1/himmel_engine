@@ -8,7 +8,6 @@ import system.abstraction;
 void unloadResourcesLogic()
 {
     debugWriteln("Exiting. See ya'!");
-    StopMusicStream(music);
     EndDrawing();
     if (sfxEnabled) {
         UnloadSound(audio.menuMoveSound);
@@ -26,7 +25,6 @@ void unloadResourcesLogic()
     {
         UnloadTexture(backgrounds[i]);
     }
-    UnloadMusicStream(music);
     CloseAudioDevice();
     CloseWindow();
 }

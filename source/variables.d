@@ -80,7 +80,7 @@ bool playAnimation = false;
 
 bool audioEnabled = false;
 
-bool sfxEnabled = true;
+bool sfxEnabled = false;
 
 bool fullscreenEnabled = true;
 
