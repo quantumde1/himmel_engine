@@ -4,7 +4,7 @@ Himmel(equal to Heaven, but in German) is an engine for Visual Novels, written u
 
 ## Getting Started
 
-### Getting needed components(besides VLC)
+### Getting needed components
 
 Build system currently assumes POSIX like system. For building, you need first install next components on:
 
