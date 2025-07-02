@@ -27,9 +27,9 @@ Next, run
 ```./build.sh```
 . Everything will be done automatically!
 
-Engine scripts are written in Lua with some raylib direct bindings as well as some custom functions written for visual novels
-
 ## Features
+
+Engine scripts are written in Lua with some raylib direct bindings as well as some custom functions written for visual novels
 
 - Drawing, loading, unloading and stop drawing character textures
 - Drawing, loading, unloading and stop drawing background textures
