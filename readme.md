@@ -27,12 +27,16 @@ Next, run
 ```./build.sh```
 . Everything will be done automatically!
 
+Engine scripts are written in Lua with some raylib direct bindings as well as some custom functions written for visual novels
+
 ## Features
 
-- Multiple characters on screen
-- Backgrounds(can be preloaded and then drawn if needed)
-- Text box with skip functionality and choices
-- Graphics effects(PNG stored in .bin, its called HPFF - Heaven/Himmel Package File Format)
+- Drawing, loading, unloading and stop drawing character textures
+- Drawing, loading, unloading and stop drawing background textures
+- Camera zooming to specific coordinates
+- Dialog box with multiple pages and choices
+- Ability for configuring custom font using ```setFont()```
+- Graphical effects from himmel archives(HPFF)
 
 ## TODO
 
