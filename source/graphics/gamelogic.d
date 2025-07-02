@@ -57,13 +57,20 @@ void effectsLogic()
 }
 
 void backgroundLogic() {
-    if (neededDraw2D) {
-        DrawTexturePro(backgroundTexture, Rectangle(0, 0, cast(float) backgroundTexture.width, cast(
-                float) backgroundTexture.height), Rectangle(0, 0, cast(float) GetScreenWidth(), cast(
-                float) GetScreenHeight()), Vector2(0, 0), 0.0, Colors.WHITE);
+    for (int i = 0; i < backgroundTextures.length; i++) {
+        if (backgroundTextures[i].drawTexture == true) {
+            float centeredX = backgroundTextures[i].x - (backgroundTextures[i].width * backgroundTextures[i].scale / 2);
+            float centeredY = backgroundTextures[i].y - (backgroundTextures[i].height * backgroundTextures[i].scale / 2);
+            DrawTextureEx(backgroundTextures[i].texture,
+            Vector2(centeredX, centeredY),
+            0.0,
+            backgroundTextures[i].scale,
+            Colors.WHITE
+            );
+        }
     }
-    for (int i = 0; i < characterTextures.length; i++)
-    {
+
+    for (int i = 0; i < characterTextures.length; i++) {
         if (characterTextures[i].drawTexture == true) {
             float centeredX = characterTextures[i].x - (characterTextures[i].width * characterTextures[i].scale / 2);
             float centeredY = characterTextures[i].y - (characterTextures[i].height * characterTextures[i].scale / 2);

@@ -21,9 +21,9 @@ void unloadResourcesLogic()
     {
         UnloadTexture(characterTextures[i].texture);
     }
-    for (int i = cast(int) backgrounds.length; i < backgrounds.length; i++)
+    for (int i = cast(int) backgroundTextures.length; i < backgroundTextures.length; i++)
     {
-        UnloadTexture(backgrounds[i]);
+        UnloadTexture(backgroundTextures[i].texture);
     }
     CloseAudioDevice();
     CloseWindow();

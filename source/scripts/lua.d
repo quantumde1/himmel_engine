@@ -96,17 +96,12 @@ extern (C) nothrow int luaL_load2Dbackground(lua_State* L)
 {
     try
     {
-        int index = cast(int) luaL_checkinteger(L, 2);
-        //if index too big, extending array
-        if (index >= backgrounds.length) {
-            backgrounds.length = index + 1;
+        int count = cast(int)luaL_checkinteger(L, 2);
+        if (count >= backgroundTextures.length) {
+            backgroundTextures.length = count + 1;
         }
-
-        // if texture with same Index already loaded, unloading it
-        if (index < backgrounds.length && backgrounds[index].id != 0) {
-            UnloadTexture(backgrounds[index]);
-        }
-        backgrounds[index] = LoadTexture(luaL_checkstring(L, 1));
+        char* filename = cast(char*)luaL_checkstring(L, 1);
+        backgroundTextures[count].texture = LoadTexture(filename);
     }
     catch (Exception e)
     {
@@ -119,8 +114,15 @@ extern (C) nothrow int luaL_draw2Dbackground(lua_State* L)
 {
     try
     {
-        backgroundTexture = backgrounds[luaL_checkinteger(L, 1)];
-        neededDraw2D = true;
+        int count = cast(int)luaL_checkinteger(L, 4);
+        debugWriteln(backgroundTextures[count]);
+        backgroundTextures[count].height = backgroundTextures[count].texture.height;
+        backgroundTextures[count].width = backgroundTextures[count].texture.width;
+        backgroundTextures[count].x = luaL_checknumber(L, 1);
+        backgroundTextures[count].y = luaL_checknumber(L, 2);
+        backgroundTextures[count].scale = cast(int)luaL_checknumber(L, 3);
+        backgroundTextures[count].drawTexture = true;
+        debugWriteln(backgroundTextures[count]);
     }
     catch (Exception e)
     {
@@ -133,8 +135,8 @@ extern (C) nothrow int luaL_stopDraw2Dbackground(lua_State* L)
 {
     try
     {
-        backgroundTexture = Texture2D();
-        neededDraw2D = true;
+        int count = cast(int)luaL_checkinteger(L, 1);
+        backgroundTextures[count].drawTexture = false;
     }
     catch (Exception e)
     {
@@ -145,7 +147,8 @@ extern (C) nothrow int luaL_stopDraw2Dbackground(lua_State* L)
 
 extern (C) nothrow int luaL_unload2Dbackground(lua_State* L)
 {
-    UnloadTexture(backgrounds[cast(int) luaL_checkinteger(L, 1)]);
+    int count = cast(int)luaL_checkinteger(L, 1);
+    UnloadTexture(backgroundTextures[count].texture);
     return 0;
 }
 
@@ -407,9 +410,9 @@ extern (C) nothrow int luaL_loadScript(lua_State* L)
     {
         UnloadTexture(characterTextures[i].texture);
     }
-    for (int i = cast(int)backgrounds.length; i < backgrounds.length; i++)
+    for (int i = cast(int)backgroundTextures.length; i < backgroundTextures.length; i++)
     {
-        UnloadTexture(backgrounds[i]);
+        UnloadTexture(backgroundTextures[i].texture);
     }
     try
     {

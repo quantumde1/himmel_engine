@@ -12,7 +12,7 @@ void resetAllScriptValues() {
     debugWriteln("Resetting all values!");
     selectedChoice = 0;
     characterTextures = [];
-    backgrounds = [];
+    backgroundTextures = [];
 }
 
 /* system */
@@ -27,7 +27,7 @@ struct SystemSettings {
     char opmenu_button;
 }
 
-struct CharacterTexture {
+struct TextureEngine {
     bool drawTexture;
     float width;
     float height;
@@ -59,7 +59,9 @@ enum EngineExitCodes {
 
 Camera2D camera;
 
-CharacterTexture[] characterTextures;
+TextureEngine[] characterTextures;
+
+TextureEngine[] backgroundTextures;
 
 SystemSettings systemSettings;
 
@@ -133,11 +135,8 @@ float typingSpeed = 0.6f;
 
 /* textures */
 
-Texture2D[] backgrounds;
-
 Texture2D[] framesUI;
 
-Texture2D backgroundTexture;
 
 /* integer values */
 
