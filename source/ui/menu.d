@@ -14,19 +14,7 @@ import std.file;
 import scripts.lua;
 import std.conv;
 import graphics.gamelogic;
-
-enum
-{
-    MENU_ITEM_START = 0,
-    MENU_ITEM_SOUND = 1,
-    MENU_ITEM_SFX = 2,
-    MENU_ITEM_FULLSCREEN = 3,
-    MENU_ITEM_EXIT = 4,
-
-    FADE_SPEED_IN = 0.02f,
-    FADE_SPEED_OUT = 0.04f,
-    INACTIVITY_TIMEOUT = 20.0f
-}
+import system.cleanup;
 
 void fadeEffect(float alpha, bool fadeIn, void delegate(float alpha) renderer)
 {
@@ -50,20 +38,6 @@ void renderText(float alpha, immutable(char)* text)
     );
 }
 
-void renderLogo(float alpha, immutable(char)* name, bool fullscreen)
-{
-    Texture2D companyLogo = LoadTexture(name);
-    if (fullscreen) {
-        DrawTexturePro(companyLogo,
-            Rectangle(0, 0, cast(float) companyLogo.width, cast(float) companyLogo.height),
-            Rectangle(0, 0, cast(float) GetScreenWidth(), cast(float) GetScreenHeight()),
-            Vector2(0, 0), 0.0, Fade(Colors.WHITE, alpha));
-    }
-    else {
-        DrawTexture(companyLogo, GetScreenWidth() / 2, GetScreenHeight() / 2, Colors.WHITE);
-    }
-}
-
 void helloScreen()
 {
     debug
@@ -72,10 +46,8 @@ void helloScreen()
         debugWriteln("hello screen showing");
         if (play == false) {
             videoFinished = true;
-            goto debug_lab;
         }
-    }
-    else {
+    } else {
         fadeEffect(0.0f, true, (float alpha) {
             renderText(alpha, "powered by\n\nHimmel Engine");
         });
@@ -95,23 +67,22 @@ void helloScreen()
         // Play Opening Video
         BeginDrawing();
         debug debugWriteln("searching for video");
-        if (std.file.exists(getcwd() ~ "/res/videos/soul_OP.moflex.mp4"))
+        if (std.file.exists(getcwd() ~ "/res/videos/op.mp4"))
         {
             debug debugWriteln("video found, playing");
-            playVideo("/res/videos/soul_OP.moflex.mp4");
+            playVideo("/res/videos/op.mp4");
         }
         else {
             debug debugWriteln("video not found, skipping");
             videoFinished = true;
         }
     }
-    debug_lab:
 }
 
 int showMainMenu() {
     int luaExecutionCode = luaInit("scripts/menu.lua");
     if (luaExecutionCode != EngineExitCodes.EXIT_OK) {
-        debugWriteln("Engine stops execution according to error code: ", 
+        writeln("[ERROR] Engine stops execution according to error code: ", 
         luaExecutionCode.to!EngineExitCodes);
         currentGameState = GameState.Exit;
         return luaExecutionCode;
@@ -119,7 +90,11 @@ int showMainMenu() {
     luaReload = false;
     while (currentGameState == GameState.MainMenu)
     {
+        if (IsKeyPressed(KeyboardKey.KEY_F11)) {
+            ToggleFullscreen();
+        }
         UpdateMusicStream(music);
+        effectsLogic();
         luaEventLoop();
         BeginDrawing();
         BeginMode2D(camera);
@@ -130,5 +105,5 @@ int showMainMenu() {
     StopMusicStream(music);
     UnloadMusicStream(music);
     luaReload = true;
-    return 0;
+    return EngineExitCodes.EXIT_OK;
 }

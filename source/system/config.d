@@ -8,14 +8,13 @@ import variables;
 import std.conv;
 import system.abstraction;
 
-nothrow char parseConf(string filename, string type)
+nothrow auto parseConf(string type)(string filename)
 {
     try
     {
         auto file = File(filename);
         auto config = file.byLineCopy();
         
-        //mappings
         auto typeMap = [
             "sound": "SOUND:",
             "backward": "BACKWARD:",
@@ -23,7 +22,8 @@ nothrow char parseConf(string filename, string type)
             "right": "RIGHT:",
             "left": "LEFT:",
             "dialog": "DIALOG:",
-            "opmenu": "OPMENU:"
+            "opmenu": "OPMENU:",
+            "script": "SCRIPT:"
         ];
 
         if (type in typeMap)
@@ -34,9 +34,16 @@ nothrow char parseConf(string filename, string type)
                 auto trimmedLine = strip(line);
                 if (trimmedLine.startsWith(prefix))
                 {
-                    auto button = trimmedLine[prefix.length .. $].strip();
-                    debug debugWriteln("Value for ", type, ": ", button);
-                    return button.front.to!char;
+                    auto value = trimmedLine[prefix.length .. $].strip();
+                    debug debugWriteln("Value for ", type, ": ", value);
+                    
+                    static if (type == "sound") {
+                        return value.to!int();
+                    } else static if (type == "script") {
+                        return value;
+                    } else {
+                        return value.front.to!char();
+                    }
                 }
             }
         }
@@ -45,18 +52,26 @@ nothrow char parseConf(string filename, string type)
     {
         debugWriteln(e.msg);
     }
-    return 'E';
+    
+    static if (type == "sound") {
+        return 0;
+    } else static if (type == "script") {
+        return "";
+    } else {
+        return 'E';
+    }
 }
 
 SystemSettings loadSettingsFromConfigFile()
 {
     return SystemSettings(
-        parseConf("conf/settings.conf", "right"),
-        parseConf("conf/settings.conf", "left"),
-        parseConf("conf/settings.conf", "backward"),
-        parseConf("conf/settings.conf", "forward"),
-        parseConf("conf/settings.conf", "dialog"),
-        parseConf("conf/settings.conf", "opmenu"),
-        parseConf("conf/settings.conf", "sound")
+        parseConf!"sound"("conf/settings.conf"),      // int
+        parseConf!"right"("conf/settings.conf"),     // char
+        parseConf!"left"("conf/settings.conf"),       // char
+        parseConf!"backward"("conf/settings.conf"),   // char
+        parseConf!"forward"("conf/settings.conf"),    // char
+        parseConf!"dialog"("conf/settings.conf"),     // char
+        parseConf!"opmenu"("conf/settings.conf"),     // char
+        parseConf!"script"("conf/settings.conf")     // string
     );
 }

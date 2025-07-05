@@ -7,29 +7,134 @@ import std.conv;
 import std.uni;
 import std.typecons;
 import std.algorithm;
+import variables;
 
 int currentPage = 0;
 float textDisplayProgress = 0.0f;
 bool textFullyDisplayed = false;
 
+// Texture variables
+bool texturesLoaded = false;
+float circleRotationAngle = 0.0f;
+
+// Border sizes for 9-slice scaling
+const int DIALOG_BORDER = 32; // Border size that won't be stretched
+const int CHOICE_BORDER = 32;  // Border size for choice window
+
+void draw9SliceTexture(Texture2D tex, Rectangle dest, int borderSize, Color tint) {
+    // Source rectangle is the whole texture
+    Rectangle src = Rectangle(0, 0, tex.width, tex.height);
+    
+    // Prevent division by zero
+    if (borderSize <= 0) borderSize = 1;
+    if (borderSize * 2 >= src.width) borderSize = cast(int)src.width / 3;
+    if (borderSize * 2 >= src.height) borderSize = cast(int)src.height / 3;
+    
+    // Calculate inner source rectangle (without borders)
+    Rectangle innerSrc = Rectangle(
+        borderSize, 
+        borderSize, 
+        src.width - borderSize * 2, 
+        src.height - borderSize * 2
+    );
+    
+    // Calculate inner destination rectangle
+    Rectangle innerDest = Rectangle(
+        dest.x + borderSize, 
+        dest.y + borderSize, 
+        dest.width - borderSize * 2, 
+        dest.height - borderSize * 2
+    );
+    
+    // Draw 9 parts:
+    // 1. Top-left corner
+    DrawTexturePro(tex, 
+        Rectangle(src.x, src.y, borderSize, borderSize),
+        Rectangle(dest.x, dest.y, borderSize, borderSize),
+        Vector2(0, 0), 0, tint);
+    
+    // 2. Top edge
+    DrawTexturePro(tex, 
+        Rectangle(src.x + borderSize, src.y, innerSrc.width, borderSize),
+        Rectangle(dest.x + borderSize, dest.y, innerDest.width, borderSize),
+        Vector2(0, 0), 0, tint);
+    
+    // 3. Top-right corner
+    DrawTexturePro(tex, 
+        Rectangle(src.x + src.width - borderSize, src.y, borderSize, borderSize),
+        Rectangle(dest.x + dest.width - borderSize, dest.y, borderSize, borderSize),
+        Vector2(0, 0), 0, tint);
+    
+    // 4. Left edge
+    DrawTexturePro(tex, 
+        Rectangle(src.x, src.y + borderSize, borderSize, innerSrc.height),
+        Rectangle(dest.x, dest.y + borderSize, borderSize, innerDest.height),
+        Vector2(0, 0), 0, tint);
+    
+    // 5. Center (stretched)
+    DrawTexturePro(tex, 
+        innerSrc,
+        innerDest,
+        Vector2(0, 0), 0, tint);
+    
+    // 6. Right edge
+    DrawTexturePro(tex, 
+        Rectangle(src.x + src.width - borderSize, src.y + borderSize, borderSize, innerSrc.height),
+        Rectangle(dest.x + dest.width - borderSize, dest.y + borderSize, borderSize, innerDest.height),
+        Vector2(0, 0), 0, tint);
+    
+    // 7. Bottom-left corner
+    DrawTexturePro(tex, 
+        Rectangle(src.x, src.y + src.height - borderSize, borderSize, borderSize),
+        Rectangle(dest.x, dest.y + dest.height - borderSize, borderSize, borderSize),
+        Vector2(0, 0), 0, tint);
+    
+    // 8. Bottom edge
+    DrawTexturePro(tex, 
+        Rectangle(src.x + borderSize, src.y + src.height - borderSize, innerSrc.width, borderSize),
+        Rectangle(dest.x + borderSize, dest.y + dest.height - borderSize, innerDest.width, borderSize),
+        Vector2(0, 0), 0, tint);
+    
+    // 9. Bottom-right corner
+    DrawTexturePro(tex, 
+        Rectangle(src.x + src.width - borderSize, src.y + src.height - borderSize, borderSize, borderSize),
+        Rectangle(dest.x + dest.width - borderSize, dest.y + dest.height - borderSize, borderSize, borderSize),
+        Vector2(0, 0), 0, tint);
+}
+
 void displayDialog(string[] pages, string[] choices, ref int selectedChoice, int choicePage, Font dialogFont, 
-bool *showDialog, float textSpeed) {
+bool *showDialog, ref float textSpeed, Color dialogColor, 
+Texture2D circle, Texture2D dialogBackgroundTex, Texture2D choiceWindowTex) {
+
     int pagesLength = cast(int)pages.length;
     int screenWidth = GetScreenWidth();
     int screenHeight = GetScreenHeight();
     
-    DrawRectangle(
-        0,
-        screenHeight - screenHeight / 3,
-        screenWidth,
-        screenHeight / 3,
-        Color(20, 20, 20, 220)
+    const int screenPadding = 10;
+    
+    // Dialog background rectangle с отступами
+    Rectangle dialogRect = Rectangle(
+        screenPadding, // X с отступом
+        screenHeight - screenHeight / 3 - screenPadding, // Y с отступом
+        screenWidth - 2 * screenPadding, // Ширина с учетом отступов
+        screenHeight / 3 // Высота (без изменения)
     );
     
-    float marginLeft = screenWidth/6.5f;
+    // Draw dialog background with 9-slice scaling
+    draw9SliceTexture(
+        dialogBackgroundTex,
+        dialogRect,
+        DIALOG_BORDER,
+        Color(255, 255, 255, 220) // Slightly transparent
+    );
+    
+    const float textLeftMargin = 33.0f;
+    const float textTopMargin = 20.0f;
+    
+    float marginLeft = dialogRect.x + textLeftMargin; // Отступ от левого края фона
     float marginRight = screenWidth/6.5f;
-    float marginTop = screenHeight - screenHeight/3.3f;
-    float textWidth = screenWidth - marginLeft - marginRight;
+    float marginTop = dialogRect.y + textTopMargin; // Отступ от верхнего края фона
+    float textWidth = dialogRect.width - textLeftMargin - marginRight;
     float fontSize = 40.0f;
     float spacing = 1.0f;
     
@@ -93,9 +198,16 @@ bool *showDialog, float textSpeed) {
         remainingText = remainingText[fitChars..$];
     }
     
-    // Draw each line of text
     float lineHeight = MeasureTextEx(dialogFont, "A", fontSize, spacing).y * 1.4;
     for (int i = 0; i < lines.length; i++) {
+        DrawTextEx(
+            dialogFont,
+            lines[i].toStringz(),
+            Vector2(marginLeft+3, 3+(marginTop + i * lineHeight)),
+            fontSize,
+            spacing,
+            Colors.BLACK
+        );
         DrawTextEx(
             dialogFont,
             lines[i].toStringz(),
@@ -106,95 +218,132 @@ bool *showDialog, float textSpeed) {
         );
     }
     
-    if (textFullyDisplayed) {
-        drawSnakeAnimation(
-            0,
-            screenHeight - screenHeight / 3,
-            screenWidth,
-            screenHeight / 3
+    if (textFullyDisplayed && lines.length > 0) {
+        // Обновляем угол вращения (например, 45 градусов в секунду)
+        circleRotationAngle += 45.0f * GetFrameTime();
+        if (circleRotationAngle >= 360.0f) {
+            circleRotationAngle -= 360.0f;
+        }
+
+        // Получаем позицию и размер последней строки текста
+        float lastLineWidth = 10 + MeasureTextEx(dialogFont, lines[$-1].toStringz(), fontSize, spacing).x;
+        float lastLineY = marginTop + 20 + (lines.length - 1) * lineHeight;
+        
+        // Позиция круга справа от последней строки
+        float circleX = marginLeft + lastLineWidth + 10; // 10 - отступ от текста
+        float circleY = lastLineY;
+        
+        // Размер круга (можете настроить)
+        float circleSize = 30.0f;
+        
+        Rectangle destRect = Rectangle(circleX, circleY, circleSize, circleSize);
+        Rectangle sourceRect = Rectangle(0, 0, circle.width, circle.height);
+        Vector2 origin = Vector2(circleSize/2, circleSize/2);
+        DrawTexturePro(
+            circle,
+            sourceRect,
+            destRect,
+            origin,
+            circleRotationAngle,
+            Colors.WHITE
         );
     }
-    if (currentPage == choicePage) {
+    
+   if (currentPage == choicePage) {
+        int verticalPadding = 30;
+        int choiceHeight = 50;
+        int choiceSpacing = 10;
+
+        int choiceWindowWidth = screenWidth / 2;
+        int choiceWindowHeight = cast(int)(verticalPadding * 2 + choices.length * choiceHeight + (choices.length - 1) * choiceSpacing);
+
+        int choiceWindowX = (screenWidth - choiceWindowWidth) / 2;
+        int choiceWindowY = (screenHeight - choiceWindowHeight) / 2;
+
+        // Draw choice window with 9-slice scaling
+        draw9SliceTexture(
+            choiceWindowTex,
+            Rectangle(choiceWindowX, choiceWindowY, choiceWindowWidth, choiceWindowHeight),
+            CHOICE_BORDER,
+            Colors.WHITE
+        );
+
+        Vector2 mousePos = GetMousePosition();
+        bool mouseClicked = IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT);
         
-        // Обработка выбора ответа (вверх/вниз)
+        for (int i = 0; i < choices.length; i++) {
+            Rectangle choiceRect = Rectangle(
+                choiceWindowX + 40,
+                choiceWindowY + verticalPadding + i * (choiceHeight + choiceSpacing),
+                choiceWindowWidth - 80,
+                choiceHeight
+            );
+            
+            bool isHovered = CheckCollisionPointRec(mousePos, choiceRect);
+            
+            if (isHovered) {
+                selectedChoice = i;
+                if (mouseClicked) {
+                    currentPage += 1;
+                    textDisplayProgress = 0.0f;
+                    textFullyDisplayed = false;
+                }
+            }
+            
+            Color color = (i == selectedChoice) ? Colors.YELLOW : (isHovered ? Colors.LIGHTGRAY : Colors.WHITE);
+            
+            if (isHovered || i == selectedChoice) {
+                DrawRectangleRec(choiceRect, Color(60, 60, 60, 200));
+            }
+            
+            Vector2 textSize = MeasureTextEx(dialogFont, choices[i].toStringz(), 39, spacing);
+            Vector2 textPos = Vector2(
+                choiceRect.x + (choiceRect.width - textSize.x) / 2,
+                choiceRect.y + (choiceRect.height - textSize.y) / 2
+            );
+            DrawTextEx(
+                dialogFont,
+                choices[i].toStringz(),
+                Vector2(textPos.x+3, textPos.y+3),
+                39,
+                spacing,
+                Colors.BLACK
+            );
+            
+            DrawTextEx(
+                dialogFont,
+                choices[i].toStringz(),
+                textPos,
+                39,
+                spacing,
+                color
+            );
+        }
+        
         if (IsKeyPressed(KeyboardKey.KEY_DOWN)) {
             selectedChoice = cast(int)((selectedChoice + 1) % choices.length);
         }
         if (IsKeyPressed(KeyboardKey.KEY_UP)) {
             selectedChoice = cast(int)((selectedChoice - 1 + choices.length) % choices.length);
         }
-    
-        for (int i = 0; i < choices.length; i++) {
-            Color color = (i == selectedChoice) ? Colors.YELLOW : Colors.WHITE; 
-            DrawTextEx(
-                dialogFont,
-                toStringz(choices[i]),
-                Vector2(marginLeft, 60 + marginTop + i * 40),
-                fontSize,
-                spacing,
-                color
-            );
+        if (IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)) {
+            currentPage += 1;
+            textDisplayProgress = 0.0f;
+            textFullyDisplayed = false;
         }
+    }
+    
+    if ((IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) || IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)) 
+    && currentPage != choicePage && currentPage < pages.length) {
+        currentPage += 1;
     }
     if (currentPage >= pagesLength) {
         currentPage = 0;
         textDisplayProgress = 0.0f;
         textFullyDisplayed = false;
         pages = [];
+        textSpeed = 0.6f;
         *showDialog = false;
         return;
-    }
-}
-
-void drawSnakeAnimation(int rectX, int rectY, int rectWidth, int rectHeight) {
-    static float animTimer = 0.0f;
-    animTimer += GetFrameTime();
-    if (animTimer > 0.1f) animTimer = 0.0f;
-    
-    int animWidth = 300;
-    int animHeight = 100;
-    int animX = rectX + rectWidth - animWidth - 20;
-    int animY = rectY + rectHeight - animHeight - 20;
-    
-    int cubeSize = 5;
-    int cubesInRow = 5;
-    int spacing = 1;
-    
-    int centerX = animX + animWidth/2 - (cubesInRow*cubeSize + (cubesInRow-1)*spacing)/2;
-    int centerY = animY + animHeight/2 - (cubesInRow*cubeSize + (cubesInRow-1)*spacing)/2;
-    
-    for (int y = 0; y < cubesInRow; y++) {
-        for (int x = 0; x < cubesInRow; x++) {
-            DrawRectangle(
-                centerX + x*(cubeSize + spacing),
-                centerY + y*(cubeSize + spacing),
-                cubeSize, cubeSize, Color(50, 50, 50, 255)
-            );
-        }
-    }
-    
-    static int snakePosition = 0;
-    if (animTimer == 0.0f) snakePosition = (snakePosition + 1) % 16;
-    
-    Tuple!(int, int)[] snakePath = [
-        tuple(2, 0), tuple(3, 0), tuple(4, 0), tuple(4, 1),
-        tuple(4, 2), tuple(4, 3), tuple(4, 4), tuple(3, 4),
-        tuple(2, 4), tuple(1, 4), tuple(0, 4), tuple(0, 3),
-        tuple(0, 2), tuple(0, 1), tuple(0, 0), tuple(1, 0)
-    ];
-    
-    for (int i = 0; i < snakePath.length; i++) {
-        int relPos = cast(int)((i + snakePosition) % snakePath.length);
-        int x = snakePath[relPos][0];
-        int y = snakePath[relPos][1];
-        
-        float t = cast(float)i / snakePath.length;
-        Color cubeColor = Color(0, cast(ubyte)(50 + 70 * (1 - t)), 0, 255); 
-        
-        DrawRectangle(
-            centerX + x*(cubeSize + spacing),
-            centerY + y*(cubeSize + spacing),
-            cubeSize, cubeSize, cubeColor
-        );
     }
 }

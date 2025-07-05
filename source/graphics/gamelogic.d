@@ -23,18 +23,15 @@ import std.file;
  
 void gameInit()
 {
+    circle = LoadTexture("res/misc/circle.png");
+    dialogBackgroundTex = LoadTexture("res/misc/TEX#win_01d.PNG");
+    choiceWindowTex = LoadTexture("res/misc/TEX#win_00d.PNG");
+    texturesLoaded = true;
     if (WindowShouldClose()) {
         currentGameState = GameState.Exit;
     } else {
         debugWriteln("Game initializing.");
         systemSettings = loadSettingsFromConfigFile();
-        if (sfxEnabled == false) {
-            UnloadSound(audio.menuMoveSound);
-            UnloadSound(audio.acceptSound);
-            UnloadSound(audio.menuChangeSound);
-            UnloadSound(audio.declineSound);
-            UnloadSound(audio.nonSound);
-        }
     }
 }
 
@@ -57,35 +54,84 @@ void effectsLogic()
 }
 
 void backgroundLogic() {
+    if (backgroundFades.length < backgroundTextures.length) {
+        backgroundFades.length = backgroundTextures.length;
+    }
+
     for (int i = 0; i < backgroundTextures.length; i++) {
-        if (backgroundTextures[i].drawTexture == true) {
+        if (backgroundTextures[i].drawTexture) {
+            if (backgroundFades[i].alpha < 1.0f) {
+                backgroundFades[i].alpha += GetFrameTime() * backgroundFades[i].fadeSpeed;
+                if (backgroundFades[i].alpha > 1.0f) backgroundFades[i].alpha = 1.0f;
+            }
+        } else {
+            if (backgroundFades[i].alpha > 0.0f) {
+                backgroundFades[i].alpha -= GetFrameTime() * backgroundFades[i].fadeSpeed;
+                if (backgroundFades[i].alpha < 0.0f) backgroundFades[i].alpha = 0.0f;
+            }
+        }
+
+        if (backgroundFades[i].alpha > 0.0f) {
             float centeredX = backgroundTextures[i].x - (backgroundTextures[i].width * backgroundTextures[i].scale / 2);
             float centeredY = backgroundTextures[i].y - (backgroundTextures[i].height * backgroundTextures[i].scale / 2);
+            
+            Color tint = Colors.WHITE;
+            tint.a = cast(ubyte)(255 * backgroundFades[i].alpha);
+            
             DrawTextureEx(backgroundTextures[i].texture,
-            Vector2(centeredX, centeredY),
-            0.0,
-            backgroundTextures[i].scale,
-            Colors.WHITE
+                Vector2(centeredX, centeredY),
+                0.0,
+                backgroundTextures[i].scale,
+                tint
             );
         }
     }
+}
+
+void characterLogic() {
+    if (characterFades.length < characterTextures.length) {
+        characterFades.length = characterTextures.length;
+    }
 
     for (int i = 0; i < characterTextures.length; i++) {
-        if (characterTextures[i].drawTexture == true) {
+        if (characterTextures[i].drawTexture) {
+            if (characterTextures[i].justDrawn) {
+                characterFades[i].alpha = 0.0f;
+                characterTextures[i].justDrawn = false;
+            }
+            
+            if (characterFades[i].alpha < 1.0f) {
+                characterFades[i].alpha += GetFrameTime() * characterFades[i].fadeSpeed;
+                if (characterFades[i].alpha > 1.0f) characterFades[i].alpha = 1.0f;
+            }
+        } else {
+            if (characterFades[i].alpha > 0.0f) {
+                characterFades[i].alpha -= GetFrameTime() * characterFades[i].fadeSpeed;
+                if (characterFades[i].alpha < 0.0f) {
+                    characterFades[i].alpha = 0.0f;
+                }
+            }
+        }
+
+        if (characterFades[i].alpha > 0.0f) {
             float centeredX = characterTextures[i].x - (characterTextures[i].width * characterTextures[i].scale / 2);
             float centeredY = characterTextures[i].y - (characterTextures[i].height * characterTextures[i].scale / 2);
+            
+            Color tint = Colors.WHITE;
+            tint.a = cast(ubyte)(255 * characterFades[i].alpha);
             
             DrawTextureEx(characterTextures[i].texture,
                         Vector2(centeredX, centeredY), 
                         0.0, 
                         characterTextures[i].scale, 
-                        Colors.WHITE);
+                        tint);
         }
     }
 }
 
 void dialogLogic() {
     if (showDialog) {
-        displayDialog(messageGlobal, choices, selectedChoice, choicePage, textFont, &showDialog, typingSpeed);
+        displayDialog(messageGlobal, choices, selectedChoice, choicePage, textFont, &showDialog, typingSpeed, 
+        dialogColor, circle, dialogBackgroundTex, choiceWindowTex);
     }
 }

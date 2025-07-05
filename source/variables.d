@@ -11,11 +11,28 @@ extern (C) char* get_file_data_from_archive(const char *input_file, const char *
 void resetAllScriptValues() {
     debugWriteln("Resetting all values!");
     selectedChoice = 0;
+    foreach (i; 0..characterTextures.length)
+    {
+        characterTextures[i].drawTexture = false;
+        UnloadTexture(characterTextures[i].texture);
+    }
+    foreach (i; 0..backgroundTextures.length)
+    {
+        backgroundTextures[i].drawTexture = false;
+        UnloadTexture(backgroundTextures[i].texture);
+    }
     characterTextures = [];
     backgroundTextures = [];
 }
 
 /* system */
+
+struct FadeEffect {
+    float alpha = 0.0f;
+    float targetAlpha = 0.0f;
+    float fadeSpeed = 9.0f;
+    bool isFading = false;
+}
 
 struct SystemSettings {
     int sound_state;
@@ -25,24 +42,18 @@ struct SystemSettings {
     char forward_button;
     char dialog_button;
     char opmenu_button;
+    string script_path;
 }
 
 struct TextureEngine {
     bool drawTexture;
+    bool justDrawn;
     float width;
     float height;
     float x;
     float y;
     Texture2D texture;
     float scale;
-}
-
-struct InterfaceAudio {
-    Sound menuMoveSound;
-    Sound menuChangeSound;
-    Sound acceptSound;
-    Sound declineSound;
-    Sound nonSound;
 }
 
 enum GameState {
@@ -65,14 +76,19 @@ TextureEngine[] backgroundTextures;
 
 SystemSettings systemSettings;
 
-InterfaceAudio audio;
-
 int currentGameState = 1;
 
 Font textFont;
 
 Music music;
 
+Color dialogColor;
+
+FadeEffect[] characterFades;
+
+FadeEffect[] backgroundFades;
+
+FadeEffect dialogFade;
 
 /* booleans */
 
@@ -137,6 +153,11 @@ float typingSpeed = 0.6f;
 
 Texture2D[] framesUI;
 
+Texture2D dialogBackgroundTex;
+
+Texture2D choiceWindowTex;
+
+Texture2D circle;
 
 /* integer values */
 

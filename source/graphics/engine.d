@@ -35,15 +35,19 @@ import system.cleanup;
 import core.stdc.stdlib;
 import core.stdc.time;
 
-void engine_loader(string window_name, int screenWidth, int screenHeight)
+void engine_loader()
 {
+    int screenWidth = GetScreenWidth();
+    int screenHeight = GetScreenHeight();
     // Initialization
     debug debugWriteln("Engine version: ", ver);
     SetExitKey(0);
+    Image icon = LoadImage("res/icon.png");
     // Window and Audio Initialization
-    InitWindow(screenWidth, screenHeight, cast(char*) window_name);
-    DisableCursor();
-    ToggleFullscreen();
+    InitWindow(screenWidth, screenHeight, "Remember11 - Self Chapter");
+    SetWindowIcon(icon);
+    UnloadImage(icon);
+    //ToggleFullscreen();
     SetTargetFPS(60);
     textFont = LoadFont("res/font_en.png");
     // Fade In and Out Effects
@@ -67,36 +71,43 @@ void engine_loader(string window_name, int screenWidth, int screenHeight)
         case GameState.InGame:
 
             gameInit();
+            luaExec = systemSettings.script_path;
             while (!WindowShouldClose())
             {
                 SetExitKey(0);
                 if (luaReload) {
                     int luaExecutionCode = luaInit(luaExec);
                     if (luaExecutionCode != EngineExitCodes.EXIT_OK) {
-                        debugWriteln("Engine stops execution according to error code: ", 
+                        writeln("[ERROR] Engine stops execution according to error code: ", 
                         luaExecutionCode.to!EngineExitCodes);
                         currentGameState = GameState.Exit;
                         break;
                     }
                     luaReload = false;
                 }
-                luaEventLoop();
+                if (IsKeyPressed(KeyboardKey.KEY_F11)) {
+                    ToggleFullscreen();
+                }
                 BeginDrawing();
                 ClearBackground(Colors.BLACK);
                 // main logic
                 BeginMode2D(camera);
                 backgroundLogic();
+                characterLogic();
                 // effects logic
                 effectsLogic();
                 EndMode2D();
                 //drawing dialogs
                 dialogLogic();
+                luaEventLoop();
                 EndDrawing();
             }
             break;
         case GameState.Exit:
             EndDrawing();
             unloadResourcesLogic();
+            CloseAudioDevice();
+            CloseWindow();
             return;
 
         default:
