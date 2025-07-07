@@ -21,15 +21,6 @@ import std.algorithm;
  * Not all engine functions usable for scripting are yet implemented.
 */
 
-string hint;
-
-extern (C) nothrow int luaL_showHint(lua_State* L)
-{
-    hint = "" ~ to!string(luaL_checkstring(L, 1));
-    hintNeeded = true;
-    return 0;
-}
-
 /* text window */
 
 extern (C) nothrow int luaL_dialogBox(lua_State* L)
@@ -58,9 +49,6 @@ extern (C) nothrow int luaL_dialogBox(lua_State* L)
         choices[i] = luaL_checkstring(L, -1).to!string;
         lua_pop(L, 1);
     }
-    dialogColor = Colors.GREEN;
-    int colorArgPos = -1;
-
     //if provided, get page on which choices must be shown
     if (lua_gettop(L) >= 3) {
         choicePage = cast(int)luaL_checkinteger(L, 3);
@@ -68,36 +56,6 @@ extern (C) nothrow int luaL_dialogBox(lua_State* L)
 
     if (lua_gettop(L) >= 4 && !lua_istable(L, 4)) {
         typingSpeed = cast(float) luaL_checknumber(L, 4);
-    }
-    
-    //if 4 argument is a table - it must be a color
-    if (lua_gettop(L) >= 4 && lua_istable(L, 4)) {
-        colorArgPos = 4;
-    }
-    //else if 5 argument is a table its a color
-    else if (lua_gettop(L) >= 5 && lua_istable(L, 5)) {
-        colorArgPos = 5;
-    }
-
-    if (colorArgPos != -1) {
-        lua_getfield(L, colorArgPos, "r");
-        dialogColor.r = cast(ubyte)lua_tointeger(L, -1);
-        lua_pop(L, 1);
-        
-        lua_getfield(L, colorArgPos, "g");
-        dialogColor.g = cast(ubyte)lua_tointeger(L, -1);
-        lua_pop(L, 1);
-        
-        lua_getfield(L, colorArgPos, "b");
-        dialogColor.b = cast(ubyte)lua_tointeger(L, -1);
-        lua_pop(L, 1);
-        
-        lua_getfield(L, colorArgPos, "a");
-        //if a empty, reset to default
-        if (!lua_isnil(L, -1)) {
-            dialogColor.a = cast(ubyte)lua_tointeger(L, -1);
-        }
-        lua_pop(L, 1);
     }
     return 0;
 }
@@ -110,12 +68,6 @@ extern (C) nothrow int luaL_getAnswerValue(lua_State* L)
 
 extern (C) nothrow int luaL_isDialogExecuted(lua_State *L) {
     lua_pushboolean(L, showDialog);
-    return 1;
-}
-
-extern (C) nothrow int luaL_dialogAnswerValue(lua_State* L)
-{
-    lua_pushinteger(L, selectedChoice);
     return 1;
 }
 
@@ -229,7 +181,30 @@ extern (C) nothrow int luaL_draw2Dcharacter(lua_State* L)
         characterTextures[count].x = cast(int) luaL_checkinteger(L, 1);
         characterTextures[count].drawTexture = true;
         characterTextures[count].justDrawn = true;
+        if (lua_gettop(L) == 5) {
+            lua_getfield(L, 5, "r");
+            characterColor.r = cast(ubyte)lua_tointeger(L, -1);
+            lua_pop(L, 1);
+            
+            lua_getfield(L, 5, "g");
+            characterColor.g = cast(ubyte)lua_tointeger(L, -1);
+            lua_pop(L, 1);
+            
+            lua_getfield(L, 5, "b");
+            characterColor.b = cast(ubyte)lua_tointeger(L, -1);
+            lua_pop(L, 1);
+            
+            lua_getfield(L, 5, "a");
+            //if empty, reset to default
+            if (!lua_isnil(L, -1)) {
+                characterColor.a = cast(ubyte)lua_tointeger(L, -1);
+            }
+            lua_pop(L, 1);
+        } else {
+            characterColor = Colors.WHITE;
+        }
         debugWriteln("Count: ", count, " drawTexture cond: ", characterTextures[count].drawTexture);
+        debugWriteln("arguments count: ", lua_gettop(L));
     } catch (Exception e) {
         debugWriteln(e.msg);
     }
@@ -325,6 +300,7 @@ extern (C) nothrow int luaL_playVideo(lua_State* L)
 
 extern (C) nothrow int luaL_moveCamera(lua_State *L) {
     try {
+        oldCamera = camera;
         float targetX = cast(float) luaL_checknumber(L, 1);
         float targetY = cast(float) luaL_checknumber(L, 2);
         float zoom = cast(float) luaL_optnumber(L, 3, 1.0f);
@@ -338,6 +314,11 @@ extern (C) nothrow int luaL_moveCamera(lua_State *L) {
     } catch (Exception e) {
         debugWriteln(e.msg);
     }
+    return 0;
+}
+
+extern (C) nothrow int luaL_restoreCamera(lua_State *L) {
+    camera = oldCamera;
     return 0;
 }
 
@@ -696,7 +677,6 @@ extern (C) nothrow int luaL_drawTextureEx(lua_State *L) {
 extern (C) nothrow void luaL_loader(lua_State* L)
 {
     lua_register(L, "dialogBox", &luaL_dialogBox);
-    lua_register(L, "dialogAnswerValue", &luaL_dialogAnswerValue);
     lua_register(L, "isDialogExecuted", &luaL_isDialogExecuted);
     lua_register(L, "getAnswerValue", &luaL_getAnswerValue);
     lua_register(L, "loadAnimationUI", &luaL_loadUIAnimation);
@@ -704,6 +684,7 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "stopAnimationUI", &luaL_stopUIAnimation);
     lua_register(L, "unloadAnimationUI", &luaL_unloadUIAnimation);
     lua_register(L, "moveCamera", &luaL_moveCamera);
+    lua_register(L, "restoreCamera", &luaL_restoreCamera);
     lua_register(L, "isCameraMoving", &luaL_isCameraMoving);
     lua_register(L, "playVideo", &luaL_playVideo);
     lua_register(L, "loadMusic", &luaL_loadMusic);
@@ -742,6 +723,20 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "measureTextY", &luaL_measureTextY);
     lua_register(L, "getTextureWidth", &luaL_getTextureWidth);
     lua_register(L, "getTextureHeight", &luaL_getTextureHeight);
+
+    debugWriteln("strict mode enabled");
+    const char* strict_lua =
+    `local mt = {
+        __index = function(_, name)
+            error("attempt to call undefined function: " .. tostring(name), 2)
+        end
+    }
+    setmetatable(_G, mt)`;
+
+    if (luaL_dostring(L, strict_lua) != LUA_OK) {
+        debugWriteln("Failed to set strict mode: ", to!string(lua_tostring(L, -1)));
+        lua_pop(L, 1); // Pop the error message
+    }
 }
 
 int luaInit(string luaExec)

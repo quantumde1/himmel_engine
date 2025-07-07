@@ -9,15 +9,18 @@ void unloadResourcesLogic()
 {
     debugWriteln("Exiting. See ya'!");
     EndDrawing();
-    for (int i = cast(int)framesUI.length; i < framesUI.length; i++) {
-        debugWriteln("unloading animations");
+    debugWriteln("unloading animations");
+    for (int i = 0; i < framesUI.length; i++) {
         UnloadTexture(framesUI[i]);
     }
+    debugWriteln("unloading font");
     UnloadFont(textFont);
-    for (int i = cast(int)characterTextures.length; i < characterTextures.length; i++) {
+    debugWriteln("unloading characters");
+    for (int i = 0; i < characterTextures.length; i++) {
         UnloadTexture(characterTextures[i].texture);
     }
-    for (int i = cast(int)backgroundTextures.length; i < backgroundTextures.length; i++) {
+    debugWriteln("unloading backgrounds");
+    for (int i = 0; i < backgroundTextures.length; i++) {
         UnloadTexture(backgroundTextures[i].texture);
     }
 }

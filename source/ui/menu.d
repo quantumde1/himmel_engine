@@ -102,6 +102,8 @@ int showMainMenu() {
         EndMode2D();
         EndDrawing();
     }
+    debugWriteln("menu assets unloading");
+    UnloadFont(textFont);
     StopMusicStream(music);
     UnloadMusicStream(music);
     luaReload = true;

@@ -26,7 +26,6 @@ void gameInit()
     circle = LoadTexture("res/misc/circle.png");
     dialogBackgroundTex = LoadTexture("res/misc/TEX#win_01d.PNG");
     choiceWindowTex = LoadTexture("res/misc/TEX#win_00d.PNG");
-    texturesLoaded = true;
     if (WindowShouldClose()) {
         currentGameState = GameState.Exit;
     } else {
@@ -117,14 +116,14 @@ void characterLogic() {
             float centeredX = characterTextures[i].x - (characterTextures[i].width * characterTextures[i].scale / 2);
             float centeredY = characterTextures[i].y - (characterTextures[i].height * characterTextures[i].scale / 2);
             
-            Color tint = Colors.WHITE;
-            tint.a = cast(ubyte)(255 * characterFades[i].alpha);
+            
+            characterColor.a = cast(ubyte)(255 * characterFades[i].alpha);
             
             DrawTextureEx(characterTextures[i].texture,
                         Vector2(centeredX, centeredY), 
                         0.0, 
                         characterTextures[i].scale, 
-                        tint);
+                        characterColor);
         }
     }
 }
@@ -132,6 +131,6 @@ void characterLogic() {
 void dialogLogic() {
     if (showDialog) {
         displayDialog(messageGlobal, choices, selectedChoice, choicePage, textFont, &showDialog, typingSpeed, 
-        dialogColor, circle, dialogBackgroundTex, choiceWindowTex);
+        circle, dialogBackgroundTex, choiceWindowTex);
     }
 }

@@ -70,6 +70,8 @@ enum EngineExitCodes {
 
 Camera2D camera;
 
+Camera2D oldCamera;
+
 TextureEngine[] characterTextures;
 
 TextureEngine[] backgroundTextures;
@@ -82,17 +84,15 @@ Font textFont;
 
 Music music;
 
-Color dialogColor;
-
 FadeEffect[] characterFades;
 
 FadeEffect[] backgroundFades;
 
 FadeEffect dialogFade;
 
-/* booleans */
+Color characterColor = Color(255, 255, 255);
 
-bool hintNeeded = false;
+/* booleans */
 
 bool playAnimation = false;
 

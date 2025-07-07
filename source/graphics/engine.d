@@ -37,8 +37,8 @@ import core.stdc.time;
 
 void engine_loader()
 {
-    int screenWidth = GetScreenWidth();
-    int screenHeight = GetScreenHeight();
+    int screenWidth = 1344;
+    int screenHeight = 1008;
     // Initialization
     debug debugWriteln("Engine version: ", ver);
     SetExitKey(0);
