@@ -8,7 +8,7 @@ import system.abstraction;
 
 extern (C) char* get_file_data_from_archive(const char *input_file, const char *file_name, uint *file_size_out);
 
-void resetAllScriptValues() {
+nothrow void resetAllScriptValues() {
     debugWriteln("Resetting all values!");
     selectedChoice = 0;
     foreach (i; 0..characterTextures.length)

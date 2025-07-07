@@ -76,6 +76,7 @@ void engine_loader()
             {
                 SetExitKey(0);
                 if (luaReload) {
+                    resetAllScriptValues();
                     int luaExecutionCode = luaInit(luaExec);
                     if (luaExecutionCode != EngineExitCodes.EXIT_OK) {
                         writeln("[ERROR] Engine stops execution according to error code: ", 

@@ -402,7 +402,12 @@ extern (C) nothrow int luaL_2dModeDisable(lua_State* L)
     return 0;
 }
 
-extern (C) nothrow int luaL_setGameFont(lua_State* L)
+extern (C) nothrow int luaL_unloadFont(lua_State *L) {
+    UnloadFont(textFont);
+    return 0;
+}
+
+extern (C) nothrow int luaL_loadFont(lua_State* L)
 {
     const char* x = luaL_checkstring(L, 1);
     debugWriteln("Setting custom font: ", x.to!string);
@@ -503,18 +508,9 @@ extern (C) nothrow int luaL_isMouseButtonPressed(lua_State* L)
 
 extern (C) nothrow int luaL_loadScript(lua_State* L)
 {
-    for (int i = cast(int)characterTextures.length; i < characterTextures.length; i++)
-    {
-        UnloadTexture(characterTextures[i].texture);
-    }
-    for (int i = cast(int)backgroundTextures.length; i < backgroundTextures.length; i++)
-    {
-        UnloadTexture(backgroundTextures[i].texture);
-    }
     try
     {
         luaExec = luaL_checkstring(L, 1).to!string;
-        resetAllScriptValues();
     }
     catch (Exception e)
     {
@@ -706,7 +702,8 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "getTime", &luaL_getTime);
     lua_register(L, "getDeltaTime", &luaL_getDeltaTime);
     lua_register(L, "loadScript", &luaL_loadScript);
-    lua_register(L, "setFont", &luaL_setGameFont);
+    lua_register(L, "loadFont", &luaL_loadFont);
+    lua_register(L, "unloadFont", &luaL_unloadFont);
     lua_register(L, "getScreenHeight", &luaL_getScreenHeight);
     lua_register(L, "getScreenWidth", &luaL_getScreenWidth);
     lua_register(L, "isKeyPressed", &luaL_isKeyPressed);
@@ -723,6 +720,8 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "measureTextY", &luaL_measureTextY);
     lua_register(L, "getTextureWidth", &luaL_getTextureWidth);
     lua_register(L, "getTextureHeight", &luaL_getTextureHeight);
+    //compat
+    lua_register(L, "setFont", &luaL_loadFont);
 
     debugWriteln("strict mode enabled");
     const char* strict_lua =

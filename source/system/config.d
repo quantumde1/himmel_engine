@@ -15,7 +15,7 @@ nothrow auto parseConf(string type)(string filename)
         auto file = File(filename);
         auto config = file.byLineCopy();
         
-        auto typeMap = [
+        static immutable typeMap = [
             "sound": "SOUND:",
             "backward": "BACKWARD:",
             "forward": "FORWARD:",
