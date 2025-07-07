@@ -65,17 +65,6 @@ void helloScreen()
         });
         */
         // Play Opening Video
-        BeginDrawing();
-        debug debugWriteln("searching for video");
-        if (std.file.exists(getcwd() ~ "/res/videos/op.mp4"))
-        {
-            debug debugWriteln("video found, playing");
-            playVideo("/res/videos/op.mp4");
-        }
-        else {
-            debug debugWriteln("video not found, skipping");
-            videoFinished = true;
-        }
     }
 }
 
@@ -90,15 +79,16 @@ int showMainMenu() {
     luaReload = false;
     while (currentGameState == GameState.MainMenu)
     {
+        ClearBackground(Colors.WHITE);
         if (IsKeyPressed(KeyboardKey.KEY_F11)) {
             ToggleFullscreen();
         }
         UpdateMusicStream(music);
-        effectsLogic();
-        luaEventLoop();
         BeginDrawing();
         BeginMode2D(camera);
         backgroundLogic();
+        effectsLogic();
+        luaEventLoop();
         EndMode2D();
         EndDrawing();
     }

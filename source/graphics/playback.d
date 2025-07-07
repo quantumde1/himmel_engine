@@ -309,6 +309,7 @@ extern (C) int playVideoInternal(char* argv)
                     (GetScreenWidth() - video.texW * video.scale) * 0.5f, (
                         GetScreenHeight() - video.texH * video.scale) * 0.5f
                 };
+                SetTextureFilter(video.texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
                 DrawTextureEx(video.texture, position, 0, video.scale, Colors.WHITE);
             }
         }

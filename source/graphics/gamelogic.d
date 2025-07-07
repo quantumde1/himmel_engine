@@ -24,8 +24,8 @@ import std.file;
 void gameInit()
 {
     circle = LoadTexture("res/misc/circle.png");
-    dialogBackgroundTex = LoadTexture("res/misc/TEX#win_01d.PNG");
-    choiceWindowTex = LoadTexture("res/misc/TEX#win_00d.PNG");
+    dialogBackgroundTex = LoadTexture("res/misc/TEX#win_01b.PNG");
+    choiceWindowTex = LoadTexture("res/misc/TEX#win_00b.PNG");
     if (WindowShouldClose()) {
         currentGameState = GameState.Exit;
     } else {

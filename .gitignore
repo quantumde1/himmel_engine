@@ -21,7 +21,10 @@ himmel-engine-test-*
 .ldc2_cache
 sky.sh
 a.out
+*.dll
+*.core
 *.so*
+/plugins/
 sky
 *.dylib*
 res/
