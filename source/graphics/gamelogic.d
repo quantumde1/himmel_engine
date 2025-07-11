@@ -19,7 +19,7 @@ import std.file;
 
 /** 
  * this module contains game logic, which was removed from engine.d for better readability.
- */
+**/
  
 void gameInit()
 {
@@ -31,6 +31,37 @@ void gameInit()
     } else {
         debugWriteln("Game initializing.");
         systemSettings = loadSettingsFromConfigFile();
+    }
+}
+
+void texturesLogic(TextureEngine[] textures) {
+    for (int i = 0; i < textures.length; i++) {
+        if (textures[i].drawTexture) {
+            if (textures[i].alpha < 1.0f) {
+                textures[i].alpha += GetFrameTime() * textures[i].fadeSpeed;
+                if (textures[i].alpha > 1.0f) textures[i].alpha = 1.0f;
+            }
+        } else {
+            if (textures[i].alpha > 0.0f) {
+                textures[i].alpha -= GetFrameTime() * textures[i].fadeSpeed;
+                if (textures[i].alpha < 0.0f) textures[i].alpha = 0.0f;
+            }
+        }
+
+        if (textures[i].alpha > 0.0f) {
+            float centeredX = textures[i].x - (textures[i].width * textures[i].scale / 2);
+            float centeredY = textures[i].y - (textures[i].height * textures[i].scale / 2);
+            
+            Color tint = Colors.WHITE;
+            tint.a = cast(ubyte)(255 * textures[i].alpha);
+            
+            DrawTextureEx(textures[i].texture,
+                Vector2(centeredX, centeredY),
+                0.0,
+                textures[i].scale,
+                tint
+            );
+        }
     }
 }
 
@@ -53,79 +84,11 @@ void effectsLogic()
 }
 
 void backgroundLogic() {
-    if (backgroundFades.length < backgroundTextures.length) {
-        backgroundFades.length = backgroundTextures.length;
-    }
-
-    for (int i = 0; i < backgroundTextures.length; i++) {
-        if (backgroundTextures[i].drawTexture) {
-            if (backgroundFades[i].alpha < 1.0f) {
-                backgroundFades[i].alpha += GetFrameTime() * backgroundFades[i].fadeSpeed;
-                if (backgroundFades[i].alpha > 1.0f) backgroundFades[i].alpha = 1.0f;
-            }
-        } else {
-            if (backgroundFades[i].alpha > 0.0f) {
-                backgroundFades[i].alpha -= GetFrameTime() * backgroundFades[i].fadeSpeed;
-                if (backgroundFades[i].alpha < 0.0f) backgroundFades[i].alpha = 0.0f;
-            }
-        }
-
-        if (backgroundFades[i].alpha > 0.0f) {
-            float centeredX = backgroundTextures[i].x - (backgroundTextures[i].width * backgroundTextures[i].scale / 2);
-            float centeredY = backgroundTextures[i].y - (backgroundTextures[i].height * backgroundTextures[i].scale / 2);
-            
-            Color tint = Colors.WHITE;
-            tint.a = cast(ubyte)(255 * backgroundFades[i].alpha);
-            
-            DrawTextureEx(backgroundTextures[i].texture,
-                Vector2(centeredX, centeredY),
-                0.0,
-                backgroundTextures[i].scale,
-                tint
-            );
-        }
-    }
+    texturesLogic(backgroundTextures);
 }
 
 void characterLogic() {
-    if (characterFades.length < characterTextures.length) {
-        characterFades.length = characterTextures.length;
-    }
-
-    for (int i = 0; i < characterTextures.length; i++) {
-        if (characterTextures[i].drawTexture) {
-            if (characterTextures[i].justDrawn) {
-                characterFades[i].alpha = 0.0f;
-                characterTextures[i].justDrawn = false;
-            }
-            
-            if (characterFades[i].alpha < 1.0f) {
-                characterFades[i].alpha += GetFrameTime() * characterFades[i].fadeSpeed;
-                if (characterFades[i].alpha > 1.0f) characterFades[i].alpha = 1.0f;
-            }
-        } else {
-            if (characterFades[i].alpha > 0.0f) {
-                characterFades[i].alpha -= GetFrameTime() * characterFades[i].fadeSpeed;
-                if (characterFades[i].alpha < 0.0f) {
-                    characterFades[i].alpha = 0.0f;
-                }
-            }
-        }
-
-        if (characterFades[i].alpha > 0.0f) {
-            float centeredX = characterTextures[i].x - (characterTextures[i].width * characterTextures[i].scale / 2);
-            float centeredY = characterTextures[i].y - (characterTextures[i].height * characterTextures[i].scale / 2);
-            
-            
-            characterColor.a = cast(ubyte)(255 * characterFades[i].alpha);
-            
-            DrawTextureEx(characterTextures[i].texture,
-                        Vector2(centeredX, centeredY), 
-                        0.0, 
-                        characterTextures[i].scale, 
-                        characterColor);
-        }
-    }
+    texturesLogic(characterTextures);
 }
 
 void dialogLogic() {

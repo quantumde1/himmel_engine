@@ -27,13 +27,6 @@ nothrow void resetAllScriptValues() {
 
 /* system */
 
-struct FadeEffect {
-    float alpha = 0.0f;
-    float targetAlpha = 0.0f;
-    float fadeSpeed = 9.0f;
-    bool isFading = false;
-}
-
 struct SystemSettings {
     int sound_state;
     char right_button;
@@ -54,6 +47,10 @@ struct TextureEngine {
     float y;
     Texture2D texture;
     float scale;
+    float alpha = 0.0f;
+    float targetAlpha = 0.0f;
+    float fadeSpeed = 9.0f;
+    bool isFading = false;
 }
 
 enum GameState {
@@ -84,12 +81,6 @@ Font textFont;
 
 Music music;
 
-FadeEffect[] characterFades;
-
-FadeEffect[] backgroundFades;
-
-FadeEffect dialogFade;
-
 Color characterColor = Color(255, 255, 255);
 
 /* booleans */
@@ -105,8 +96,6 @@ bool fullscreenEnabled = true;
 bool luaReload = true;
 
 bool videoFinished = false;
-
-bool neededDraw2D = false;
 
 bool isCameraMoving = false;
 
@@ -128,8 +117,6 @@ string[] choices;
 string[] backlogText;
 
 string luaExec;
-
-string usedLang = "english";
 
 char* musicPath;
 

@@ -102,6 +102,9 @@ extern (C) nothrow int luaL_draw2Dbackground(lua_State* L)
         int count = cast(int)luaL_checkinteger(L, 4);
         debugWriteln(backgroundTextures[count]);
         backgroundTextures[count].height = backgroundTextures[count].texture.height;
+        if (backgroundTextures.length < backgroundTextures.length) {
+            backgroundTextures.length = backgroundTextures.length;
+        }
         backgroundTextures[count].width = backgroundTextures[count].texture.width;
         backgroundTextures[count].x = luaL_checknumber(L, 1);
         backgroundTextures[count].y = luaL_checknumber(L, 2);
@@ -151,10 +154,14 @@ extern (C) nothrow int luaL_unload2Dbackground(lua_State* L)
 extern (C) nothrow int luaL_load2Dcharacter(lua_State *L) {
     try
     {
+        
         int count = cast(int) luaL_checkinteger(L, 2);
 
         if (count >= characterTextures.length) {
             characterTextures.length = count + 1;
+        }
+        if (characterTextures.length < characterTextures.length) {
+            characterTextures.length = characterTextures.length;
         }
         if (count < characterTextures.length && characterTextures[count].texture.id != 0) {
             UnloadTexture(characterTextures[count].texture);
@@ -384,24 +391,6 @@ extern (C) nothrow int luaL_getScreenHeight(lua_State* L)
     return 1;
 }
 
-extern (C) nothrow int luaL_getUsedLanguage(lua_State* L)
-{
-    lua_pushstring(L, usedLang.toStringz());
-    return 1;
-}
-
-extern (C) nothrow int luaL_2dModeEnable(lua_State* L)
-{
-    neededDraw2D = true;
-    return 0;
-}
-
-extern (C) nothrow int luaL_2dModeDisable(lua_State* L)
-{
-    neededDraw2D = false;
-    return 0;
-}
-
 extern (C) nothrow int luaL_unloadFont(lua_State *L) {
     UnloadFont(textFont);
     return 0;
@@ -540,7 +529,7 @@ extern (C) nothrow int luaL_loadTexture(lua_State *L) {
         lua_pushcfunction(L, &luaL_textureGC);
         lua_setfield(L, -2, "__gc");
     }
-    
+    SetTextureFilter(texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
     lua_setmetatable(L, -2);
     return 1;
 }
@@ -689,8 +678,6 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "unloadMusic", &luaL_unloadMusic);
     lua_register(L, "playSfx", &luaL_playSfx);
     lua_register(L, "stopSfx", &luaL_stopSfx);
-    lua_register(L, "Begin2D", &luaL_2dModeEnable);
-    lua_register(L, "End2D", &luaL_2dModeDisable);
     lua_register(L, "loadCharacter", &luaL_load2Dcharacter);
     lua_register(L, "drawCharacter", &luaL_draw2Dcharacter);
     lua_register(L, "stopDrawCharacter", &luaL_stopDraw2Dcharacter);
@@ -708,7 +695,6 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "getScreenWidth", &luaL_getScreenWidth);
     lua_register(L, "isKeyPressed", &luaL_isKeyPressed);
     lua_register(L, "isMouseButtonPressed", &luaL_isMouseButtonPressed);
-    lua_register(L, "getLanguage", &luaL_getUsedLanguage);
     lua_register(L, "setGameState", &luaL_setGameState);
     //raylib direct bindings
     lua_register(L, "loadTexture", &luaL_loadTexture);

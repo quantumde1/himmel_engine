@@ -123,11 +123,11 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
             nameRect.y + (nameRect.height - nameSize.y) / 2
         );
         
-        DrawTextEx(dialogFont, name.toStringz(), namePos + Vector2(2, 2), fontSize, spacing, Colors.BLACK);
+        DrawTextEx(dialogFont, name.toStringz(), namePos + Vector2(3, 3), fontSize, spacing, Colors.BLACK);
         DrawTextEx(dialogFont, name.toStringz(), namePos, fontSize, spacing, Colors.WHITE);
     }
 
-    if (IsKeyPressed(KeyboardKey.KEY_ENTER)) {
+    if (IsKeyPressed(KeyboardKey.KEY_ENTER) || IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)) {
         if (!textFullyDisplayed) {
             textDisplayProgress = displayText.length;
             textFullyDisplayed = true;
@@ -202,7 +202,7 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
     }
     
     // Choice selection logic
-    if (currentPage == choicePage) {
+    if (textFullyDisplayed && (currentPage == choicePage)) {
         const choiceHeight = 50;
         const choiceSpacing = 10;
         const verticalPadding = 30;
@@ -230,10 +230,6 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
             bool hovered = CheckCollisionPointRec(mousePos, choiceRect);
             if (hovered) selectedChoice = cast(int)i;
             
-            if (hovered || i == selectedChoice) {
-                DrawRectangleRec(choiceRect, Color(60, 60, 60, 200));
-            }
-            
             Vector2 textSize = MeasureTextEx(dialogFont, choice.toStringz(), 39, spacing);
             Vector2 textPos = Vector2(
                 choiceRect.x + (choiceRect.width - textSize.x)/2,
@@ -258,6 +254,7 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
     // Fast-forward with Ctrl
     if ((IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) || IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)) 
         && currentPage != choicePage && currentPage < pages.length) {
+        textFullyDisplayed = true;
         currentPage++;
     }
     
