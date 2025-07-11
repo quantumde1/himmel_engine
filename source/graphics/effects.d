@@ -8,11 +8,12 @@ import system.abstraction;
 import system.config;
 import std.algorithm;
 import system.abstraction;
+import std.file;
 
 int screenWidth;
 int screenHeight;
 
-Texture2D[] loadAnimationFramesUI(const string archivePath, const string animationName)
+Texture2D[] loadAnimationFramesUI(const string fileDir, const string animationFileName)
 {
     screenWidth = GetScreenWidth();
     screenHeight = GetScreenHeight();
@@ -20,18 +21,10 @@ Texture2D[] loadAnimationFramesUI(const string archivePath, const string animati
     uint frameIndex = 1;
     while (true)
     {
-        string frameFileName = format("%s-%03d.png", animationName, frameIndex);
-        uint image_size;
+        string frameFileName = format("%s-%03d.png", animationFileName, frameIndex);
+        if (std.file.exists(fileDir~"/"~frameFileName) == false) break;
         debug debugWriteln(frameFileName);
-        char* image_data = get_file_data_from_archive(toStringz(archivePath),
-                toStringz(frameFileName), &image_size);
-        if (image_data == null) {
-            debug debugWriteln("exiting from load anim UI");
-            break;
-        }
-        Image image = LoadImageFromMemory(".PNG", cast(const(ubyte)*) image_data, image_size);
-        Texture2D texture = LoadTextureFromImage(image);
-        UnloadImage(image);
+        Texture2D texture = LoadTexture((fileDir~"/"~frameFileName).toStringz());
         frames ~= texture;
         debug debugWriteln("Loaded frame for UI ", frameIndex, " - ", frameFileName);
         frameIndex++;

@@ -40,7 +40,6 @@ void engine_loader()
     int screenWidth = 1344;
     int screenHeight = 1008;
     // Initialization
-    debug debugWriteln("Engine version: ", ver);
     SetExitKey(0);
     Image icon = LoadImage("res/icon.png");
     // Window and Audio Initialization
@@ -49,10 +48,10 @@ void engine_loader()
     UnloadImage(icon);
     //ToggleFullscreen();
     SetTargetFPS(60);
+    //fallback font?
     textFont = LoadFont("res/font_en.png");
     // Fade In and Out Effects
     InitAudioDevice();
-    audioEnabled = systemSettings.sound_state.to!bool;
     helloScreen();
     ClearBackground(Colors.BLACK);
     EndDrawing();
@@ -69,12 +68,11 @@ void engine_loader()
             showMainMenu();
             break;
         case GameState.InGame:
-
             gameInit();
             luaExec = systemSettings.script_path;
             while (!WindowShouldClose())
             {
-                SetExitKey(0);
+            
                 if (luaReload) {
                     resetAllScriptValues();
                     int luaExecutionCode = luaInit(luaExec);
@@ -86,6 +84,7 @@ void engine_loader()
                     }
                     luaReload = false;
                 }
+                SetExitKey(0);
                 if (IsKeyPressed(KeyboardKey.KEY_F11)) {
                     ToggleFullscreen();
                 }

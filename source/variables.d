@@ -6,8 +6,6 @@ import raylib;
 import bindbc.lua;
 import system.abstraction;
 
-extern (C) char* get_file_data_from_archive(const char *input_file, const char *file_name, uint *file_size_out);
-
 nothrow void resetAllScriptValues() {
     debugWriteln("Resetting all values!");
     selectedChoice = 0;
@@ -87,19 +85,11 @@ Color characterColor = Color(255, 255, 255);
 
 bool playAnimation = false;
 
-bool audioEnabled = false;
-
-bool sfxEnabled = false;
-
-bool fullscreenEnabled = true;
-
 bool luaReload = true;
 
 bool videoFinished = false;
 
 bool isCameraMoving = false;
-
-bool neededCharacterDrawing = false;
 
 bool showDialog = false;
 
@@ -108,17 +98,11 @@ bool isTextFullyDisplayed = false;
 
 /* strings */
 
-string ver = "1.1.8";
-
 string[] messageGlobal;
 
 string[] choices;
 
-string[] backlogText;
-
 string luaExec;
-
-char* musicPath;
 
 
 /* floats */

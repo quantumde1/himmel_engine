@@ -35,7 +35,6 @@ extern (C) nothrow int luaL_dialogBox(lua_State* L)
     foreach (i; 0..textTableLength) {
         lua_rawgeti(L, 1, i + 1);
         messageGlobal[i] = luaL_checkstring(L, -1).to!string;
-        backlogText ~= messageGlobal[i];
         lua_pop(L, 1);
     }
 
@@ -246,7 +245,7 @@ extern (C) nothrow int luaL_loadMusic(lua_State* L)
 {
     try
     {
-        musicPath = cast(char*) luaL_checkstring(L, 1);
+        char* musicPath = cast(char*)luaL_checkstring(L, 1);
         music = LoadMusicStream(musicPath);
     }
     catch (Exception e)
@@ -686,17 +685,18 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "drawBackground", &luaL_draw2Dbackground);
     lua_register(L, "stopDrawBackground", &luaL_stopDraw2Dbackground);
     lua_register(L, "unloadBackground", &luaL_unload2Dbackground);
-    lua_register(L, "getTime", &luaL_getTime);
-    lua_register(L, "getDeltaTime", &luaL_getDeltaTime);
     lua_register(L, "loadScript", &luaL_loadScript);
-    lua_register(L, "loadFont", &luaL_loadFont);
-    lua_register(L, "unloadFont", &luaL_unloadFont);
     lua_register(L, "getScreenHeight", &luaL_getScreenHeight);
     lua_register(L, "getScreenWidth", &luaL_getScreenWidth);
     lua_register(L, "isKeyPressed", &luaL_isKeyPressed);
     lua_register(L, "isMouseButtonPressed", &luaL_isMouseButtonPressed);
     lua_register(L, "setGameState", &luaL_setGameState);
+
     //raylib direct bindings
+    lua_register(L, "unloadFont", &luaL_unloadFont);
+    lua_register(L, "loadFont", &luaL_loadFont);
+    lua_register(L, "getTime", &luaL_getTime);
+    lua_register(L, "getDeltaTime", &luaL_getDeltaTime);
     lua_register(L, "loadTexture", &luaL_loadTexture);
     lua_register(L, "drawTexture", &luaL_drawTexture);
     lua_register(L, "drawTextureEx", &luaL_drawTextureEx);
