@@ -197,7 +197,7 @@ void cleanup_video(Video* video)
     free(video);
 }
 
-extern (C) int playVideoInternal(char* argv)
+extern (C) void playVideoInternal(char* argv)
 {
     const(char)*[] vlcArgs;
     debug
@@ -219,7 +219,7 @@ extern (C) int playVideoInternal(char* argv)
     {
         debug debugWriteln("Something went wrong with libvlc init. Turn on DEBUG in conf/build_type.conf at BUILD_TYPE field to get more logs.");
         videoFinished = true;
-        return 0;
+        return;
     }
 
     Video*[] video_list;
@@ -227,7 +227,7 @@ extern (C) int playVideoInternal(char* argv)
     if (new_video is null)
     {
         libvlc_release(libvlc);
-        return 0;
+        return;
     }
 
     video_list ~= new_video;
@@ -315,7 +315,7 @@ extern (C) int playVideoInternal(char* argv)
         }
 
         
-        if (IsKeyPressed(KeyboardKey.KEY_ENTER))
+        if (IsKeyPressed(KeyboardKey.KEY_ENTER) || IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
         {
             foreach (video; video_list)
             {
@@ -326,7 +326,7 @@ extern (C) int playVideoInternal(char* argv)
             video_list.length = 0;
             EndDrawing();
             libvlc_release(libvlc);
-            return 0;
+            return;
         }
 
         EndDrawing();
@@ -339,7 +339,7 @@ extern (C) int playVideoInternal(char* argv)
     videoFinished = true;
     video_list.length = 0;
     libvlc_release(libvlc);
-    return 0;
+    return;
 }
 
 void playVideo(string filename) {

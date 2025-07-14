@@ -31,6 +31,7 @@ void gameInit()
     } else {
         debugWriteln("Game initializing.");
         systemSettings = loadSettingsFromConfigFile();
+        luaExec = systemSettings.script_path;
     }
 }
 

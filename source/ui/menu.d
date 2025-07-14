@@ -93,7 +93,6 @@ int showMainMenu() {
         EndDrawing();
     }
     debugWriteln("menu assets unloading");
-    UnloadFont(textFont);
     StopMusicStream(music);
     UnloadMusicStream(music);
     luaReload = true;

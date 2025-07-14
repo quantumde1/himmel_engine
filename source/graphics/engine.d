@@ -63,55 +63,53 @@ void engine_loader()
     {
         switch (currentGameState)
         {
-        case GameState.MainMenu:
-            debugWriteln("Showing menu.");
-            showMainMenu();
-            break;
-        case GameState.InGame:
-            gameInit();
-            luaExec = systemSettings.script_path;
-            while (!WindowShouldClose())
-            {
-            
-                if (luaReload) {
-                    resetAllScriptValues();
-                    int luaExecutionCode = luaInit(luaExec);
-                    if (luaExecutionCode != EngineExitCodes.EXIT_OK) {
-                        writeln("[ERROR] Engine stops execution according to error code: ", 
-                        luaExecutionCode.to!EngineExitCodes);
-                        currentGameState = GameState.Exit;
-                        break;
+            case GameState.MainMenu:
+                debugWriteln("Showing menu.");
+                showMainMenu();
+                break;
+            case GameState.InGame:
+                gameInit();
+                while (!WindowShouldClose())
+                {
+                    if (luaReload) {
+                        resetAllScriptValues();
+                        int luaExecutionCode = luaInit(luaExec);
+                        if (luaExecutionCode != EngineExitCodes.EXIT_OK) {
+                            writeln("[ERROR] Engine stops execution according to error code: ", 
+                            luaExecutionCode.to!EngineExitCodes);
+                            currentGameState = GameState.Exit;
+                            break;
+                        }
+                        luaReload = false;
                     }
-                    luaReload = false;
+                    SetExitKey(0);
+                    if (IsKeyPressed(KeyboardKey.KEY_F11)) {
+                        ToggleFullscreen();
+                    }
+                    BeginDrawing();
+                    ClearBackground(Colors.BLACK);
+                    // main logic
+                    BeginMode2D(camera);
+                    backgroundLogic();
+                    characterLogic();
+                    // effects logic
+                    effectsLogic();
+                    EndMode2D();
+                    //drawing dialogs
+                    dialogLogic();
+                    luaEventLoop();
+                    EndDrawing();
                 }
-                SetExitKey(0);
-                if (IsKeyPressed(KeyboardKey.KEY_F11)) {
-                    ToggleFullscreen();
-                }
-                BeginDrawing();
-                ClearBackground(Colors.BLACK);
-                // main logic
-                BeginMode2D(camera);
-                backgroundLogic();
-                characterLogic();
-                // effects logic
-                effectsLogic();
-                EndMode2D();
-                //drawing dialogs
-                dialogLogic();
-                luaEventLoop();
+                break;
+            case GameState.Exit:
                 EndDrawing();
-            }
-            break;
-        case GameState.Exit:
-            EndDrawing();
-            unloadResourcesLogic();
-            CloseAudioDevice();
-            CloseWindow();
-            return;
+                unloadResourcesLogic();
+                CloseAudioDevice();
+                CloseWindow();
+                return;
 
-        default:
-            break;
+            default:
+                break;
         }
     }
 }
