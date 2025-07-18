@@ -72,7 +72,7 @@ extern (C) nothrow int luaL_isDialogExecuted(lua_State *L) {
 
 /* background drawing and loading */
 
-extern (C) nothrow int luaL_load2Dbackground(lua_State* L)
+extern (C) nothrow int luaL_loadBackground(lua_State* L)
 {
     try
     {
@@ -94,14 +94,14 @@ extern (C) nothrow int luaL_load2Dbackground(lua_State* L)
     return 0;
 }
 
-extern (C) nothrow int luaL_draw2Dbackground(lua_State* L)
+extern (C) nothrow int luaL_drawBackground(lua_State* L)
 {
     try
     {
         int count = cast(int)luaL_checkinteger(L, 4);
         debugWriteln(backgroundTextures[count]);
         backgroundTextures[count].height = backgroundTextures[count].texture.height;
-        if (backgroundTextures.length < backgroundTextures.length) {
+        if (backgroundTextures.length < count) {
             backgroundTextures.length = backgroundTextures.length;
         }
         backgroundTextures[count].width = backgroundTextures[count].texture.width;
@@ -118,7 +118,7 @@ extern (C) nothrow int luaL_draw2Dbackground(lua_State* L)
     return 0;
 }
 
-extern (C) nothrow int luaL_stopDraw2Dbackground(lua_State* L)
+extern (C) nothrow int luaL_stopDrawBackground(lua_State* L)
 {
     try
     {
@@ -136,7 +136,7 @@ extern (C) nothrow int luaL_stopDraw2Dbackground(lua_State* L)
     return 0;
 }
 
-extern (C) nothrow int luaL_unload2Dbackground(lua_State* L)
+extern (C) nothrow int luaL_unloadBackground(lua_State* L)
 {
     int count = cast(int)luaL_checkinteger(L, 1);
     if (count >= backgroundTextures.length) {
@@ -150,7 +150,7 @@ extern (C) nothrow int luaL_unload2Dbackground(lua_State* L)
 
 /* character textures */
 
-extern (C) nothrow int luaL_load2Dcharacter(lua_State *L) {
+extern (C) nothrow int luaL_loadCharacter(lua_State *L) {
     try
     {
         
@@ -177,7 +177,7 @@ extern (C) nothrow int luaL_load2Dcharacter(lua_State *L) {
     return 0;
 }
 
-extern (C) nothrow int luaL_draw2Dcharacter(lua_State* L)
+extern (C) nothrow int luaL_drawCharacter(lua_State* L)
 {
     try {
         //configuring needed parameters in characterTextures like coordinates, scale and drawTexture(its a boolean value which checks need this texture to be drawn or not)
@@ -217,7 +217,7 @@ extern (C) nothrow int luaL_draw2Dcharacter(lua_State* L)
     return 0;
 }
 
-extern (C) nothrow int luaL_stopDraw2Dcharacter(lua_State* L)
+extern (C) nothrow int luaL_stopDrawCharacter(lua_State* L)
 {
     int count = cast(int) luaL_checkinteger(L, 1);
     if (count >= characterTextures.length) {
@@ -228,7 +228,7 @@ extern (C) nothrow int luaL_stopDraw2Dcharacter(lua_State* L)
     return 0;
 }
 
-extern (C) nothrow int luaL_unload2Dcharacter(lua_State *L) {
+extern (C) nothrow int luaL_unloadCharacter(lua_State *L) {
     int count = cast(int) luaL_checkinteger(L, 1);
     if (count >= characterTextures.length) {
         debugWriteln("error unloading not loaded character");
@@ -677,14 +677,14 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "unloadMusic", &luaL_unloadMusic);
     lua_register(L, "playSfx", &luaL_playSfx);
     lua_register(L, "stopSfx", &luaL_stopSfx);
-    lua_register(L, "loadCharacter", &luaL_load2Dcharacter);
-    lua_register(L, "drawCharacter", &luaL_draw2Dcharacter);
-    lua_register(L, "stopDrawCharacter", &luaL_stopDraw2Dcharacter);
-    lua_register(L, "unloadCharacter", &luaL_unload2Dcharacter);
-    lua_register(L, "loadBackground", &luaL_load2Dbackground);
-    lua_register(L, "drawBackground", &luaL_draw2Dbackground);
-    lua_register(L, "stopDrawBackground", &luaL_stopDraw2Dbackground);
-    lua_register(L, "unloadBackground", &luaL_unload2Dbackground);
+    lua_register(L, "loadCharacter", &luaL_loadCharacter);
+    lua_register(L, "drawCharacter", &luaL_drawCharacter);
+    lua_register(L, "stopDrawCharacter", &luaL_stopDrawCharacter);
+    lua_register(L, "unloadCharacter", &luaL_unloadCharacter);
+    lua_register(L, "loadBackground", &luaL_loadBackground);
+    lua_register(L, "drawBackground", &luaL_drawBackground);
+    lua_register(L, "stopDrawBackground", &luaL_stopDrawBackground);
+    lua_register(L, "unloadBackground", &luaL_unloadBackground);
     lua_register(L, "loadScript", &luaL_loadScript);
     lua_register(L, "getScreenHeight", &luaL_getScreenHeight);
     lua_register(L, "getScreenWidth", &luaL_getScreenWidth);

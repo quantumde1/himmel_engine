@@ -41,9 +41,10 @@ void engine_loader()
     int screenHeight = 1008;
     // Initialization
     SetExitKey(0);
-    Image icon = LoadImage("res/icon.png");
+    systemSettings = loadSettingsFromConfigFile();
+    Image icon = LoadImage(systemSettings.iconPath.toStringz());
     // Window and Audio Initialization
-    InitWindow(screenWidth, screenHeight, "Remember11 - Self Chapter");
+    InitWindow(screenWidth, screenHeight, systemSettings.windowTitle.toStringz());
     SetWindowIcon(icon);
     UnloadImage(icon);
     //ToggleFullscreen();

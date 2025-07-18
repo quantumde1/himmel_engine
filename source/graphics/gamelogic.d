@@ -30,8 +30,7 @@ void gameInit()
         currentGameState = GameState.Exit;
     } else {
         debugWriteln("Game initializing.");
-        systemSettings = loadSettingsFromConfigFile();
-        luaExec = systemSettings.script_path;
+        luaExec = systemSettings.scriptPath;
     }
 }
 

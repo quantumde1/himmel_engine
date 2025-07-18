@@ -26,14 +26,9 @@ nothrow void resetAllScriptValues() {
 /* system */
 
 struct SystemSettings {
-    int sound_state;
-    char right_button;
-    char left_button;
-    char back_button;
-    char forward_button;
-    char dialog_button;
-    char opmenu_button;
-    string script_path;
+    string scriptPath;
+    string windowTitle;
+    string iconPath;
 }
 
 struct TextureEngine {

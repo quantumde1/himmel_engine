@@ -16,14 +16,9 @@ nothrow auto parseConf(string type)(string filename)
         auto config = file.byLineCopy();
         
         static immutable typeMap = [
-            "sound": "SOUND:",
-            "backward": "BACKWARD:",
-            "forward": "FORWARD:",
-            "right": "RIGHT:",
-            "left": "LEFT:",
-            "dialog": "DIALOG:",
-            "opmenu": "OPMENU:",
-            "script": "SCRIPT:"
+            "script": "SCRIPT:",
+            "title": "TITLE:",
+            "icon": "ICON:"
         ];
 
         if (type in typeMap)
@@ -36,14 +31,7 @@ nothrow auto parseConf(string type)(string filename)
                 {
                     auto value = trimmedLine[prefix.length .. $].strip();
                     debug debugWriteln("Value for ", type, ": ", value);
-                    
-                    static if (type == "sound") {
-                        return value.to!int();
-                    } else static if (type == "script") {
-                        return value;
-                    } else {
-                        return value.front.to!char();
-                    }
+                    return value;
                 }
             }
         }
@@ -52,26 +40,14 @@ nothrow auto parseConf(string type)(string filename)
     {
         debugWriteln(e.msg);
     }
-    
-    static if (type == "sound") {
-        return 0;
-    } else static if (type == "script") {
-        return "";
-    } else {
-        return 'E';
-    }
+    return "";
 }
 
 SystemSettings loadSettingsFromConfigFile()
 {
     return SystemSettings(
-        parseConf!"sound"("conf/settings.conf"),      // int
-        parseConf!"right"("conf/settings.conf"),     // char
-        parseConf!"left"("conf/settings.conf"),       // char
-        parseConf!"backward"("conf/settings.conf"),   // char
-        parseConf!"forward"("conf/settings.conf"),    // char
-        parseConf!"dialog"("conf/settings.conf"),     // char
-        parseConf!"opmenu"("conf/settings.conf"),     // char
-        parseConf!"script"("conf/settings.conf")     // string
+        parseConf!"script"("conf/settings.conf"),
+        parseConf!"title"("conf/settings.conf"),
+        parseConf!"icon"("conf/settings.conf")
     );
 }
