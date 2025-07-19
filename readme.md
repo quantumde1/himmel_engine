@@ -2,6 +2,7 @@
 
 Himmel(equal to Heaven, but in German) is an engine for Visual Novels, written using Dlang and Lua.
 
+![image info](image.png)
 ## Getting Started
 
 ### Getting needed components

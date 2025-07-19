@@ -50,7 +50,7 @@ void engine_loader()
     //ToggleFullscreen();
     SetTargetFPS(60);
     //fallback font?
-    textFont = LoadFont("res/font_en.png");
+    textFont = LoadFont(systemSettings.fallbackFont.toStringz());
     // Fade In and Out Effects
     InitAudioDevice();
     helloScreen();

@@ -29,6 +29,10 @@ struct SystemSettings {
     string scriptPath;
     string windowTitle;
     string iconPath;
+    string dialogBoxEndIndicator;
+    string dialogBoxImage;
+    string choiceBoxImage;
+    string fallbackFont;
 }
 
 struct TextureEngine {

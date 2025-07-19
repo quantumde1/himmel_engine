@@ -203,7 +203,7 @@ extern (C) void playVideoInternal(char* argv)
     debug
     {
         vlcArgs = [
-            "--verbose=2", "--no-xlib", "--drop-late-frames", "--live-caching=0",
+            "--verbose=1", "--no-xlib", "--drop-late-frames", "--live-caching=0",
             "--no-lua"
         ];
     }
