@@ -9,7 +9,6 @@ import core.stdc.string;
 import core.thread;
 import variables;
 import core.sync.mutex;
-import std.array;
 import std.file;
 import system.abstraction;
 

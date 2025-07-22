@@ -3,19 +3,11 @@ module graphics.gamelogic;
 import raylib;
 import bindbc.lua;
 import variables;
-import core.stdc.stdlib;
-import core.stdc.time;
-import graphics.engine;
-import scripts.lua;
-import std.stdio;
-import std.conv;
 import graphics.effects;
 import std.string;
 import std.math;
 import dialogs.dialogbox;
 import system.abstraction;
-import system.config;
-import std.file;
 
 /** 
  * this module contains game logic, which was removed from engine.d for better readability.
@@ -65,9 +57,7 @@ void texturesLogic(TextureEngine[] textures) {
     }
 }
 
-void effectsLogic()
-{
-    UpdateMusicStream(music);
+void effectsLogic() {
     if (isCameraMoving) {
         float delta = GetFrameTime() * cameraMoveSpeed;
         camera.target.x += (cameraTargetX - camera.target.x) * delta;

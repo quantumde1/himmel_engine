@@ -5,9 +5,6 @@ import std.stdio;
 import variables;
 import std.string;
 import system.abstraction;
-import system.config;
-import std.algorithm;
-import system.abstraction;
 import std.file;
 
 int screenWidth;
@@ -15,8 +12,8 @@ int screenHeight;
 
 Texture2D[] loadAnimationFramesUI(const string fileDir, const string animationFileName)
 {
-    screenWidth = GetScreenWidth();
-    screenHeight = GetScreenHeight();
+    screenWidth = systemSettings.defaultScreenWidth;
+    screenHeight = systemSettings.defaultScreenHeight;
     Texture2D[] frames;
     uint frameIndex = 1;
     while (true)

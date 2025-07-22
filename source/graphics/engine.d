@@ -5,17 +5,10 @@ import raylib;
 
 //dlang imports
 import std.stdio;
-import std.math;
-import std.file;
-import std.array;
 import std.string;
 import std.conv;
-import std.typecons;
-import std.random;
-import std.datetime;
 
 //graphics
-import graphics.playback;
 import graphics.gamelogic;
 import ui.menu;
 
@@ -31,20 +24,19 @@ import system.abstraction;
 import variables;
 import system.cleanup;
 
-//C bindings
-import core.stdc.stdlib;
-import core.stdc.time;
-
 void engine_loader()
 {
-    int screenWidth = 1344;
-    int screenHeight = 1008;
+    systemSettings = loadSettingsFromConfigFile("conf/settings.conf");
+    int screenWidth = systemSettings.defaultScreenWidth;
+    int screenHeight = systemSettings.defaultScreenHeight;
     // Initialization
     SetExitKey(0);
-    systemSettings = loadSettingsFromConfigFile();
     Image icon = LoadImage(systemSettings.iconPath.toStringz());
     // Window and Audio Initialization
     InitWindow(screenWidth, screenHeight, systemSettings.windowTitle.toStringz());
+    if (systemSettings.defaultFullscreen == true) {
+        ToggleFullscreen();
+    }
     SetWindowIcon(icon);
     UnloadImage(icon);
     //ToggleFullscreen();

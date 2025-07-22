@@ -33,6 +33,9 @@ struct SystemSettings {
     string dialogBoxImage;
     string choiceBoxImage;
     string fallbackFont;
+    int defaultScreenWidth;
+    int defaultScreenHeight;
+    bool defaultFullscreen;
 }
 
 struct TextureEngine {

@@ -4,17 +4,9 @@ import raylib;
 import variables;
 import std.stdio;
 import system.abstraction;
-import system.config;
-import core.time;
-import core.thread;
-import std.string;
-import graphics.engine;
 import graphics.playback;
-import std.file;
 import scripts.lua;
-import std.conv;
 import graphics.gamelogic;
-import system.cleanup;
 
 void fadeEffect(float alpha, bool fadeIn, void delegate(float alpha) renderer)
 {
@@ -72,7 +64,7 @@ int showMainMenu() {
     int luaExecutionCode = luaInit("scripts/menu.lua");
     if (luaExecutionCode != EngineExitCodes.EXIT_OK) {
         writeln("[ERROR] Engine stops execution according to error code: ", 
-        luaExecutionCode.to!EngineExitCodes);
+        luaExecutionCode);
         currentGameState = GameState.Exit;
         return luaExecutionCode;
     }

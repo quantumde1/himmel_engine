@@ -12,8 +12,6 @@ import std.string;
 import graphics.engine;
 import graphics.playback;
 import std.file;
-import std.array;
-import std.algorithm;
 
 /* 
  * This module provides Lua bindings for various engine functionalities.

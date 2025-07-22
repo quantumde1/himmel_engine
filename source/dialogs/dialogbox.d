@@ -2,10 +2,7 @@ module dialogs.dialogbox;
 
 import raylib;
 import std.string;
-import std.stdio;
-import std.conv;
 import std.uni;
-import std.typecons;
 import std.algorithm;
 import variables;
 
@@ -18,8 +15,8 @@ bool textFullyDisplayed = false;
 float circleRotationAngle = 0.0f;
 
 // Border sizes for 9-slice scaling
-const int DIALOG_BORDER = 32; // Border that won't be stretched
-const int CHOICE_BORDER = 32; // Choice window border
+immutable int DIALOG_BORDER = 32; // Border that won't be stretched
+immutable int CHOICE_BORDER = 32; // Choice window border
 
 // Draws a texture with 9-slice scaling
 void draw9SliceTexture(Texture2D tex, Rectangle dest, int borderSize, Color tint) {
@@ -73,9 +70,9 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
                    ref float textSpeed, Texture2D circle, 
                    Texture2D dialogBackgroundTex, Texture2D choiceWindowTex) {
     
-    const screenWidth = GetScreenWidth();
-    const screenHeight = GetScreenHeight();
-    const screenPadding = 10;
+    immutable int screenWidth = systemSettings.defaultScreenWidth;
+    immutable int screenHeight = systemSettings.defaultScreenHeight;
+    immutable int screenPadding = 10;
     
     // Dialog background rectangle with padding
     Rectangle dialogRect = Rectangle(
@@ -88,12 +85,12 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
     draw9SliceTexture(dialogBackgroundTex, dialogRect, DIALOG_BORDER, Colors.WHITE);
     
     // Text layout parameters
-    const float textLeftMargin = 33.0f;
-    const float textTopMargin = 20.0f;
-    const float textRightMargin = 33.0f;
-    const float textWidth = dialogRect.width - textLeftMargin - textRightMargin;
-    const float fontSize = 40.0f;
-    const float spacing = 1.0f;
+    immutable float textLeftMargin = 33.0f;
+    immutable float textTopMargin = 20.0f;
+    immutable float textRightMargin = 33.0f;
+    immutable float textWidth = dialogRect.width - textLeftMargin - textRightMargin;
+    immutable float fontSize = 40.0f;
+    immutable float spacing = 1.0f;
     string name;
     
     // Text display logic
@@ -174,7 +171,7 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
     }
     
     // Draw text lines with shadow effect
-    const float lineHeight = MeasureTextEx(dialogFont, "A", fontSize, spacing).y * 1.4;
+    immutable float lineHeight = MeasureTextEx(dialogFont, "A", fontSize, spacing).y * 1.4;
     foreach(i, line; lines) {
         Vector2 pos = Vector2(dialogRect.x + textLeftMargin, dialogRect.y + textTopMargin + i*lineHeight);
         DrawTextEx(dialogFont, line.toStringz(), pos + Vector2(3, 3), fontSize, spacing, Colors.BLACK);
@@ -203,9 +200,9 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
     
     // Choice selection logic
     if (textFullyDisplayed && (currentPage == choicePage)) {
-        const choiceHeight = 50;
-        const choiceSpacing = 10;
-        const verticalPadding = 30;
+        immutable choiceHeight = 50;
+        immutable choiceSpacing = 10;
+        immutable verticalPadding = 30;
         
         Rectangle choiceWindow = Rectangle(
             (screenWidth - screenWidth/2)/2,

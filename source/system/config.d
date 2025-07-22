@@ -8,8 +8,7 @@ import variables;
 import std.conv;
 import system.abstraction;
 
-nothrow auto parseConf(string type)(string filename)
-{
+nothrow string parseConf(string type, string filename) {
     try
     {
         auto file = File(filename);
@@ -22,7 +21,10 @@ nothrow auto parseConf(string type)(string filename)
             "dialog_end_indicator": "DIALOG_END_INDICATOR:",
             "dialog_box": "DIALOG_BOX:",
             "choice_box": "CHOICE_BOX:",
-            "fallback_font": "FALLBACK_FONT:"
+            "fallback_font": "FALLBACK_FONT:",
+            "default_screen_width": "DEFAULT_SCREEN_WIDTH:",
+            "default_screen_height": "DEFAULT_SCREEN_HEIGHT:",
+            "default_fullscreen": "DEFAULT_FULLSCREEN:"
         ];
 
         if (type in typeMap)
@@ -47,15 +49,17 @@ nothrow auto parseConf(string type)(string filename)
     return "";
 }
 
-SystemSettings loadSettingsFromConfigFile()
-{
+SystemSettings loadSettingsFromConfigFile(string confName) {
     return SystemSettings(
-        parseConf!"script"("conf/settings.conf"),
-        parseConf!"title"("conf/settings.conf"),
-        parseConf!"icon"("conf/settings.conf"),
-        parseConf!"dialog_end_indicator"("conf/settings.conf"),
-        parseConf!"dialog_box"("conf/settings.conf"),
-        parseConf!"choice_box"("conf/settings.conf"),
-        parseConf!"fallback_font"("conf/settings.conf")
+        parseConf("script", confName),
+        parseConf("title", confName),
+        parseConf("icon", confName),
+        parseConf("dialog_end_indicator", confName),
+        parseConf("dialog_box", confName),
+        parseConf("choice_box", confName),
+        parseConf("fallback_font", confName),
+        parseConf("default_screen_width", confName).to!int,
+        parseConf("default_screen_height", confName).to!int,
+        parseConf("default_fullscreen", confName).to!bool
     );
 }
