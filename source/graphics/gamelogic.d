@@ -17,7 +17,6 @@ void gameInit()
 {
     circle = LoadTexture(systemSettings.dialogBoxEndIndicator.toStringz());
     dialogBackgroundTex = LoadTexture(systemSettings.dialogBoxImage.toStringz());
-    choiceWindowTex = LoadTexture(systemSettings.choiceBoxImage.toStringz());
     if (WindowShouldClose()) {
         currentGameState = GameState.Exit;
     } else {
@@ -44,7 +43,7 @@ void texturesLogic(TextureEngine[] textures) {
             float centeredX = textures[i].x - (textures[i].width * textures[i].scale / 2);
             float centeredY = textures[i].y - (textures[i].height * textures[i].scale / 2);
             
-            Color tint = Colors.WHITE;
+            Color tint = textures[i].color;
             tint.a = cast(ubyte)(255 * textures[i].alpha);
             
             DrawTextureEx(textures[i].texture,
@@ -58,6 +57,7 @@ void texturesLogic(TextureEngine[] textures) {
 }
 
 void effectsLogic() {
+    UpdateMusicStream(music);
     if (isCameraMoving) {
         float delta = GetFrameTime() * cameraMoveSpeed;
         camera.target.x += (cameraTargetX - camera.target.x) * delta;
@@ -84,6 +84,6 @@ void characterLogic() {
 void dialogLogic() {
     if (showDialog) {
         displayDialog(messageGlobal, choices, selectedChoice, choicePage, textFont, &showDialog, typingSpeed, 
-        circle, dialogBackgroundTex, choiceWindowTex);
+        circle, dialogBackgroundTex, scale);
     }
 }

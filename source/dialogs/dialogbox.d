@@ -68,7 +68,7 @@ void draw9SliceTexture(Texture2D tex, Rectangle dest, int borderSize, Color tint
 void displayDialog(string[] pages, string[] choices, ref int selectedChoice, 
                    int choicePage, Font dialogFont, bool* showDialog, 
                    ref float textSpeed, Texture2D circle, 
-                   Texture2D dialogBackgroundTex, Texture2D choiceWindowTex) {
+                   Texture2D dialogBackgroundTex, float scale) {
     
     immutable int screenWidth = systemSettings.defaultScreenWidth;
     immutable int screenHeight = systemSettings.defaultScreenHeight;
@@ -89,7 +89,7 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
     immutable float textTopMargin = 20.0f;
     immutable float textRightMargin = 33.0f;
     immutable float textWidth = dialogRect.width - textLeftMargin - textRightMargin;
-    immutable float fontSize = 40.0f;
+    immutable float fontSize = cast(int)(40.0f*scale);
     immutable float spacing = 1.0f;
     string name;
     
@@ -112,7 +112,7 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
             screenWidth / 12 + MeasureTextEx(dialogFont, name.toStringz(), fontSize, spacing).x,
             screenHeight / 12
         );
-        draw9SliceTexture(choiceWindowTex, nameRect, DIALOG_BORDER, Colors.WHITE);
+        draw9SliceTexture(dialogBackgroundTex, nameRect, DIALOG_BORDER, Colors.WHITE);
         Vector2 nameSize = MeasureTextEx(dialogFont, name.toStringz(), fontSize, spacing);
         
         Vector2 namePos = Vector2(
@@ -120,7 +120,7 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
             nameRect.y + (nameRect.height - nameSize.y) / 2
         );
         
-        DrawTextEx(dialogFont, name.toStringz(), namePos + Vector2(3, 3), fontSize, spacing, Colors.BLACK);
+        DrawTextEx(dialogFont, name.toStringz(), namePos + Vector2(3*scale, 3*scale), fontSize, spacing, Colors.BLACK);
         DrawTextEx(dialogFont, name.toStringz(), namePos, fontSize, spacing, Colors.WHITE);
     }
 
@@ -174,7 +174,7 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
     immutable float lineHeight = MeasureTextEx(dialogFont, "A", fontSize, spacing).y * 1.4;
     foreach(i, line; lines) {
         Vector2 pos = Vector2(dialogRect.x + textLeftMargin, dialogRect.y + textTopMargin + i*lineHeight);
-        DrawTextEx(dialogFont, line.toStringz(), pos + Vector2(3, 3), fontSize, spacing, Colors.BLACK);
+        DrawTextEx(dialogFont, line.toStringz(), pos + Vector2(3*scale, 3*scale), fontSize, spacing, Colors.BLACK);
         DrawTextEx(dialogFont, line.toStringz(), pos, fontSize, spacing, Colors.WHITE);
     }
     
@@ -184,15 +184,16 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
         
         float lastLineWidth = MeasureTextEx(dialogFont, lines[$-1].toStringz(), fontSize, spacing).x;
         Vector2 circlePos = Vector2(
-            dialogRect.x + textLeftMargin + lastLineWidth + 20,
-            dialogRect.y + textTopMargin + (lines.length-1)*lineHeight
+            (dialogRect.x + textLeftMargin + lastLineWidth + 20),
+            (dialogRect.y + textTopMargin + ((lines.length)-1)*lineHeight)
         );
         
+        float circleSize = 30.0f * scale;
         DrawTexturePro(
             circle,
             Rectangle(0, 0, circle.width, circle.height),
-            Rectangle(circlePos.x, circlePos.y+20, 30, 30),
-            Vector2(15, 15),
+            Rectangle(circlePos.x, circlePos.y + (scale*20), circleSize, circleSize),
+            Vector2(circleSize / 2, circleSize / 2),
             circleRotationAngle,
             Colors.WHITE
         );
@@ -211,7 +212,7 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
             verticalPadding*2 + choices.length*(choiceHeight + choiceSpacing)
         );
         
-        draw9SliceTexture(choiceWindowTex, choiceWindow, CHOICE_BORDER, Colors.WHITE);
+        draw9SliceTexture(dialogBackgroundTex, choiceWindow, CHOICE_BORDER, Colors.WHITE);
         
         Vector2 mousePos = GetMousePosition();
         bool mouseClicked = IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT);
@@ -227,14 +228,14 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
             bool hovered = CheckCollisionPointRec(mousePos, choiceRect);
             if (hovered) selectedChoice = cast(int)i;
             
-            Vector2 textSize = MeasureTextEx(dialogFont, choice.toStringz(), 39, spacing);
+            Vector2 textSize = MeasureTextEx(dialogFont, choice.toStringz(), fontSize, spacing);
             Vector2 textPos = Vector2(
                 choiceRect.x + (choiceRect.width - textSize.x)/2,
                 choiceRect.y + (choiceRect.height - textSize.y)/2
             );
             
-            DrawTextEx(dialogFont, choice.toStringz(), textPos + Vector2(3, 3), 39, spacing, Colors.BLACK);
-            DrawTextEx(dialogFont, choice.toStringz(), textPos, 39, spacing, 
+            DrawTextEx(dialogFont, choice.toStringz(), textPos + Vector2(3*scale, 3*scale), fontSize, spacing, Colors.BLACK);
+            DrawTextEx(dialogFont, choice.toStringz(), textPos, fontSize, spacing, 
                       (i == selectedChoice) ? Colors.YELLOW : (hovered ? Colors.LIGHTGRAY : Colors.WHITE));
             
             if (hovered && mouseClicked) {

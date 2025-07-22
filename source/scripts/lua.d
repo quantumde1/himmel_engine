@@ -9,6 +9,7 @@ import std.conv;
 import system.abstraction;
 import system.config;
 import std.string;
+import std.algorithm;
 import graphics.engine;
 import graphics.playback;
 import std.file;
@@ -105,7 +106,7 @@ extern (C) nothrow int luaL_drawBackground(lua_State* L)
         backgroundTextures[count].width = backgroundTextures[count].texture.width;
         backgroundTextures[count].x = luaL_checknumber(L, 1);
         backgroundTextures[count].y = luaL_checknumber(L, 2);
-        backgroundTextures[count].scale = luaL_checknumber(L, 3);
+        backgroundTextures[count].scale = luaL_checknumber(L, 3) * scale;
         backgroundTextures[count].drawTexture = true;
         debugWriteln(backgroundTextures[count]);
     }
@@ -180,32 +181,32 @@ extern (C) nothrow int luaL_drawCharacter(lua_State* L)
     try {
         //configuring needed parameters in characterTextures like coordinates, scale and drawTexture(its a boolean value which checks need this texture to be drawn or not)
         int count = to!int(luaL_checkinteger(L, 4));
-        characterTextures[count].scale = luaL_checknumber(L, 3);
-        characterTextures[count].y = cast(int) luaL_checkinteger(L, 2);
-        characterTextures[count].x = cast(int) luaL_checkinteger(L, 1);
+        characterTextures[count].scale = luaL_checknumber(L, 3) * scale;
+        characterTextures[count].y = cast(int) luaL_checknumber(L, 2);
+        characterTextures[count].x = cast(int) luaL_checknumber(L, 1);
         characterTextures[count].drawTexture = true;
         characterTextures[count].justDrawn = true;
         if (lua_gettop(L) == 5) {
             lua_getfield(L, 5, "r");
-            characterColor.r = cast(ubyte)lua_tointeger(L, -1);
+            characterTextures[count].color.r = cast(ubyte)lua_tointeger(L, -1);
             lua_pop(L, 1);
             
             lua_getfield(L, 5, "g");
-            characterColor.g = cast(ubyte)lua_tointeger(L, -1);
+            characterTextures[count].color.g = cast(ubyte)lua_tointeger(L, -1);
             lua_pop(L, 1);
             
             lua_getfield(L, 5, "b");
-            characterColor.b = cast(ubyte)lua_tointeger(L, -1);
+            characterTextures[count].color.b = cast(ubyte)lua_tointeger(L, -1);
             lua_pop(L, 1);
             
             lua_getfield(L, 5, "a");
             //if empty, reset to default
             if (!lua_isnil(L, -1)) {
-                characterColor.a = cast(ubyte)lua_tointeger(L, -1);
+                characterTextures[count].color.a = cast(ubyte)lua_tointeger(L, -1);
             }
             lua_pop(L, 1);
         } else {
-            characterColor = Colors.WHITE;
+            characterTextures[count].color = Colors.WHITE;
         }
         debugWriteln("Count: ", count, " drawTexture cond: ", characterTextures[count].drawTexture);
         debugWriteln("arguments count: ", lua_gettop(L));
@@ -407,7 +408,8 @@ extern (C) nothrow int luaL_loadFont(lua_State* L)
     {
         codepoints[96 + i] = 0x400 + i;
     }
-    textFont = LoadFontEx(x, 40, codepoints.ptr, codepoints.length);
+    int fontSize = max(10, cast(int)(40 * scale));
+    textFont = LoadFontEx(x, fontSize, null, 0);
     return 0;
 }
 
@@ -567,19 +569,19 @@ extern (C) nothrow int luaL_drawTexture(lua_State *L) {
         lua_pop(L, 1);
     }
     
-    DrawTexture(*texture, x, y, color);
+    DrawTextureEx(*texture, Vector2(x, y), 0.0f, scale, color);
     return 0;
 }
 
 extern (C) nothrow int luaL_getTextureWidth(lua_State *L) {
     Texture2D* texture = cast(Texture2D*)luaL_checkudata(L, 1, "Texture");
-    lua_pushinteger(L, texture.width);
+    lua_pushnumber(L, texture.width*variables.scale);
     return 1;
 }
 
 extern (C) nothrow int luaL_getTextureHeight(lua_State *L) {
     Texture2D* texture = cast(Texture2D*)luaL_checkudata(L, 1, "Texture");
-    lua_pushinteger(L, texture.height);
+    lua_pushnumber(L, texture.height*variables.scale);
     return 1;
 }
 
@@ -648,7 +650,7 @@ extern (C) nothrow int luaL_drawTextureEx(lua_State *L) {
         color.a = cast(ubyte)lua_tointeger(L, -1);
         lua_pop(L, 1);
     }
-    DrawTextureEx(*texture, Vector2(x, y), rotation, scale, color);
+    DrawTextureEx(*texture, Vector2(x, y), rotation, scale*variables.scale, color);
     
     return 0;
 }

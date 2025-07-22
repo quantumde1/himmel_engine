@@ -31,7 +31,6 @@ struct SystemSettings {
     string iconPath;
     string dialogBoxEndIndicator;
     string dialogBoxImage;
-    string choiceBoxImage;
     string fallbackFont;
     int defaultScreenWidth;
     int defaultScreenHeight;
@@ -47,6 +46,7 @@ struct TextureEngine {
     float y;
     Texture2D texture;
     float scale;
+    Color color = Colors.WHITE;
     float alpha = 0.0f;
     float targetAlpha = 0.0f;
     float fadeSpeed = 9.0f;
@@ -80,8 +80,6 @@ int currentGameState = 1;
 Font textFont;
 
 Music music;
-
-Color characterColor = Color(255, 255, 255);
 
 /* booleans */
 
@@ -121,14 +119,13 @@ float frameDuration = 0.016f;
 
 float typingSpeed = 0.6f;
 
+float scale = 1.0f;
 
 /* textures */
 
 Texture2D[] framesUI;
 
 Texture2D dialogBackgroundTex;
-
-Texture2D choiceWindowTex;
 
 Texture2D circle;
 

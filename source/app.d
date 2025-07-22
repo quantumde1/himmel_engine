@@ -12,5 +12,5 @@ void main(string[] args)
     } else {
         SetTraceLogLevel(7);
     }
-    engine_loader();
+    engineLoader();
 }

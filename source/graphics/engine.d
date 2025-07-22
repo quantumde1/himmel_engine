@@ -23,12 +23,17 @@ import system.config;
 import system.abstraction;
 import variables;
 import system.cleanup;
+import std.algorithm;
 
-void engine_loader()
+void engineLoader()
 {
     systemSettings = loadSettingsFromConfigFile("conf/settings.conf");
+    float baseWidth = 1344.0f;
+    float baseHeight = 1008.0f;
     int screenWidth = systemSettings.defaultScreenWidth;
     int screenHeight = systemSettings.defaultScreenHeight;
+    scale = min(cast(float)(screenWidth/baseWidth), cast(float)(screenHeight/baseHeight));
+    debugWriteln("scale: ", scale);
     // Initialization
     SetExitKey(0);
     Image icon = LoadImage(systemSettings.iconPath.toStringz());
