@@ -6,7 +6,7 @@ git clone https://github.com/quantumde1/hpff
 
 echo 'Building raylib'
 cd raylib/src && make -j$(nproc) PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED
-cp ./*.so.* ../../
+cp ./*.so ../../
 cd ../../
 
 echo 'Building hpff'

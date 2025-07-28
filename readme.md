@@ -21,7 +21,7 @@ doas apk add ldc2 dub vlc-dev vlc lua5.3-dev
 
 3. __Debian:__
 ```
-sudo apt install dub ldc vlc-dev liblua5.3-dev vlc lua
+sudo apt install dub ldc libvlc-dev liblua5.3-dev vlc lua5.3 build-essential
 ```
 
 Next, run 
