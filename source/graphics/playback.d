@@ -10,6 +10,7 @@ import core.thread;
 import variables;
 import core.sync.mutex;
 import std.file;
+import std.string;
 import system.abstraction;
 
 extern (C)
@@ -196,7 +197,7 @@ void cleanup_video(Video* video)
     free(video);
 }
 
-extern (C) void playVideoInternal(char* argv)
+extern (C) void playVideoInternal(immutable char* argv)
 {
     const(char)*[] vlcArgs;
     debug
@@ -343,7 +344,7 @@ extern (C) void playVideoInternal(char* argv)
 
 void playVideo(string filename) {
     version (Posix)
-        playVideoInternal(cast(char*)(getcwd() ~ "/" ~ filename));
+        playVideoInternal(toStringz(getcwd() ~ "/" ~ filename));
     version (Windows)
-        playVideoInternal(cast(char*)("/" ~ getcwd() ~ "/" ~ filename));
+        playVideoInternal(toStringz("/" ~ getcwd() ~ "/" ~ filename));
 }
