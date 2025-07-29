@@ -28,10 +28,10 @@ import std.algorithm;
 void engineLoader()
 {
     systemSettings = loadSettingsFromConfigFile("conf/settings.conf");
-    float baseWidth = 1344.0f;
-    float baseHeight = 1008.0f;
-    int screenWidth = systemSettings.defaultScreenWidth;
-    int screenHeight = systemSettings.defaultScreenHeight;
+    baseWidth = systemSettings.defaultScreenWidth;
+    baseHeight = systemSettings.defaultScreenHeight;
+    int screenWidth = systemSettings.screenWidth;
+    int screenHeight = systemSettings.screenHeight;
     scale = min(cast(float)(screenWidth/baseWidth), cast(float)(screenHeight/baseHeight));
     debugWriteln("scale: ", scale);
     // Initialization

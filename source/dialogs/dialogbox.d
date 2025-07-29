@@ -70,8 +70,8 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
                    ref float textSpeed, Texture2D circle, 
                    Texture2D dialogBackgroundTex, float scale) {
     
-    immutable int screenWidth = systemSettings.defaultScreenWidth;
-    immutable int screenHeight = systemSettings.defaultScreenHeight;
+    immutable int screenWidth = systemSettings.screenWidth;
+    immutable int screenHeight = systemSettings.screenHeight;
     immutable int screenPadding = 10;
     
     // Dialog background rectangle with padding

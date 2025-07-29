@@ -34,6 +34,8 @@ struct SystemSettings {
     string fallbackFont;
     int defaultScreenWidth;
     int defaultScreenHeight;
+    int screenWidth;
+    int screenHeight;
     bool defaultFullscreen;
 }
 
@@ -106,6 +108,10 @@ string luaExec;
 
 
 /* floats */
+
+float baseWidth;
+
+float baseHeight;
 
 float cameraTargetX = 0;
 

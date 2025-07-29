@@ -23,6 +23,8 @@ nothrow string parseConf(string type, string filename) {
             "fallback_font": "FALLBACK_FONT:",
             "default_screen_width": "DEFAULT_SCREEN_WIDTH:",
             "default_screen_height": "DEFAULT_SCREEN_HEIGHT:",
+            "screen_width": "SCREEN_WIDTH:",
+            "screen_height": "SCREEN_HEIGHT:",
             "default_fullscreen": "DEFAULT_FULLSCREEN:"
         ];
 
@@ -58,6 +60,8 @@ SystemSettings loadSettingsFromConfigFile(string confName) {
         parseConf("fallback_font", confName),
         parseConf("default_screen_width", confName).to!int,
         parseConf("default_screen_height", confName).to!int,
+        parseConf("screen_width", confName).to!int,
+        parseConf("screen_height", confName).to!int,
         parseConf("default_fullscreen", confName).to!bool
     );
 }
