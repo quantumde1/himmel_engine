@@ -87,6 +87,7 @@ int showMainMenu() {
     debugWriteln("menu assets unloading");
     StopMusicStream(music);
     UnloadMusicStream(music);
+    music = Music();
     luaReload = true;
     return EngineExitCodes.EXIT_OK;
 }
