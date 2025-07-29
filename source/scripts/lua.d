@@ -269,6 +269,7 @@ extern (C) nothrow int luaL_stopMusic(lua_State* L)
 extern (C) nothrow int luaL_unloadMusic(lua_State* L)
 {
     UnloadMusicStream(music);
+    music = Music();
     return 0;
 }
 
