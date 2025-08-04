@@ -12,8 +12,8 @@ int screenHeight;
 
 Texture2D[] loadAnimationFramesUI(const string fileDir, const string animationFileName)
 {
-    screenWidth = systemSettings.defaultScreenWidth;
-    screenHeight = systemSettings.defaultScreenHeight;
+    screenWidth = systemSettings.screenWidth;
+    screenHeight = systemSettings.screenHeight;
     Texture2D[] frames;
     uint frameIndex = 1;
     while (true)

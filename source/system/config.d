@@ -21,8 +21,8 @@ nothrow string parseConf(string type, string filename) {
             "dialog_end_indicator": "DIALOG_END_INDICATOR:",
             "dialog_box": "DIALOG_BOX:",
             "fallback_font": "FALLBACK_FONT:",
-            "default_screen_width": "DEFAULT_SCREEN_WIDTH:",
-            "default_screen_height": "DEFAULT_SCREEN_HEIGHT:",
+            "default_screen_width": "DEV_SCREEN_WIDTH:",
+            "default_screen_height": "DEV_SCREEN_HEIGHT:",
             "screen_width": "SCREEN_WIDTH:",
             "screen_height": "SCREEN_HEIGHT:",
             "default_fullscreen": "DEFAULT_FULLSCREEN:"
