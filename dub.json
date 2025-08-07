@@ -27,6 +27,9 @@
 	"lflags-windows": [
 		"-L./"
 	],
+	"lflags": [
+		"-build-id=none"
+	],
 	"libs-posix": [
 		"raylib",
 		"lua-5.3",
