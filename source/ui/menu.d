@@ -7,6 +7,7 @@ import system.abstraction;
 import graphics.playback;
 import scripts.lua;
 import graphics.gamelogic;
+import std.conv : to;
 
 void fadeEffect(float alpha, bool fadeIn, void delegate(float alpha) renderer)
 {
@@ -63,8 +64,8 @@ void helloScreen()
 int showMainMenu() {
     int luaExecutionCode = luaInit(systemSettings.menuScriptPath);
     if (luaExecutionCode != EngineExitCodes.EXIT_OK) {
-        writeln("[ERROR] Engine stops execution according to error code: ", 
-        luaExecutionCode);
+        writeln("[ERROR] Engine stops Lua execution according to error code: ", 
+        luaExecutionCode.to!EngineExitCodes);
         currentGameState = GameState.Exit;
         return luaExecutionCode;
     }

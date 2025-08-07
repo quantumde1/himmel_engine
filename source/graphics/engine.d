@@ -73,7 +73,7 @@ void engineLoader()
                         resetAllScriptValues();
                         int luaExecutionCode = luaInit(luaExec);
                         if (luaExecutionCode != EngineExitCodes.EXIT_OK) {
-                            writeln("[ERROR] Engine stops execution according to error code: ", 
+                            writeln("[ERROR] Engine stops Lua execution according to error code: ", 
                             luaExecutionCode.to!EngineExitCodes);
                             currentGameState = GameState.Exit;
                             break;
