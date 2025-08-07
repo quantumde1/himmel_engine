@@ -27,6 +27,7 @@ nothrow void resetAllScriptValues() {
 
 struct SystemSettings {
     string scriptPath;
+    string menuScriptPath;
     string windowTitle;
     string iconPath;
     string dialogBoxEndIndicator;

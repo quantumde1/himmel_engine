@@ -61,7 +61,7 @@ void helloScreen()
 }
 
 int showMainMenu() {
-    int luaExecutionCode = luaInit("scripts/menu.lua");
+    int luaExecutionCode = luaInit(systemSettings.menuScriptPath);
     if (luaExecutionCode != EngineExitCodes.EXIT_OK) {
         writeln("[ERROR] Engine stops execution according to error code: ", 
         luaExecutionCode);

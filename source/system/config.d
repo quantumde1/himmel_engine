@@ -16,6 +16,7 @@ nothrow string parseConf(string type, string filename) {
         
         static immutable typeMap = [
             "script": "SCRIPT:",
+            "menu_script": "MENU_SCRIPT:",
             "title": "TITLE:",
             "icon": "ICON:",
             "dialog_end_indicator": "DIALOG_END_INDICATOR:",
@@ -53,6 +54,7 @@ nothrow string parseConf(string type, string filename) {
 SystemSettings loadSettingsFromConfigFile(string confName) {
     return SystemSettings(
         parseConf("script", confName),
+        parseConf("menu_script", confName),
         parseConf("title", confName),
         parseConf("icon", confName),
         parseConf("dialog_end_indicator", confName),
