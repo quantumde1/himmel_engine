@@ -10,25 +10,26 @@
 	"description": "Engine on Dlang for visual novels",
 	"lflags-linux": [
 		"-rpath=/usr/lib",
-		"-rpath=$$ORIGIN"
+		"-rpath=$$ORIGIN",
+		"-build-id=none"
 	],
 	"lflags-osx": [
 		"-rpath",
 		"./",
 		"-rpath",
-		"/opt/local/lib"
+		"/opt/local/lib",
+		"-build-id=none"
 	],
 	"lflags-posix": [
 		"-L/usr/lib",
 		"-L.",
 		"-L/opt/local/lib",
-		"-L/usr/local/lib"
+		"-L/usr/local/lib",
+		"-build-id=none"
 	],
 	"lflags-windows": [
-		"-L./"
-	],
-	"lflags": [
-		"-build-id=none"
+		"-L./",
+		"/Brepro"
 	],
 	"libs-posix": [
 		"raylib",
