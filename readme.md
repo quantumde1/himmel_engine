@@ -24,7 +24,7 @@ doas apk add ldc2 dub vlc-dev vlc lua5.3-dev
 sudo apt install dub ldc libvlc-dev liblua5.3-dev vlc lua5.3 build-essential
 ```
 
-Next, run 
+Next, run
 ```./build.sh```
 . Everything will be done automatically!
 
@@ -32,18 +32,18 @@ Next, run
 
 Engine scripts are written in Lua with some raylib direct bindings as well as some custom functions written for visual novels
 
-- Drawing, loading, unloading and stop drawing character textures
-- Drawing, loading, unloading and stop drawing background textures
+- Drawing, loading, unloading and stop drawing character and background textures
 - Camera zooming to specific coordinates
-- Dialog box with multiple pages and choices
-- Ability for configuring custom font using ```setFont()```
-- Graphical effects from himmel archives(HPFF)
+- Dialog box with multiple pages and choices, with configurable design using png background 40x32 images
+- Custom fonts(PNG format from XNA, ttf, otf)
+- Very flexible API with direct bindings from raylib, which allows to create interesting UI
+- Graphical effects from multiple PNG images
+- Resolution of development, end-user resolution, fullscreen, window name, icon, menu scripts and first game script.
 
 ## TODO
 
-- Adding lipsync
+- Adding lipsync as a feature
 - Adding savestates in-engine
-- Adding backlog and menus
 
 ## Documentation
 
