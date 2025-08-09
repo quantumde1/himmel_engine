@@ -16,7 +16,7 @@ import system.abstraction;
 void gameInit()
 {
     circle = LoadTexture(systemSettings.dialogBoxEndIndicator.toStringz());
-    dialogBackgroundTex = LoadTexture(systemSettings.dialogBoxImage.toStringz());
+    dialogBackgroundTex = LoadTexture(systemSettings.dialogBoxBackground.toStringz());
     if (WindowShouldClose()) {
         currentGameState = GameState.Exit;
     } else {
@@ -70,7 +70,7 @@ void effectsLogic() {
             isCameraMoving = false;
         }
     }
-    playUIAnimation(framesUI);
+    playUIAnimation(framesUI, animationAlpha);
 }
 
 void backgroundLogic() {

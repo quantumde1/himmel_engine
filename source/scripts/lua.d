@@ -350,7 +350,13 @@ extern (C) nothrow int luaL_loadUIAnimation(lua_State *L) {
 extern (C) nothrow int luaL_playUIAnimation(lua_State *L) {
     debug debugWriteln("Animation UI start");
     try {
-        playAnimation = true;
+        if (lua_gettop(L) == 0) playAnimation = true;
+        else {
+            debugWriteln("animationAlpha before reconfig: ", animationAlpha);
+            animationAlpha = luaL_checkinteger(L, 1).to!ubyte;
+            debugWriteln("animationAlpha after reconfig: ", animationAlpha);
+            playAnimation = true;
+        }
     } catch (Exception e) {
         debugWriteln(e.msg);
     }
@@ -373,6 +379,23 @@ extern (C) nothrow int luaL_unloadUIAnimation(lua_State *L) {
     } catch (Exception e) {
         debugWriteln(e.msg);
     }
+    return 0;
+}
+
+extern (C) nothrow int luaL_setDialogBoxBackground(lua_State *L) {
+    string filename = luaL_checkstring(L, 1).to!string;
+    debug debugWriteln("Set dialog background to: ", filename);
+    UnloadTexture(dialogBackgroundTex);
+    dialogBackgroundTex = Texture2D();
+    dialogBackgroundTex = LoadTexture(filename.toStringz());
+    return 0;
+}
+
+extern (C) nothrow int luaL_setDialogBoxEndIndicatorTexture(lua_State *L) {
+    char* filename = cast(char*)luaL_checkstring(L, 1);
+    UnloadTexture(circle);
+    circle = Texture2D();
+    circle = LoadTexture(filename);
     return 0;
 }
 
@@ -668,6 +691,8 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "playAnimationUI", &luaL_playUIAnimation);
     lua_register(L, "stopAnimationUI", &luaL_stopUIAnimation);
     lua_register(L, "unloadAnimationUI", &luaL_unloadUIAnimation);
+    lua_register(L, "setDialogBoxBackground", &luaL_setDialogBoxBackground);
+    lua_register(L, "setDialogEndIndicator", &luaL_setDialogBoxEndIndicatorTexture);
     lua_register(L, "moveCamera", &luaL_moveCamera);
     lua_register(L, "restoreCamera", &luaL_restoreCamera);
     lua_register(L, "isCameraMoving", &luaL_isCameraMoving);

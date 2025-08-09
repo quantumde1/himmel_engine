@@ -31,7 +31,7 @@ struct SystemSettings {
     string windowTitle;
     string iconPath;
     string dialogBoxEndIndicator;
-    string dialogBoxImage;
+    string dialogBoxBackground;
     string fallbackFont;
     int defaultScreenWidth;
     int defaultScreenHeight;
@@ -148,6 +148,7 @@ int currentFrame = 0;
 
 int currentChoiceCharIndex = 0;
 
+ubyte animationAlpha = 127;
 
 /* lua */
 

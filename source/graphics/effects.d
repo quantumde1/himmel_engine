@@ -30,7 +30,7 @@ Texture2D[] loadAnimationFramesUI(const string fileDir, const string animationFi
     return frames;
 }
 
-void playUIAnimation(Texture2D[] frames)
+void playUIAnimation(Texture2D[] frames, ubyte alpha)
 {
     static float frameTime = 0.0f;
     
@@ -51,7 +51,7 @@ void playUIAnimation(Texture2D[] frames)
             Rectangle(0, 0, screenWidth, screenHeight),
             Vector2(0, 0),
             0,
-            Color(255, 255, 255, 127)
+            Color(255, 255, 255, alpha)
         );
     } else {
         frameTime = 0.0f;
