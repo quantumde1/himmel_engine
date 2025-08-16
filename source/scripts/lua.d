@@ -486,6 +486,10 @@ extern (C) nothrow int luaL_isKeyPressed(lua_State* L)
     }
 }
 
+extern (C) nothrow int luaL_isKeyDown(lua_State *L) {
+    return IsKeyDown(cast(int)luaL_checkinteger(L, 1));
+}
+
 extern (C) nothrow int luaL_isMouseButtonPressed(lua_State* L)
 {
     try
@@ -715,6 +719,7 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "getScreenHeight", &luaL_getScreenHeight);
     lua_register(L, "getScreenWidth", &luaL_getScreenWidth);
     lua_register(L, "isKeyPressed", &luaL_isKeyPressed);
+    lua_register(L, "isKeyDown", &luaL_isKeyDown);
     lua_register(L, "isMouseButtonPressed", &luaL_isMouseButtonPressed);
     lua_register(L, "setGameState", &luaL_setGameState);
 
