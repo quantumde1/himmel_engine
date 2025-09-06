@@ -304,35 +304,6 @@ extern (C) nothrow int luaL_playVideo(lua_State* L)
 
 /* ui animations */
 
-extern (C) nothrow int luaL_moveCamera(lua_State *L) {
-    try {
-        oldCamera = camera;
-        float targetX = cast(float) luaL_checknumber(L, 1);
-        float targetY = cast(float) luaL_checknumber(L, 2);
-        float zoom = cast(float) luaL_optnumber(L, 3, 1.0f);
-        float speed = cast(float) luaL_optnumber(L, 4, 5.0f);
-        debugWriteln(targetX, targetY, zoom, speed);
-        cameraTargetX = targetX;
-        cameraTargetY = targetY;
-        cameraTargetZoom = zoom;
-        cameraMoveSpeed = speed;
-        isCameraMoving = true;
-    } catch (Exception e) {
-        debugWriteln(e.msg);
-    }
-    return 0;
-}
-
-extern (C) nothrow int luaL_restoreCamera(lua_State *L) {
-    camera = oldCamera;
-    return 0;
-}
-
-extern (C) nothrow int luaL_isCameraMoving(lua_State *L) {
-    lua_pushboolean(L, isCameraMoving);
-    return 1;
-}
-
 extern (C) nothrow int luaL_loadUIAnimation(lua_State *L) {
     try {
         //loads from uifx folder HPFF files, in which png textures are stored
@@ -522,6 +493,16 @@ extern (C) nothrow int luaL_isMouseButtonPressed(lua_State* L)
     }
 }
 
+extern (C) nothrow int luaL_getMouseX(lua_State *L) {
+    lua_pushnumber(L, GetMousePosition.x);
+    return 1;
+}
+
+extern (C) nothrow int luaL_getMouseY(lua_State *L) {
+    lua_pushnumber(L, GetMousePosition.y);
+    return 1;
+}
+
 extern (C) nothrow int luaL_loadScript(lua_State* L)
 {
     try
@@ -538,6 +519,48 @@ extern (C) nothrow int luaL_loadScript(lua_State* L)
 
 extern (C) nothrow int luaL_setGameState(lua_State *L) {
     currentGameState = cast(int)luaL_checkinteger(L, 1);
+    return 0;
+}
+
+extern (C) nothrow int luaL_setCamera(lua_State *L) {
+    camera.position = Vector3(
+        luaL_checknumber(L, 1),
+        luaL_checknumber(L, 2),
+        luaL_checknumber(L, 3)
+    );
+    camera.target = Vector3(
+        luaL_checknumber(L, 4),
+        luaL_checknumber(L, 5),
+        luaL_checknumber(L, 6)
+    );
+    return 0;
+}
+
+ModelAnimation *modelAnimations;
+int animationCurrentFrame = 0;
+int animsCount = 0;
+
+extern (C) nothrow int luaL_loadModelAnimations(lua_State *L) {
+    modelAnimations = LoadModelAnimations(luaL_checkstring(L, 1), &animsCount);
+    return 0;
+}
+
+extern (C) nothrow int luaL_updateModelAnimation(lua_State *L) {
+        ModelAnimation anim = modelAnimations[cast(int)luaL_checkinteger(L, 2)];
+        int speedMultipler;
+        if (lua_gettop(L) == 3) {
+            speedMultipler = cast(int)luaL_checkinteger(L, 3);
+        } else {
+            speedMultipler = 1;
+        }
+        animationCurrentFrame = (animationCurrentFrame + speedMultipler)%anim.frameCount;
+        Model *model = cast(Model*)luaL_checkudata(L, 1, "Model");
+        UpdateModelAnimation(*model, anim, animationCurrentFrame);
+        return 0;
+}
+
+extern (C) nothrow int luaL_resetModelAnimation(lua_State *L) {
+    animationCurrentFrame = 0;
     return 0;
 }
 
@@ -683,6 +706,71 @@ extern (C) nothrow int luaL_drawTextureEx(lua_State *L) {
     return 0;
 }
 
+extern (C) nothrow int luaL_loadModel(lua_State *L) {
+    const char* fileName = luaL_checkstring(L, 1);
+    Model model = LoadModel(fileName);
+    
+    Model* modelPtr = cast(Model*)lua_newuserdata(L, Model.sizeof);
+    *modelPtr = model;
+    
+    if (luaL_newmetatable(L, "Model")) {
+        lua_pushcfunction(L, &luaL_textureGC);
+        lua_setfield(L, -2, "__gc");
+    }
+    lua_setmetatable(L, -2);
+    return 1;
+}
+
+extern (C) nothrow int luaL_drawModel(lua_State *L) {
+    Model* model = cast(Model*)luaL_checkudata(L, 1, "Model");
+    float x = luaL_checknumber(L, 2);
+    float y = luaL_checknumber(L, 3);
+    float z = luaL_checknumber(L, 4);
+    float rotation = luaL_optnumber(L, 5, 0);
+    float scale = luaL_optnumber(L, 6, 1);
+    Color color = Colors.WHITE;
+    if (lua_istable(L, 6)) {
+        lua_getfield(L, 6, "r");
+        color.r = cast(ubyte)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        
+        lua_getfield(L, 6, "g");
+        color.g = cast(ubyte)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        
+        lua_getfield(L, 6, "b");
+        color.b = cast(ubyte)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        
+        lua_getfield(L, 6, "a");
+        color.a = cast(ubyte)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+    }
+    DrawModelEx(
+        *model,
+        Vector3(x, y, z),
+        Vector3(0.0f, 1.0f, 0.0f),
+        rotation,
+        Vector3(scale, scale, scale),
+        color
+    );
+    return 0;
+}
+
+extern (C) nothrow int luaL_showCursor(lua_State *L) {
+    ShowCursor();
+    return 0;
+}
+
+extern (C) nothrow int luaL_hideCursor(lua_State *L) {
+    HideCursor();
+    return 0;
+}
+
+extern (C) nothrow int luaL_setMousePosition(lua_State *L) {
+    SetMousePosition(cast(int)luaL_checkinteger(L, 1), cast(int)luaL_checkinteger(L, 2));
+    return 0;
+}
 
 /* Register functions */
 
@@ -697,9 +785,6 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "unloadAnimationUI", &luaL_unloadUIAnimation);
     lua_register(L, "setDialogBoxBackground", &luaL_setDialogBoxBackground);
     lua_register(L, "setDialogEndIndicator", &luaL_setDialogBoxEndIndicatorTexture);
-    lua_register(L, "moveCamera", &luaL_moveCamera);
-    lua_register(L, "restoreCamera", &luaL_restoreCamera);
-    lua_register(L, "isCameraMoving", &luaL_isCameraMoving);
     lua_register(L, "playVideo", &luaL_playVideo);
     lua_register(L, "loadMusic", &luaL_loadMusic);
     lua_register(L, "playMusic", &luaL_playMusic);
@@ -721,8 +806,14 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "isKeyPressed", &luaL_isKeyPressed);
     lua_register(L, "isKeyDown", &luaL_isKeyDown);
     lua_register(L, "isMouseButtonPressed", &luaL_isMouseButtonPressed);
+    lua_register(L, "getMouseX", &luaL_getMouseX);
+    lua_register(L, "getMouseY", &luaL_getMouseY);
     lua_register(L, "setGameState", &luaL_setGameState);
-
+    lua_register(L, "setCamera", &luaL_setCamera);
+    lua_register(L, "loadModelAnimations", &luaL_loadModelAnimations);
+    lua_register(L, "updateModelAnimation", &luaL_updateModelAnimation);
+    lua_register(L, "resetModelAnimation", &luaL_resetModelAnimation);
+    
     //raylib direct bindings
     lua_register(L, "unloadFont", &luaL_unloadFont);
     lua_register(L, "loadFont", &luaL_loadFont);
@@ -737,6 +828,12 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "measureTextY", &luaL_measureTextY);
     lua_register(L, "getTextureWidth", &luaL_getTextureWidth);
     lua_register(L, "getTextureHeight", &luaL_getTextureHeight);
+    lua_register(L, "loadModel", &luaL_loadModel);
+    lua_register(L, "drawModel", &luaL_drawModel);
+    lua_register(L, "showCursor", &luaL_showCursor);
+    lua_register(L, "hideCursor", &luaL_hideCursor);
+    lua_register(L, "setMousePosition", &luaL_setMousePosition);
+
     //compat
     lua_register(L, "setFont", &luaL_loadFont);
 

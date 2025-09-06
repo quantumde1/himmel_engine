@@ -58,18 +58,6 @@ void texturesLogic(TextureEngine[] textures) {
 
 void effectsLogic() {
     UpdateMusicStream(music);
-    if (isCameraMoving) {
-        float delta = GetFrameTime() * cameraMoveSpeed;
-        camera.target.x += (cameraTargetX - camera.target.x) * delta;
-        camera.target.y += (cameraTargetY - camera.target.y) * delta;
-        camera.zoom += (cameraTargetZoom - camera.zoom) * delta;
-
-        if (fabs(camera.target.x - cameraTargetX) < 5.0f &&
-            fabs(camera.target.y - cameraTargetY) < 5.0f &&
-            fabs(camera.zoom - cameraTargetZoom) < 0.5f) {
-            isCameraMoving = false;
-        }
-    }
     playUIAnimation(framesUI, animationAlpha);
 }
 

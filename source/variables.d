@@ -68,9 +68,7 @@ enum EngineExitCodes {
     EXIT_OK = 0,
 }
 
-Camera2D camera;
-
-Camera2D oldCamera;
+Camera3D camera;
 
 TextureEngine[] characterTextures;
 
@@ -114,19 +112,17 @@ float baseWidth;
 
 float baseHeight;
 
-float cameraTargetX = 0;
-
-float cameraTargetY = 0;
-
-float cameraTargetZoom = 1.0f;
-
-float cameraMoveSpeed = 5.0f;
-
 float frameDuration = 0.016f;
 
 float typingSpeed = 0.6f;
 
 float scale = 1.0f;
+
+float acceleration = 0.2f;
+
+float maxVelocity = 10.0f;
+
+float currentVelocity = 0.0f;
 
 /* textures */
 

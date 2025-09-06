@@ -53,10 +53,13 @@ void engineLoader()
     helloScreen();
     ClearBackground(Colors.BLACK);
     EndDrawing();
-    camera.target = Vector2(screenWidth/2.0f, screenHeight/2.0f);
-    camera.offset = Vector2(screenWidth/2.0f, screenHeight/2.0f);
-    camera.rotation = 0.0f;
-    camera.zoom = 1.0f;
+    camera = Camera(
+        Vector3(0.0f, 10.0f, 8.0f),
+        Vector3(0.0f, 5.0f, 0.0f),
+        Vector3(0.0, 1.0, 0.0),
+        45.0f,
+        CameraProjection.CAMERA_PERSPECTIVE
+    );
     while (true)
     {
         switch (currentGameState)
@@ -86,16 +89,24 @@ void engineLoader()
                     }
                     BeginDrawing();
                     ClearBackground(Colors.BLACK);
-                    // main logic
-                    BeginMode2D(camera);
+
+                    /* 2D part */
+                    
+                    // background display logic
                     backgroundLogic();
+                    // character display logic
                     characterLogic();
                     // effects logic
                     effectsLogic();
-                    EndMode2D();
                     //drawing dialogs
                     dialogLogic();
+
+                    /* 3D part */
+
+                    BeginMode3D(camera);
+                    DrawGrid(10, 2);
                     luaEventLoop();
+                    EndMode3D();
                     EndDrawing();
                 }
                 break;

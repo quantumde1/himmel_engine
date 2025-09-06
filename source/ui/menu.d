@@ -78,11 +78,9 @@ int showMainMenu() {
         }
         UpdateMusicStream(music);
         BeginDrawing();
-        BeginMode2D(camera);
         backgroundLogic();
         effectsLogic();
         luaEventLoop();
-        EndMode2D();
         EndDrawing();
     }
     debugWriteln("menu assets unloading");

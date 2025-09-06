@@ -27,6 +27,7 @@ a.out
 /plugins/
 sky
 *.dylib*
+capture.mp4
 res/
 /scripts/
 docs/
