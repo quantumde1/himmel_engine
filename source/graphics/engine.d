@@ -24,6 +24,7 @@ import system.abstraction;
 import variables;
 import system.cleanup;
 import std.algorithm;
+import graphics.collision;
 
 void engineLoader()
 {
@@ -53,11 +54,11 @@ void engineLoader()
     helloScreen();
     ClearBackground(Colors.BLACK);
     EndDrawing();
-    camera = Camera(
+    camera = Camera3D(
         Vector3(0.0f, 10.0f, 8.0f),
         Vector3(0.0f, 5.0f, 0.0f),
         Vector3(0.0, 1.0, 0.0),
-        45.0f,
+        90.0f,
         CameraProjection.CAMERA_PERSPECTIVE
     );
     while (true)
@@ -90,6 +91,13 @@ void engineLoader()
                     BeginDrawing();
                     ClearBackground(Colors.BLACK);
 
+                    /* 3D part */
+
+                    BeginMode3D(camera);
+                    luaEventLoop3D();
+                    EndMode3D();
+
+                    luaEventLoop2D();
                     /* 2D part */
                     
                     // background display logic
@@ -101,12 +109,6 @@ void engineLoader()
                     //drawing dialogs
                     dialogLogic();
 
-                    /* 3D part */
-
-                    BeginMode3D(camera);
-                    DrawGrid(10, 2);
-                    luaEventLoop();
-                    EndMode3D();
                     EndDrawing();
                 }
                 break;

@@ -80,7 +80,7 @@ int showMainMenu() {
         BeginDrawing();
         backgroundLogic();
         effectsLogic();
-        luaEventLoop();
+        luaEventLoop2D();
         EndDrawing();
     }
     debugWriteln("menu assets unloading");

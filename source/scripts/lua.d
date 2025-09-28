@@ -13,6 +13,7 @@ import std.algorithm;
 import graphics.engine;
 import graphics.playback;
 import std.file;
+import graphics.collision;
 
 /* 
  * This module provides Lua bindings for various engine functionalities.
@@ -273,6 +274,11 @@ extern (C) nothrow int luaL_unloadMusic(lua_State* L)
     return 0;
 }
 
+extern (C) nothrow int luaL_setMusicVolume(lua_State *L) {
+    SetMusicVolume(music, luaL_checknumber(L, 1));
+    return 0;
+}
+
 extern (C) nothrow int luaL_playSfx(lua_State *L) {
     try {
     playSfx(to!string(luaL_checkstring(L, 1)));
@@ -493,6 +499,38 @@ extern (C) nothrow int luaL_isMouseButtonPressed(lua_State* L)
     }
 }
 
+extern (C) nothrow int luaL_isMouseButtonDown(lua_State* L)
+{
+    try
+    {
+        int keyCode = cast(int)luaL_checkinteger(L, 1);
+        bool isPressed = IsMouseButtonDown(keyCode);
+
+        double currentTime = GetTime();
+        if (isPressed && (currentTime - lastKeyPressTime) < keyPressCooldown)
+        {
+            lua_pushboolean(L, false);
+        }
+        else if (isPressed)
+        {
+            lastKeyPressTime = currentTime;
+            lua_pushboolean(L, true);
+        }
+        else
+        {
+            lua_pushboolean(L, false);
+        }
+
+        return 1;
+    }
+    catch (Exception e)
+    {
+        debugWriteln(e.msg);
+        lua_pushboolean(L, false);
+        return 1;
+    }
+}
+
 extern (C) nothrow int luaL_getMouseX(lua_State *L) {
     lua_pushnumber(L, GetMousePosition.x);
     return 1;
@@ -562,6 +600,91 @@ extern (C) nothrow int luaL_updateModelAnimation(lua_State *L) {
 extern (C) nothrow int luaL_resetModelAnimation(lua_State *L) {
     animationCurrentFrame = 0;
     return 0;
+}
+
+extern (C) nothrow int luaL_placeCollision(lua_State *L) {
+    try {
+        placeOBB(
+            cast(int)luaL_checkinteger(L, 1),
+            Vector3(
+                luaL_checknumber(L, 2),
+                luaL_checknumber(L, 3),
+                luaL_checknumber(L, 4)
+            ),
+            Vector3(
+                luaL_checknumber(L, 5),
+                luaL_checknumber(L, 6),
+                luaL_checknumber(L, 7)
+            ),
+            Vector3(
+                luaL_checknumber(L, 8),
+                luaL_checknumber(L, 9),
+                luaL_checknumber(L, 10)
+            ),
+        );
+    } catch (Exception e) {
+        debugWriteln("Error placing obb: ", e.msg);
+    }
+    return 0;
+}
+
+extern (C) nothrow int luaL_moveCollision(lua_State *L) {
+    collisions[cast(int)luaL_checkinteger(L, 1)].center = Vector3(
+        luaL_checknumber(L, 2),
+        luaL_checknumber(L, 3),
+        luaL_checknumber(L, 4)
+    );
+    return 0;
+}
+
+extern (C) nothrow int luaL_removeCollision(lua_State *L) {
+    collisions = collisions[0 .. cast(int)luaL_checkinteger(L, 1)] ~ collisions[cast(int)luaL_checkinteger(L, 1) .. $];
+    return 0;
+}
+
+extern (C) nothrow int luaL_setPlayerCollisionIndex(lua_State *L) {
+    playerCollisionIndex = cast(int)luaL_checkinteger(L, 1);
+    return 0;
+}
+
+extern (C) nothrow int luaL_drawCollisionWires(lua_State *L) {
+    try {
+        for (int i = 0; i < collisions.length; i++) {
+            drawWireframe(collisions[i], Colors.RED);
+        }
+    } catch (Exception e) {
+        
+    }
+    return 0;
+}
+
+extern (C) nothrow int luaL_checkCollision(lua_State *L) {
+    try {
+        for (int i = 0; i < collisions.length; i++) {
+            debugWriteln("collision index check: ", i);
+            bool collided = checkCollisionOBBvsOBB(collisions[playerCollisionIndex], collisions[i]);
+            if (collided == true) {
+                lua_pushboolean(L, true);
+            }
+            else lua_pushboolean(L, false);
+        }
+    } catch (Exception e) {
+
+    }
+    return 1;
+}
+
+extern (C) nothrow int luaL_checkCollisionIndex(lua_State *L) {
+    try {
+        bool collided = checkCollisionOBBvsOBB(collisions[cast(int)luaL_checkinteger(L, 1)], collisions[cast(int)luaL_checkinteger(L, 2)]);
+        if (collided == true) {
+            lua_pushboolean(L, true);
+        }
+        else lua_pushboolean(L, false);
+    } catch (Exception e) {
+
+    }
+    return 1;
 }
 
 /* raylib direct bindings for graphics */
@@ -706,6 +829,11 @@ extern (C) nothrow int luaL_drawTextureEx(lua_State *L) {
     return 0;
 }
 
+extern (C) nothrow int luaL_drawRect(lua_State *L) {
+    DrawRectangle(cast(int)luaL_checkinteger(L, 1), cast(int)luaL_checkinteger(L, 2), cast(int)luaL_checkinteger(L, 3), cast(int)luaL_checkinteger(L, 4), Colors.WHITE);
+    return 0;
+}
+
 extern (C) nothrow int luaL_loadModel(lua_State *L) {
     const char* fileName = luaL_checkstring(L, 1);
     Model model = LoadModel(fileName);
@@ -772,6 +900,11 @@ extern (C) nothrow int luaL_setMousePosition(lua_State *L) {
     return 0;
 }
 
+extern (C) nothrow int luaL_drawFPS(lua_State *L) {
+    DrawFPS(cast(int)luaL_checkinteger(L, 1), cast(int)luaL_checkinteger(L, 2));
+    return 0;
+}
+
 /* Register functions */
 
 extern (C) nothrow void luaL_loader(lua_State* L)
@@ -790,6 +923,7 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "playMusic", &luaL_playMusic);
     lua_register(L, "stopMusic", &luaL_stopMusic);
     lua_register(L, "unloadMusic", &luaL_unloadMusic);
+    lua_register(L, "setMusicVolume", &luaL_setMusicVolume);
     lua_register(L, "playSfx", &luaL_playSfx);
     lua_register(L, "stopSfx", &luaL_stopSfx);
     lua_register(L, "loadCharacter", &luaL_loadCharacter);
@@ -806,6 +940,7 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "isKeyPressed", &luaL_isKeyPressed);
     lua_register(L, "isKeyDown", &luaL_isKeyDown);
     lua_register(L, "isMouseButtonPressed", &luaL_isMouseButtonPressed);
+    lua_register(L, "isMouseButtonDown", &luaL_isMouseButtonDown);
     lua_register(L, "getMouseX", &luaL_getMouseX);
     lua_register(L, "getMouseY", &luaL_getMouseY);
     lua_register(L, "setGameState", &luaL_setGameState);
@@ -813,8 +948,16 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "loadModelAnimations", &luaL_loadModelAnimations);
     lua_register(L, "updateModelAnimation", &luaL_updateModelAnimation);
     lua_register(L, "resetModelAnimation", &luaL_resetModelAnimation);
+    lua_register(L, "placeCollision", &luaL_placeCollision);
+    lua_register(L, "moveCollision", &luaL_moveCollision);
+    lua_register(L, "removeCollision", &luaL_removeCollision);
+    lua_register(L, "playerCollisionIndex", &luaL_setPlayerCollisionIndex);
+    lua_register(L, "drawCollision", &luaL_drawCollisionWires);
+    lua_register(L, "checkAllCollision", &luaL_checkCollision);
+    lua_register(L, "checkSpecificCollision", &luaL_checkCollisionIndex);
     
     //raylib direct bindings
+    lua_register(L, "drawRectangle", &luaL_drawRect);
     lua_register(L, "unloadFont", &luaL_unloadFont);
     lua_register(L, "loadFont", &luaL_loadFont);
     lua_register(L, "getTime", &luaL_getTime);
@@ -833,6 +976,7 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "showCursor", &luaL_showCursor);
     lua_register(L, "hideCursor", &luaL_hideCursor);
     lua_register(L, "setMousePosition", &luaL_setMousePosition);
+    lua_register(L, "drawFPS", &luaL_drawFPS);
 
     //compat
     lua_register(L, "setFont", &luaL_loadFont);
@@ -870,12 +1014,22 @@ int luaInit(string luaExec)
     return EngineExitCodes.EXIT_OK;
 }
 
-void luaEventLoop()
+void luaEventLoop2D()
 {
-    lua_getglobal(L, "EventLoop");
+    lua_getglobal(L, "EventLoop2D");
     if (lua_pcall(L, 0, 0, 0) != LUA_OK)
     {
-        debug debugWriteln("Error in EventLoop: ", to!string(lua_tostring(L, -1)));
+        debug debugWriteln("Error in EventLoop2D: ", to!string(lua_tostring(L, -1)));
+    }
+    lua_pop(L, 0);
+}
+
+void luaEventLoop3D()
+{
+    lua_getglobal(L, "EventLoop3D");
+    if (lua_pcall(L, 0, 0, 0) != LUA_OK)
+    {
+        debug debugWriteln("Error in EventLoop3D: ", to!string(lua_tostring(L, -1)));
     }
     lua_pop(L, 0);
 }

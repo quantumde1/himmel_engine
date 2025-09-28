@@ -5,6 +5,7 @@ import std.typecons;
 import raylib;
 import bindbc.lua;
 import system.abstraction;
+import graphics.collision;
 
 nothrow void resetAllScriptValues() {
     debugWriteln("Resetting all values!");
@@ -70,13 +71,13 @@ enum EngineExitCodes {
 
 Camera3D camera;
 
+OBB[] collisions;
+
 TextureEngine[] characterTextures;
 
 TextureEngine[] backgroundTextures;
 
 SystemSettings systemSettings;
-
-int currentGameState = 1;
 
 Font textFont;
 
@@ -140,11 +141,18 @@ int selectedChoice = 0;
 
 int choicePage = -1;
 
+int currentGameState = 1;
+
 int currentFrame = 0;
 
 int currentChoiceCharIndex = 0;
 
+int playerCollisionIndex = 0; //default, can be changed via setter function in graphics.collision
+
+/* ubyte values */
+
 ubyte animationAlpha = 127;
+
 
 /* lua */
 
