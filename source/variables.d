@@ -78,8 +78,6 @@ TextureEngine[] backgroundTextures;
 
 SystemSettings systemSettings;
 
-int currentGameState = 1;
-
 Font textFont;
 
 Music music;
@@ -147,6 +145,10 @@ int choicePage = -1;
 int currentFrame = 0;
 
 int currentChoiceCharIndex = 0;
+
+int currentGameState = 1;
+
+/* ubyte values */
 
 ubyte animationAlpha = 127;
 

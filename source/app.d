@@ -4,7 +4,7 @@ import raylib;
 //local imports
 import graphics.engine;
 
-void main(string[] args)
+void main()
 {
     validateRaylibBinding();
     debug {
