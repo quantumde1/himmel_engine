@@ -422,18 +422,23 @@ extern (C) nothrow int luaL_loadFont(lua_State* L)
 {
     const char* x = luaL_checkstring(L, 1);
     debugWriteln("Setting custom font: ", x.to!string);
-    int[512] codepoints = 0;
-    //configuring both cyrillic and latin fonts if available
+    
+    int[] codepoints = new int[256];
+    
     foreach (i; 0 .. 95)
     {
         codepoints[i] = 32 + i;
     }
-    foreach (i; 0 .. 255)
+    
+    foreach (i; 0 .. 64)
     {
-        codepoints[96 + i] = 0x400 + i;
+        codepoints[95 + i] = 0x410 + i;
     }
+    
     int fontSize = max(10, cast(int)(40 * scale));
-    textFont = LoadFontEx(x, fontSize, null, 0);
+    
+    textFont = LoadFontEx(x, fontSize, codepoints.ptr, cast(int)codepoints.length);
+    
     return 0;
 }
 
