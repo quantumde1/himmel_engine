@@ -429,7 +429,7 @@ extern (C) nothrow int luaL_getDeltaTime(lua_State* L)
 }
 
 float lastKeyPressTime = 0.0;
-immutable float keyPressCooldown = 0.2;
+immutable float keyPressCooldown = 0.001;
 
 extern (C) nothrow int luaL_isKeyPressed(lua_State* L)
 {
@@ -834,6 +834,12 @@ extern (C) nothrow int luaL_drawRect(lua_State *L) {
     return 0;
 }
 
+extern (C) nothrow int luaL_modelGC(lua_State *L) {
+    Model* model = cast(Model*)luaL_checkudata(L, 1, "Model");
+    UnloadModel(*model);
+    return 0;
+}
+
 extern (C) nothrow int luaL_loadModel(lua_State *L) {
     const char* fileName = luaL_checkstring(L, 1);
     Model model = LoadModel(fileName);
@@ -842,7 +848,7 @@ extern (C) nothrow int luaL_loadModel(lua_State *L) {
     *modelPtr = model;
     
     if (luaL_newmetatable(L, "Model")) {
-        lua_pushcfunction(L, &luaL_textureGC);
+        lua_pushcfunction(L, &luaL_modelGC);
         lua_setfield(L, -2, "__gc");
     }
     lua_setmetatable(L, -2);
@@ -903,6 +909,183 @@ extern (C) nothrow int luaL_setMousePosition(lua_State *L) {
 extern (C) nothrow int luaL_drawFPS(lua_State *L) {
     DrawFPS(cast(int)luaL_checkinteger(L, 1), cast(int)luaL_checkinteger(L, 2));
     return 0;
+}
+
+extern (C) nothrow int luaL_shaderGC(lua_State *L) {
+    Shader* shader = cast(Shader*)luaL_checkudata(L, 1, "Shader");
+    UnloadShader(*shader);
+    return 0;
+}
+
+extern (C) nothrow int luaL_loadShader(lua_State *L) {
+    debugWriteln("Loading custom shader");
+    const char* fileName = luaL_checkstring(L, 1);
+    const char* fileNameVs = luaL_checkstring(L, 2);
+    
+    debugWriteln("Fragment shader: ", fileName.to!string);
+    debugWriteln("Vertex shader: ", fileNameVs.to!string);
+    
+    Shader shader = LoadShader(fileNameVs, fileName);
+    
+    debugWriteln("Shader loaded successfully, ID: ", shader.id);
+    
+    Shader* shaderPtr = cast(Shader*)lua_newuserdata(L, Shader.sizeof);
+    *shaderPtr = shader;
+    
+    if (luaL_newmetatable(L, "Shader")) {
+        lua_pushcfunction(L, &luaL_shaderGC);
+        lua_setfield(L, -2, "__gc");
+    }
+    lua_setmetatable(L, -2);
+    return 1;
+}
+
+extern (C) nothrow int luaL_unloadShader(lua_State *L) {
+    debugWriteln("unloading custom shader");
+    UnloadShader(*(cast(Shader*)luaL_checkudata(L, 1, "Shader")));
+    return 0;
+}
+
+extern (C) nothrow int luaL_getShaderLocation(lua_State *L) {
+    Shader* shader = cast(Shader*)luaL_checkudata(L, 1, "Shader");
+    char* smth = cast(char*)luaL_checkstring(L, 2);
+    lua_pushinteger(L, GetShaderLocation(*shader, smth));
+    return 1;
+}
+
+extern (C) nothrow int luaL_setModelShader(lua_State *L) {
+    Model* model = cast(Model*)luaL_checkudata(L, 1, "Model");
+    Shader* shader = cast(Shader*)luaL_checkudata(L, 2, "Shader");
+    for (int i = 0; i <= model.materialCount; i++) {
+        model.materials[i].shader = *shader;
+    }
+    return 0;
+}
+
+extern (C) nothrow int luaL_setShaderValueFloat(lua_State *L) {
+    Shader* shader = cast(Shader*)luaL_checkudata(L, 1, "Shader");
+    int locIndex = cast(int)luaL_checkinteger(L, 2);
+    float value = cast(float)luaL_checknumber(L, 3);
+    SetShaderValue(*shader, locIndex, &value, ShaderUniformDataType.SHADER_UNIFORM_FLOAT);
+    return 0;
+}
+
+extern (C) nothrow int luaL_setShaderValueInt(lua_State *L) {
+    Shader* shader = cast(Shader*)luaL_checkudata(L, 1, "Shader");
+    int locIndex = cast(int)luaL_checkinteger(L, 2);
+    int value = cast(int)luaL_checkinteger(L, 3);
+    SetShaderValue(*shader, locIndex, &value, ShaderUniformDataType.SHADER_UNIFORM_INT);
+    return 0;
+}
+
+extern (C) nothrow int luaL_setShaderValueVector2(lua_State *L) {
+    Shader* shader = cast(Shader*)luaL_checkudata(L, 1, "Shader");
+    int locIndex = cast(int)luaL_checkinteger(L, 2);
+    float x = cast(float)luaL_checknumber(L, 3);
+    float y = cast(float)luaL_checknumber(L, 4);
+    Vector2 value = Vector2(x, y);
+    SetShaderValue(*shader, locIndex, &value, ShaderUniformDataType.SHADER_UNIFORM_VEC2);
+    return 0;
+}
+
+extern (C) nothrow int luaL_setShaderValueVector3(lua_State *L) {
+    Shader* shader = cast(Shader*)luaL_checkudata(L, 1, "Shader");
+    int locIndex = cast(int)luaL_checkinteger(L, 2);
+    float x = cast(float)luaL_checknumber(L, 3);
+    float y = cast(float)luaL_checknumber(L, 4);
+    float z = cast(float)luaL_checknumber(L, 5);
+    Vector3 value = Vector3(x, y, z);
+    SetShaderValue(*shader, locIndex, &value, ShaderUniformDataType.SHADER_UNIFORM_VEC3);
+    return 0;
+}
+
+extern (C) nothrow int luaL_setShaderValueVector4(lua_State *L) {
+    Shader* shader = cast(Shader*)luaL_checkudata(L, 1, "Shader");
+    int locIndex = cast(int)luaL_checkinteger(L, 2);
+    float x = cast(float)luaL_checknumber(L, 3);
+    float y = cast(float)luaL_checknumber(L, 4);
+    float z = cast(float)luaL_checknumber(L, 5);
+    float w = cast(float)luaL_checknumber(L, 6);
+    Vector4 value = Vector4(x, y, z, w);
+    SetShaderValue(*shader, locIndex, &value, ShaderUniformDataType.SHADER_UNIFORM_VEC4);
+    return 0;
+}
+
+// Post-processing shader functions
+extern (C) nothrow int luaL_beginShaderMode(lua_State *L) {
+    Shader* shader = cast(Shader*)luaL_checkudata(L, 1, "Shader");
+    BeginShaderMode(*shader);
+    return 0;
+}
+
+extern (C) nothrow int luaL_endShaderMode(lua_State *L) {
+    EndShaderMode();
+    return 0;
+}
+
+extern (C) nothrow int luaL_beginTextureMode(lua_State *L) {
+    RenderTexture2D* target = cast(RenderTexture2D*)luaL_checkudata(L, 1, "RenderTexture");
+    BeginTextureMode(*target);
+    return 0;
+}
+
+extern (C) nothrow int luaL_endTextureMode(lua_State *L) {
+    EndTextureMode();
+    return 0;
+}
+
+extern (C) nothrow int luaL_renderTextureGC(lua_State *L) {
+    RenderTexture2D* target = cast(RenderTexture2D*)luaL_checkudata(L, 1, "RenderTexture");
+    UnloadRenderTexture(*target);
+    return 0;
+}
+
+extern (C) nothrow int luaL_loadRenderTexture(lua_State *L) {
+    int width = cast(int)luaL_checkinteger(L, 1);
+    int height = cast(int)luaL_checkinteger(L, 2);
+    RenderTexture2D target = LoadRenderTexture(width, height);
+    
+    RenderTexture2D* targetPtr = cast(RenderTexture2D*)lua_newuserdata(L, RenderTexture2D.sizeof);
+    *targetPtr = target;
+    
+    if (luaL_newmetatable(L, "RenderTexture")) {
+        lua_pushcfunction(L, &luaL_renderTextureGC);
+        lua_setfield(L, -2, "__gc");
+    }
+    lua_setmetatable(L, -2);
+    return 1;
+}
+
+extern (C) nothrow int luaL_getRenderTextureTexture(lua_State *L) {
+    RenderTexture2D* target = cast(RenderTexture2D*)luaL_checkudata(L, 1, "RenderTexture");
+    
+    Texture2D* texturePtr = cast(Texture2D*)lua_newuserdata(L, Texture2D.sizeof);
+    *texturePtr = target.texture;
+    
+    if (luaL_newmetatable(L, "Texture")) {
+        lua_pushcfunction(L, &luaL_textureGC);
+        lua_setfield(L, -2, "__gc");
+    }
+    lua_setmetatable(L, -2);
+    return 1;
+}
+
+extern (C) nothrow int luaL_setShaderValueTexture(lua_State *L) {
+    Shader* shader = cast(Shader*)luaL_checkudata(L, 1, "Shader");
+    int locIndex = cast(int)luaL_checkinteger(L, 2);
+    Texture2D* texture = cast(Texture2D*)luaL_checkudata(L, 3, "Texture");
+    SetShaderValueTexture(*shader, locIndex, *texture);
+    return 0;
+}
+
+extern (C) nothrow int luaL_getFPS(lua_State *L) {
+    lua_pushinteger(L, GetFPS());
+    return 1;
+}
+
+extern (C) nothrow int luaL_getFrameTime(lua_State *L) {
+    lua_pushnumber(L, GetFrameTime());
+    return 1;
 }
 
 /* Register functions */
@@ -977,6 +1160,32 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "hideCursor", &luaL_hideCursor);
     lua_register(L, "setMousePosition", &luaL_setMousePosition);
     lua_register(L, "drawFPS", &luaL_drawFPS);
+
+    // Shader bindings
+    lua_register(L, "loadShader", &luaL_loadShader);
+    lua_register(L, "unloadShader", &luaL_unloadShader);
+    lua_register(L, "getShaderLocation", &luaL_getShaderLocation);
+    lua_register(L, "setModelShader", &luaL_setModelShader);
+    lua_register(L, "setShaderValueFloat", &luaL_setShaderValueFloat);
+    lua_register(L, "setShaderValueInt", &luaL_setShaderValueInt);
+    lua_register(L, "setShaderValueVector2", &luaL_setShaderValueVector2);
+    lua_register(L, "setShaderValueVector3", &luaL_setShaderValueVector3);
+    lua_register(L, "setShaderValueVector4", &luaL_setShaderValueVector4);
+    lua_register(L, "setShaderValueTexture", &luaL_setShaderValueTexture);
+
+    // Shader mode
+    lua_register(L, "beginShaderMode", &luaL_beginShaderMode);
+    lua_register(L, "endShaderMode", &luaL_endShaderMode);
+
+    // Render texture
+    lua_register(L, "loadRenderTexture", &luaL_loadRenderTexture);
+    lua_register(L, "beginTextureMode", &luaL_beginTextureMode);
+    lua_register(L, "endTextureMode", &luaL_endTextureMode);
+    lua_register(L, "getRenderTextureTexture", &luaL_getRenderTextureTexture);
+
+    // Utils
+    lua_register(L, "getFPS", &luaL_getFPS);
+    lua_register(L, "getFrameTime", &luaL_getFrameTime);
 
     //compat
     lua_register(L, "setFont", &luaL_loadFont);
