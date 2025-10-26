@@ -1096,6 +1096,16 @@ extern (C) nothrow int luaL_getFrameTime(lua_State *L) {
     return 1;
 }
 
+extern (C) nothrow int luaL_print(lua_State *L) {
+    try {
+        string lineToPrint = to!string(luaL_checkstring(L, 1));
+        debugWriteln(lineToPrint);
+    } catch (Exception e) {
+        debugWriteln(e.msg);
+    }
+    return 0;
+}
+
 /* Register functions */
 
 extern (C) nothrow void luaL_loader(lua_State* L)
@@ -1199,6 +1209,8 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     //compat
     lua_register(L, "setFont", &luaL_loadFont);
 
+    lua_register(L, "print", &luaL_print);
+    
     debugWriteln("strict mode enabled");
     const char* strict_lua =
     `local mt = {
