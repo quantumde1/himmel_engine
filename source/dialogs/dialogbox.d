@@ -180,8 +180,6 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
     
     // Draw continue indicator when text is fully displayed
     if (textFullyDisplayed && !lines.empty) {
-        circleRotationAngle = (circleRotationAngle + 45*GetFrameTime()) % 360;
-        
         float lastLineWidth = MeasureTextEx(dialogFont, lines[$-1].toStringz(), fontSize, spacing).x;
         Vector2 circlePos = Vector2(
             (dialogRect.x + textLeftMargin + lastLineWidth + 20),

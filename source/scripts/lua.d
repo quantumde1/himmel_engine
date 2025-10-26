@@ -166,7 +166,7 @@ extern (C) nothrow int luaL_loadCharacter(lua_State *L) {
             UnloadTexture(characterTextures[count].texture);
         }
         characterTextures[count].texture = LoadTexture(luaL_checkstring(L, 1));
-        SetTextureFilter(characterTextures[count].texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
+        //SetTextureFilter(characterTextures[count].texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
         characterTextures[count].width = characterTextures[count].texture.width;
         characterTextures[count].height = characterTextures[count].texture.height;
         characterTextures[count].drawTexture = false;
@@ -928,7 +928,7 @@ extern (C) nothrow int luaL_loadShader(lua_State *L) {
     
     Shader shader = LoadShader(fileNameVs, fileName);
     
-    debugWriteln("Shader loaded successfully, ID: ", shader.id.to!string);
+    debugWriteln("Shader loaded successfully, ID: ", shader.id);
     
     Shader* shaderPtr = cast(Shader*)lua_newuserdata(L, Shader.sizeof);
     *shaderPtr = shader;

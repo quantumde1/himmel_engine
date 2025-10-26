@@ -20,6 +20,10 @@ nothrow void resetAllScriptValues() {
         backgroundTextures[i].drawTexture = false;
         UnloadTexture(backgroundTextures[i].texture);
     }
+    foreach (i; 0..framesUI.length)
+    {
+        UnloadTexture(framesUI[i]);
+    }
     characterTextures = [];
     backgroundTextures = [];
 }
