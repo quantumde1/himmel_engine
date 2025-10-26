@@ -8,6 +8,7 @@ import std.string;
 import std.math;
 import dialogs.dialogbox;
 import system.abstraction;
+import std.conv;
 
 /** 
  * this module contains game logic, which was removed from engine.d for better readability.
@@ -23,6 +24,21 @@ void gameInit()
         debugWriteln("Game initializing.");
         luaExec = systemSettings.scriptPath;
     }
+}
+
+nothrow void unloadResourcesOnExit() {
+    resetAllScriptValues();
+    debugWriteln("unloading font");
+    UnloadFont(textFont);
+    UnloadTexture(circle);
+    UnloadTexture(dialogBackgroundTex);
+    lua_getglobal(L, "OnGameExit");
+    if (lua_isfunction(L, -1)) {
+        if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+            debug debugWriteln("Error in OnGameExit: ", to!string(lua_tostring(L, -1)));
+        }
+    }
+    lua_pop(L, 1);
 }
 
 void texturesLogic(TextureEngine[] textures) {

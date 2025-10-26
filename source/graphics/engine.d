@@ -116,11 +116,7 @@ void engineLoader()
                 break;
             case GameState.Exit:
                 EndDrawing();
-                resetAllScriptValues();
-                debugWriteln("unloading font");
-                UnloadFont(textFont);
-                UnloadTexture(circle);
-                UnloadTexture(dialogBackgroundTex);
+                unloadResourcesOnExit();
                 CloseAudioDevice();
                 CloseWindow();
                 return;

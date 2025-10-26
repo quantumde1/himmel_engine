@@ -857,6 +857,12 @@ extern (C) nothrow int luaL_loadModel(lua_State *L) {
     return 1;
 }
 
+extern (C) nothrow int luaL_unloadModel(lua_State *L) {
+    Model* model = cast(Model*)luaL_checkudata(L, 1, "Model");
+    UnloadModel(*model);
+    return 0;
+}
+
 extern (C) nothrow int luaL_drawModel(lua_State *L) {
     Model* model = cast(Model*)luaL_checkudata(L, 1, "Model");
     float x = luaL_checknumber(L, 2);
@@ -1158,6 +1164,7 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "getTextureHeight", &luaL_getTextureHeight);
     lua_register(L, "loadModel", &luaL_loadModel);
     lua_register(L, "drawModel", &luaL_drawModel);
+    lua_register(L, "unloadModel", &luaL_unloadModel);
     lua_register(L, "showCursor", &luaL_showCursor);
     lua_register(L, "hideCursor", &luaL_hideCursor);
     lua_register(L, "setMousePosition", &luaL_setMousePosition);
