@@ -702,7 +702,7 @@ extern (C) nothrow int luaL_loadTexture(lua_State *L) {
         lua_pushcfunction(L, &luaL_textureGC);
         lua_setfield(L, -2, "__gc");
     }
-    SetTextureFilter(texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
+    //SetTextureFilter(texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
     lua_setmetatable(L, -2);
     return 1;
 }
@@ -723,22 +723,23 @@ extern (C) nothrow int luaL_drawTexture(lua_State *L) {
     Texture2D* texture = cast(Texture2D*)luaL_checkudata(L, 1, "Texture");
     int x = cast(int)luaL_checkinteger(L, 2);
     int y = cast(int)luaL_checkinteger(L, 3);
+    float scale = luaL_checknumber(L, 4)*variables.scale;
     Color color = Colors.WHITE;
     
-    if (lua_gettop(L) >= 4 && lua_istable(L, 4)) {
-        lua_getfield(L, 4, "r");
+    if (lua_gettop(L) >= 5 && lua_istable(L, 5)) {
+        lua_getfield(L, 5, "r");
         color.r = cast(ubyte)lua_tointeger(L, -1);
         lua_pop(L, 1);
         
-        lua_getfield(L, 4, "g");
+        lua_getfield(L, 5, "g");
         color.g = cast(ubyte)lua_tointeger(L, -1);
         lua_pop(L, 1);
         
-        lua_getfield(L, 4, "b");
+        lua_getfield(L, 5, "b");
         color.b = cast(ubyte)lua_tointeger(L, -1);
         lua_pop(L, 1);
         
-        lua_getfield(L, 4, "a");
+        lua_getfield(L, 5, "a");
         color.a = cast(ubyte)lua_tointeger(L, -1);
         lua_pop(L, 1);
     }
@@ -927,7 +928,7 @@ extern (C) nothrow int luaL_loadShader(lua_State *L) {
     
     Shader shader = LoadShader(fileNameVs, fileName);
     
-    debugWriteln("Shader loaded successfully, ID: ", shader.id);
+    debugWriteln("Shader loaded successfully, ID: ", shader.id.to!string);
     
     Shader* shaderPtr = cast(Shader*)lua_newuserdata(L, Shader.sizeof);
     *shaderPtr = shader;
@@ -1223,9 +1224,19 @@ int luaInit(string luaExec)
     return EngineExitCodes.EXIT_OK;
 }
 
-void luaEventLoop2D()
+void luaEventLoopPost2D()
 {
     lua_getglobal(L, "EventLoop2D");
+    if (lua_pcall(L, 0, 0, 0) != LUA_OK)
+    {
+        debug debugWriteln("Error in EventLoop2D: ", to!string(lua_tostring(L, -1)));
+    }
+    lua_pop(L, 0);
+}
+
+void luaEventLoopPre2D()
+{
+    lua_getglobal(L, "EventLoopPre2D");
     if (lua_pcall(L, 0, 0, 0) != LUA_OK)
     {
         debug debugWriteln("Error in EventLoop2D: ", to!string(lua_tostring(L, -1)));

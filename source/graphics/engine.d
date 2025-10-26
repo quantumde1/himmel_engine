@@ -85,19 +85,21 @@ void engineLoader()
                         luaReload = false;
                     }
                     SetExitKey(0);
-                    if (IsKeyPressed(KeyboardKey.KEY_F11)) {
+                    if (IsKeyPressed(KeyboardKey.KEY_F)) {
                         ToggleFullscreen();
                     }
                     BeginDrawing();
                     ClearBackground(Colors.BLACK);
 
                     /* 3D part */
+                    
+                    luaEventLoopPre2D();
 
                     BeginMode3D(camera);
                     luaEventLoop3D();
                     EndMode3D();
 
-                    luaEventLoop2D();
+                    luaEventLoopPost2D();
                     /* 2D part */
                     
                     // background display logic
