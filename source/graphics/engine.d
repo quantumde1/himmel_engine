@@ -119,6 +119,8 @@ void engineLoader()
                 resetAllScriptValues();
                 debugWriteln("unloading font");
                 UnloadFont(textFont);
+                UnloadTexture(circle);
+                UnloadTexture(dialogBackgroundTex);
                 CloseAudioDevice();
                 CloseWindow();
                 return;
