@@ -11,6 +11,7 @@ import std.conv;
 //graphics
 import graphics.gamelogic;
 import ui.menu;
+import ui.effects;
 
 //dialogs
 import dialogs.dialogbox;
@@ -22,7 +23,6 @@ import scripts.lua;
 import system.config;
 import system.abstraction;
 import variables;
-import system.cleanup;
 import std.algorithm;
 import graphics.collision;
 
@@ -116,7 +116,9 @@ void engineLoader()
                 break;
             case GameState.Exit:
                 EndDrawing();
-                unloadResourcesLogic();
+                resetAllScriptValues();
+                debugWriteln("unloading font");
+                UnloadFont(textFont);
                 CloseAudioDevice();
                 CloseWindow();
                 return;

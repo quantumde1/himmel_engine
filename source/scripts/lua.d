@@ -14,6 +14,7 @@ import graphics.engine;
 import graphics.playback;
 import std.file;
 import graphics.collision;
+import audio.sfx;
 
 /* 
  * This module provides Lua bindings for various engine functionalities.

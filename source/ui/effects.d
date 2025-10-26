@@ -46,15 +46,5 @@ void helloScreen()
         fadeEffect(2.0f, false, (float alpha) {
             renderText(alpha, "powered by\n\nHimmel Engine");
         });
-        /*
-        fadeEffect(0.0f, true, (float alpha) {
-            renderLogo(alpha, "atlus_logo.png".toStringz, true);
-        });
-        
-        fadeEffect(fadeAlpha, false, (float alpha) {
-            renderLogo(alpha, "atlus_logo.png".toStringz, true);
-        });
-        */
-        // Play Opening Video
     }
 }

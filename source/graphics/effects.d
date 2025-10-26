@@ -58,11 +58,3 @@ void playUIAnimation(Texture2D[] frames, ubyte alpha)
         currentFrame = 0;
     }
 }
-
-Sound sfx;
-
-void playSfx(string filename) {
-    debug debugWriteln("Loading & playing SFX");
-    sfx = LoadSound(filename.toStringz());
-    PlaySound(sfx);
-}

@@ -34,13 +34,11 @@
 	"libs-posix": [
 		"raylib",
 		"lua-5.3",
-		"vlc",
-		"hpff"
+		"vlc"
 	],
 	"libs-windows": [
 		"raylib",
 		"lua53",
-		"libhpff",
 		"vlc"
 	],
 	"license": "MIT License",

@@ -8,22 +8,23 @@ import system.abstraction;
 import graphics.collision;
 
 nothrow void resetAllScriptValues() {
-    debugWriteln("Resetting all values!");
+    debugWriteln("cleaning all values!");
     selectedChoice = 0;
-    foreach (i; 0..characterTextures.length)
-    {
+    debugWriteln("unloading animations");
+    for (int i = 0; i < framesUI.length; i++) {
+        UnloadTexture(framesUI[i]);
+    }
+    debugWriteln("unloading characters");
+    for (int i = 0; i < characterTextures.length; i++) {
         characterTextures[i].drawTexture = false;
         UnloadTexture(characterTextures[i].texture);
     }
-    foreach (i; 0..backgroundTextures.length)
-    {
+    debugWriteln("unloading backgrounds");
+    for (int i = 0; i < backgroundTextures.length; i++) {
         backgroundTextures[i].drawTexture = false;
         UnloadTexture(backgroundTextures[i].texture);
     }
-    foreach (i; 0..framesUI.length)
-    {
-        UnloadTexture(framesUI[i]);
-    }
+    debugWriteln("resetting characterTextures and backgroundTextures");
     characterTextures = [];
     backgroundTextures = [];
 }
