@@ -64,7 +64,6 @@ void mainLoop() {
                 }
                 break;
             case GameState.Exit:
-                EndShaderMode();
                 unloadResourcesOnExit();
                 CloseAudioDevice();
                 debugWriteln("closing window!");
