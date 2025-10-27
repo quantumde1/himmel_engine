@@ -5,7 +5,7 @@ import variables;
 import std.stdio;
 import system.abstraction;
 import graphics.playback;
-import scripts.lua;
+import scripts.lua.core;
 import graphics.gamelogic;
 import std.conv : to;
 

@@ -2,7 +2,7 @@
 import raylib;
 
 //local imports
-import graphics.engine;
+import system.init;
 
 void main(string[] args)
 {

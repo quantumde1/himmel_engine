@@ -9,10 +9,6 @@ import std.math;
 import dialogs.dialogbox;
 import system.abstraction;
 import std.conv;
-
-/** 
- * this module contains game logic, which was removed from engine.d for better readability.
-**/
  
 void gameInit()
 {
@@ -26,19 +22,32 @@ void gameInit()
     }
 }
 
-nothrow void unloadResourcesOnExit() {
-    resetAllScriptValues();
-    debugWriteln("unloading font");
-    UnloadFont(textFont);
-    UnloadTexture(circle);
-    UnloadTexture(dialogBackgroundTex);
+void unloadResourcesOnExit() {
     lua_getglobal(L, "OnGameExit");
-    if (lua_isfunction(L, -1)) {
-        if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
-            debug debugWriteln("Error in OnGameExit: ", to!string(lua_tostring(L, -1)));
+    if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+        debug debugWriteln("Error in OnGameExit: ", to!string(lua_tostring(L, -1)));
+    }
+    
+    UnloadMusicStream(music);
+    
+    for (int i = 0; i < characterTextures.length; i++) {
+        if (characterTextures[i].texture.id != 0) {
+            UnloadTexture(characterTextures[i].texture);
         }
     }
-    lua_pop(L, 1);
+    
+    for (int i = 0; i < backgroundTextures.length; i++) {
+        if (backgroundTextures[i].texture.id != 0) {
+            UnloadTexture(backgroundTextures[i].texture);
+        }
+    }
+    
+    // И только в конце шрифт
+    if (textFont.texture.id != 0) {
+        UnloadFont(textFont);
+    }
+    
+    resetAllScriptValues();
 }
 
 void texturesLogic(TextureEngine[] textures) {

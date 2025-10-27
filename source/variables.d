@@ -12,17 +12,17 @@ nothrow void resetAllScriptValues() {
     selectedChoice = 0;
     debugWriteln("unloading animations");
     for (int i = 0; i < framesUI.length; i++) {
-        UnloadTexture(framesUI[i]);
+        if (framesUI[i].id != 0) UnloadTexture(framesUI[i]);
     }
     debugWriteln("unloading characters");
     for (int i = 0; i < characterTextures.length; i++) {
         characterTextures[i].drawTexture = false;
-        UnloadTexture(characterTextures[i].texture);
+        if (characterTextures[i].texture.id != 0) UnloadTexture(characterTextures[i].texture);
     }
     debugWriteln("unloading backgrounds");
     for (int i = 0; i < backgroundTextures.length; i++) {
         backgroundTextures[i].drawTexture = false;
-        UnloadTexture(backgroundTextures[i].texture);
+        if (backgroundTextures[i].texture.id != 0) UnloadTexture(backgroundTextures[i].texture);
     }
     debugWriteln("resetting characterTextures and backgroundTextures");
     characterTextures = [];
@@ -87,6 +87,8 @@ SystemSettings systemSettings;
 Font textFont;
 
 Music music;
+
+ModelAnimation *modelAnimations;
 
 /* booleans */
 
@@ -153,6 +155,10 @@ int currentFrame = 0;
 int currentChoiceCharIndex = 0;
 
 int playerCollisionIndex = 0; //default, can be changed via setter function in graphics.collision
+
+int animationCurrentFrame = 0;
+
+int animsCount = 0;
 
 /* ubyte values */
 
