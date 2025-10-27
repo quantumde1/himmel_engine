@@ -24,27 +24,33 @@ void gameInit()
 
 void unloadResourcesOnExit() {
     UnloadMusicStream(music);
+    debugWriteln("unloading textures");
     for (int i = 0; i < textures.length; i++) {
         if (textures[i].id != 0) {
+            debugWriteln("unloading texture index: ", i);
             UnloadTexture(textures[i]);
         }
     }
+    debugWriteln("unloading shaders");
     for (int i = 0; i < shaders.length; i++) {
         if (shaders[i].id != 0) {
+            debugWriteln("unloading shader index: ", i);
             UnloadShader(shaders[i]);
         }
     }
+    debugWriteln("unloading models");
     for (int i = 0; i < models.length; i++) {
         if (models[i].meshCount != 0) {
+            debugWriteln("unloading model index: ", i);
             UnloadModel(models[i]);
         }
-    }
-    if (textFont.texture.id != 0) {
-        UnloadFont(textFont);
     }
     resetAllScriptValues();
     UnloadTexture(circle);
     UnloadTexture(dialogBackgroundTex);
+    if (textFont.texture.id != 0) {
+        UnloadFont(textFont);
+    }
 }
 
 void texturesLogic(TextureEngine[] textures) {
