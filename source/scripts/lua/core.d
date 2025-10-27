@@ -28,7 +28,6 @@ import scripts.lua.textures;
 import scripts.lua.uianimation;
 import scripts.lua.video;
 import scripts.lua.visualnovel;
-import scripts.lua.rendertexture;
 
 extern (C) nothrow void luaL_loader(lua_State* L)
 {
@@ -112,17 +111,10 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "setShaderValueVector2", &luaL_setShaderValueVector2);
     lua_register(L, "setShaderValueVector3", &luaL_setShaderValueVector3);
     lua_register(L, "setShaderValueVector4", &luaL_setShaderValueVector4);
-    lua_register(L, "setShaderValueTexture", &luaL_setShaderValueTexture);
 
     // Shader mode
     lua_register(L, "beginShaderMode", &luaL_beginShaderMode);
     lua_register(L, "endShaderMode", &luaL_endShaderMode);
-
-    // Render texture
-    lua_register(L, "loadRenderTexture", &luaL_loadRenderTexture);
-    lua_register(L, "beginTextureMode", &luaL_beginTextureMode);
-    lua_register(L, "endTextureMode", &luaL_endTextureMode);
-    lua_register(L, "getRenderTextureTexture", &luaL_getRenderTextureTexture);
 
     // Utils
     lua_register(L, "getFPS", &luaL_getFPS);
@@ -132,8 +124,6 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "setFont", &luaL_loadFont);
 
     lua_register(L, "print", &luaL_print);
-    lua_register(L, "unloadCircle", &luaL_unloadCircle);
-    lua_register(L, "unloadDialogBackground", &luaL_unloadDialogBackground);
     debugWriteln("strict mode enabled");
     const char* strict_lua =
     `local mt = {

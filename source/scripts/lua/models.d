@@ -16,32 +16,28 @@ import graphics.collision;
 import audio.sfx;
 
 extern (C) nothrow int luaL_loadModel(lua_State *L) {
-    const char* fileName = luaL_checkstring(L, 1);
-    
-    Model* modelPtr = cast(Model*)lua_newuserdata(L, Model.sizeof);
-    
-    Model loadedModel = LoadModel(fileName);
-    *modelPtr = loadedModel;
-    
-    if (luaL_newmetatable(L, "Model")) {
+    int modelIndex = cast(int)luaL_checkinteger(L, 1);
+    if (modelIndex >= models.length) {
+        models.length = modelIndex + 1;
     }
-    lua_setmetatable(L, -2);
+    if (models.length < models.length) {
+        models.length = models.length;
+    }
+    if (modelIndex < models.length && models[modelIndex].meshCount != 0) {
+        UnloadModel(models[modelIndex]);
+    }
+    char* modelPath = cast(char*)luaL_checkstring(L, 2);
+    models[modelIndex] = LoadModel(modelPath);
     return 1;
 }
 
 extern (C) nothrow int luaL_unloadModel(lua_State *L) {
-    Model* model = cast(Model*)luaL_checkudata(L, 1, "Model");
-    debugWriteln("model meshCount: ", model.meshCount);
-    if (model.meshCount != 0) {
-        UnloadModel(*model);
-    } else {
-        debugWriteln("model already unloaded or invalid");
-    }
+    UnloadModel(models[cast(int)luaL_checkinteger(L, 1)]);
     return 0;
 }
 
 extern (C) nothrow int luaL_drawModel(lua_State *L) {
-    Model* model = cast(Model*)luaL_checkudata(L, 1, "Model");
+    int modelIndex = cast(int)luaL_checkinteger(L, 1);
     float x = luaL_checknumber(L, 2);
     float y = luaL_checknumber(L, 3);
     float z = luaL_checknumber(L, 4);
@@ -66,7 +62,7 @@ extern (C) nothrow int luaL_drawModel(lua_State *L) {
         lua_pop(L, 1);
     }
     DrawModelEx(
-        *model,
+        models[modelIndex],
         Vector3(x, y, z),
         Vector3(0.0f, 1.0f, 0.0f),
         rotation,
@@ -90,8 +86,8 @@ extern (C) nothrow int luaL_updateModelAnimation(lua_State *L) {
             speedMultipler = 1;
         }
         animationCurrentFrame = (animationCurrentFrame + speedMultipler)%anim.frameCount;
-        Model *model = cast(Model*)luaL_checkudata(L, 1, "Model");
-        UpdateModelAnimation(*model, anim, animationCurrentFrame);
+        int modelIndex = cast(int)luaL_checkinteger(L, 1);
+        UpdateModelAnimation(models[modelIndex], anim, animationCurrentFrame);
         return 0;
 }
 

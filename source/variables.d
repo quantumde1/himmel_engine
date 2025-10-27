@@ -27,6 +27,8 @@ nothrow void resetAllScriptValues() {
     debugWriteln("resetting characterTextures and backgroundTextures");
     characterTextures = [];
     backgroundTextures = [];
+    textures = [];
+    shaders = [];
 }
 
 /* system */
@@ -89,6 +91,12 @@ Font textFont;
 Music music;
 
 ModelAnimation *modelAnimations;
+
+Model[] models;
+
+Shader[] shaders;
+
+Texture[] textures;
 
 /* booleans */
 

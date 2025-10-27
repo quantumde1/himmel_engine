@@ -23,31 +23,28 @@ void gameInit()
 }
 
 void unloadResourcesOnExit() {
-    lua_getglobal(L, "OnGameExit");
-    if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
-        debug debugWriteln("Error in OnGameExit: ", to!string(lua_tostring(L, -1)));
-    }
-    
     UnloadMusicStream(music);
-    
-    for (int i = 0; i < characterTextures.length; i++) {
-        if (characterTextures[i].texture.id != 0) {
-            UnloadTexture(characterTextures[i].texture);
+    for (int i = 0; i < textures.length; i++) {
+        if (textures[i].id != 0) {
+            UnloadTexture(textures[i]);
         }
     }
-    
-    for (int i = 0; i < backgroundTextures.length; i++) {
-        if (backgroundTextures[i].texture.id != 0) {
-            UnloadTexture(backgroundTextures[i].texture);
+    for (int i = 0; i < shaders.length; i++) {
+        if (shaders[i].id != 0) {
+            UnloadShader(shaders[i]);
         }
     }
-    
-    // И только в конце шрифт
+    for (int i = 0; i < models.length; i++) {
+        if (models[i].meshCount != 0) {
+            UnloadModel(models[i]);
+        }
+    }
     if (textFont.texture.id != 0) {
         UnloadFont(textFont);
     }
-    
     resetAllScriptValues();
+    UnloadTexture(circle);
+    UnloadTexture(dialogBackgroundTex);
 }
 
 void texturesLogic(TextureEngine[] textures) {

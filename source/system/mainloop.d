@@ -67,9 +67,6 @@ void mainLoop() {
                 unloadResourcesOnExit();
                 CloseAudioDevice();
                 debugWriteln("closing window!");
-                double exitTime = GetTime();
-                while (GetTime() - exitTime < 0.5) {
-                }
                 CloseWindow();
                 return;
             default:

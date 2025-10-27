@@ -137,15 +137,3 @@ extern (C) nothrow int luaL_setCamera(lua_State *L) {
     );
     return 0;
 }
-
-extern (C) nothrow int luaL_unloadCircle(lua_State *L) {
-    UnloadTexture(circle);
-    debugWriteln("unloaded circle");
-    return 0;
-}
-
-extern (C) nothrow int luaL_unloadDialogBackground(lua_State *L) {
-    UnloadTexture(dialogBackgroundTex);
-    debugWriteln("unloaded dialog background");
-    return 0;
-}

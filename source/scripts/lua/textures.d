@@ -16,32 +16,29 @@ import graphics.collision;
 import audio.sfx;
 
 extern (C) nothrow int luaL_loadTexture(lua_State *L) {
-    const char* fileName = luaL_checkstring(L, 1);
-    Texture texture = LoadTexture(fileName);
-    
-    Texture* texturePtr = cast(Texture*)lua_newuserdata(L, Texture.sizeof);
-    *texturePtr = texture;
-    
-    if (luaL_newmetatable(L, "Texture")) {
+    int textureIndex = cast(int)luaL_checkinteger(L, 1);
+    char* textureFilename = cast(char*)luaL_checkstring(L, 2);
+    if (textureIndex >= textures.length) {
+        textures.length = textureIndex + 1;
     }
-    //SetTextureFilter(texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
-    lua_setmetatable(L, -2);
-    return 1;
+    if (textures.length < textures.length) {
+        textures.length = textures.length;
+    }
+    if (textureIndex < textures.length && textures[textureIndex].id != 0) {
+        UnloadTexture(textures[textureIndex]);
+    }
+    textures[textureIndex] = LoadTexture(textureFilename);
+    return 0;
 }
 
 extern (C) nothrow int luaL_unloadTexture(lua_State *L) {
-    Texture* texture = cast(Texture*)luaL_checkudata(L, 1, "Texture");
-    debugWriteln("texture id: ", texture.id);
-    if (texture.id != 0) {
-        UnloadTexture(*texture);
-    } else {
-        debugWriteln("texture already unloaded or invalid");
-    }
+    int textureIndex = cast(int)luaL_checkinteger(L, 1);
+    UnloadTexture(textures[textureIndex]);
     return 0;
 }
 
 extern (C) nothrow int luaL_drawTexture(lua_State *L) {
-    Texture* texture = cast(Texture*)luaL_checkudata(L, 1, "Texture");
+    int textureIndex = cast(int)luaL_checkinteger(L, 1);
     int x = cast(int)luaL_checkinteger(L, 2);
     int y = cast(int)luaL_checkinteger(L, 3);
     float scale = luaL_checknumber(L, 4)*variables.scale;
@@ -65,24 +62,24 @@ extern (C) nothrow int luaL_drawTexture(lua_State *L) {
         lua_pop(L, 1);
     }
     
-    DrawTextureEx(*texture, Vector2(x, y), 0.0f, scale, color);
+    DrawTextureEx(textures[textureIndex], Vector2(x, y), 0.0f, scale, color);
     return 0;
 }
 
 extern (C) nothrow int luaL_getTextureWidth(lua_State *L) {
-    Texture* texture = cast(Texture*)luaL_checkudata(L, 1, "Texture");
-    lua_pushnumber(L, texture.width*variables.scale);
+    int textureIndex = cast(int)luaL_checkinteger(L, 1);
+    lua_pushnumber(L, textures[textureIndex].width*variables.scale);
     return 1;
 }
 
 extern (C) nothrow int luaL_getTextureHeight(lua_State *L) {
-    Texture* texture = cast(Texture*)luaL_checkudata(L, 1, "Texture");
-    lua_pushnumber(L, texture.height*variables.scale);
+    int textureIndex = cast(int)luaL_checkinteger(L, 1);
+    lua_pushnumber(L, textures[textureIndex].height*variables.scale);
     return 1;
 }
 
 extern (C) nothrow int luaL_drawTextureEx(lua_State *L) {
-    Texture* texture = cast(Texture*)luaL_checkudata(L, 1, "Texture");
+    int textureIndex = cast(int)luaL_checkinteger(L, 1);
     float x = luaL_checknumber(L, 2);
     float y = luaL_checknumber(L, 3);
     float rotation = luaL_optnumber(L, 4, 0);
@@ -105,7 +102,7 @@ extern (C) nothrow int luaL_drawTextureEx(lua_State *L) {
         color.a = cast(ubyte)lua_tointeger(L, -1);
         lua_pop(L, 1);
     }
-    DrawTextureEx(*texture, Vector2(x, y), rotation, scale*variables.scale, color);
+    DrawTextureEx(textures[textureIndex], Vector2(x, y), rotation, scale*variables.scale, color);
     
     return 0;
 }
