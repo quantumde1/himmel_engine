@@ -137,3 +137,8 @@ extern (C) nothrow int luaL_setCamera(lua_State *L) {
     );
     return 0;
 }
+
+extern (C) nothrow int luaL_clearBackground(lua_State *L) {
+    ClearBackground(Colors.BLACK);
+    return 0;
+}

@@ -18,4 +18,4 @@ import audio.sfx;
 extern (C) nothrow int luaL_drawRect(lua_State *L) {
     DrawRectangle(cast(int)luaL_checkinteger(L, 1), cast(int)luaL_checkinteger(L, 2), cast(int)luaL_checkinteger(L, 3), cast(int)luaL_checkinteger(L, 4), Colors.WHITE);
     return 0;
-}   
+}

@@ -34,6 +34,8 @@ void engineLoader()
     baseHeight = systemSettings.defaultScreenHeight;
     int screenWidth = systemSettings.screenWidth;
     int screenHeight = systemSettings.screenHeight;
+    renderTextureWidth = systemSettings.renderTextureWidth;
+    renderTextureHeight = systemSettings.renderTextureHeight;
     scale = min(cast(float)(screenWidth/baseWidth), cast(float)(screenHeight/baseHeight));
     debugWriteln("scale: ", scale);
     // Initialization

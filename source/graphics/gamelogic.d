@@ -45,6 +45,7 @@ void unloadResourcesOnExit() {
             UnloadModel(models[i]);
         }
     }
+    UnloadRenderTexture(renderTexture);
     resetAllScriptValues();
     UnloadTexture(circle);
     UnloadTexture(dialogBackgroundTex);
@@ -99,7 +100,6 @@ void characterLogic() {
 
 void dialogLogic() {
     if (showDialog) {
-        displayDialog(messageGlobal, choices, selectedChoice, choicePage, textFont, &showDialog, typingSpeed, 
-        circle, dialogBackgroundTex, scale);
+        dialogBox();
     }
 }

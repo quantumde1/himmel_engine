@@ -26,7 +26,9 @@ nothrow string parseConf(string type, string filename) {
             "default_screen_height": "DEV_SCREEN_HEIGHT:",
             "screen_width": "SCREEN_WIDTH:",
             "screen_height": "SCREEN_HEIGHT:",
-            "default_fullscreen": "DEFAULT_FULLSCREEN:"
+            "default_fullscreen": "DEFAULT_FULLSCREEN:",
+            "render_texture_width": "RENDER_TEXTURE_WIDTH:",
+            "render_texture_height": "RENDER_TEXTURE_HEIGHT:"
         ];
 
         if (type in typeMap)
@@ -64,6 +66,8 @@ SystemSettings loadSettingsFromConfigFile(string confName) {
         parseConf("default_screen_height", confName).to!int,
         parseConf("screen_width", confName).to!int,
         parseConf("screen_height", confName).to!int,
-        parseConf("default_fullscreen", confName).to!bool
+        parseConf("default_fullscreen", confName).to!bool,
+        parseConf("render_texture_width", confName).to!int,
+        parseConf("render_texture_height", confName).to!int,
     );
 }

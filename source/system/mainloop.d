@@ -8,8 +8,14 @@ import raylib;
 import std.stdio;
 import std.conv;
 import scripts.lua.core;
+import std.algorithm;
 
 void mainLoop() {
+    renderTexture = LoadRenderTexture(renderTextureWidth, renderTextureHeight);
+    float renderScale = min(
+        cast(float)GetScreenWidth() / renderTextureWidth,
+        cast(float)GetScreenHeight() / renderTextureHeight
+    );
     while (true)
     {
         switch (currentGameState)
@@ -37,6 +43,7 @@ void mainLoop() {
                     if (IsKeyPressed(KeyboardKey.KEY_F)) {
                         ToggleFullscreen();
                     }
+                    BeginTextureMode(renderTexture);
                     BeginDrawing();
                     ClearBackground(Colors.BLACK);
 
@@ -47,6 +54,22 @@ void mainLoop() {
                     BeginMode3D(camera);
                     luaEventLoop3D();
                     EndMode3D();
+
+                    EndTextureMode();
+                    
+                    DrawTexturePro(
+                        renderTexture.texture,
+                        Rectangle(0, 0, renderTextureWidth, -renderTextureHeight),
+                        Rectangle(
+                            (GetScreenWidth() - (renderTextureWidth * renderScale)) * 0.5f,
+                            (GetScreenHeight() - (renderTextureHeight * renderScale)) * 0.5f,
+                            renderTextureWidth * renderScale,
+                            renderTextureHeight * renderScale
+                        ),
+                        Vector2(0, 0),
+                        0.0f,
+                        Colors.WHITE
+                    );
 
                     luaEventLoopPost2D();
                     /* 2D part */

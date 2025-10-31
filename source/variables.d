@@ -46,6 +46,8 @@ struct SystemSettings {
     int screenWidth;
     int screenHeight;
     bool defaultFullscreen;
+    int renderTextureWidth;
+    int renderTextureHeight;
 }
 
 struct TextureEngine {
@@ -97,6 +99,8 @@ Model[] models;
 Shader[] shaders;
 
 Texture[] textures;
+
+RenderTexture renderTexture;
 
 /* booleans */
 
@@ -167,6 +171,10 @@ int playerCollisionIndex = 0; //default, can be changed via setter function in g
 int animationCurrentFrame = 0;
 
 int animsCount = 0;
+
+int renderTextureWidth;
+
+int renderTextureHeight;
 
 /* ubyte values */
 

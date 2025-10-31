@@ -100,7 +100,7 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "hideCursor", &luaL_hideCursor);
     lua_register(L, "setMousePosition", &luaL_setMousePosition);
     lua_register(L, "drawFPS", &luaL_drawFPS);
-
+    lua_register(L, "clearBackground", &luaL_clearBackground);
     // Shader bindings
     lua_register(L, "loadShader", &luaL_loadShader);
     lua_register(L, "unloadShader", &luaL_unloadShader);
