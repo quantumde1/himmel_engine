@@ -40,9 +40,6 @@ void mainLoop() {
                         luaReload = false;
                     }
                     SetExitKey(0);
-                    if (IsKeyPressed(KeyboardKey.KEY_F)) {
-                        ToggleFullscreen();
-                    }
                     BeginTextureMode(renderTexture);
                     BeginDrawing();
                     ClearBackground(Colors.BLACK);
