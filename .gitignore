@@ -14,6 +14,7 @@ himmel-engine.a
 himmel-engine.lib
 himmel-engine-test-*
 *.exe
+*.7z
 *.pdb
 *.o
 *.obj
@@ -28,7 +29,7 @@ a.out
 sky
 *.dylib*
 capture.mp4
-res/
+res*
 /scripts/
 docs/
 ./save.txt
