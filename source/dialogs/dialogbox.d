@@ -69,7 +69,7 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
                    int choicePage, Font dialogFont, bool* showDialog, 
                    ref float textSpeed, Texture2D circle, 
                    Texture2D dialogBackgroundTex, float scale) {
-    
+    pauseParser = true;
     immutable int screenWidth = systemSettings.screenWidth;
     immutable int screenHeight = systemSettings.screenHeight;
     immutable int screenPadding = 10;
@@ -262,5 +262,6 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
         textDisplayProgress = 0.0f;
         textFullyDisplayed = false;
         *showDialog = false;
+        pauseParser = false;
     }
 }

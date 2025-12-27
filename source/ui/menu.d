@@ -33,13 +33,18 @@ void renderText(float alpha, immutable(char)* text)
 
 void helloScreen()
 {
-    fadeEffect(0.0f, true, (float alpha) {
-        renderText(alpha, "powered by\n\nHimmel Engine");
-    });
+    debug
+    {
+        debugWriteln("hello screen showing");
+    } else {
+        fadeEffect(0.0f, true, (float alpha) {
+            renderText(alpha, "powered by\n\nHimmel Engine");
+        });
 
-    fadeEffect(2.0f, false, (float alpha) {
-        renderText(alpha, "powered by\n\nHimmel Engine");
-    });
+        fadeEffect(2.0f, false, (float alpha) {
+            renderText(alpha, "powered by\n\nHimmel Engine");
+        });
+    }
 }
 
 int showMainMenu() {

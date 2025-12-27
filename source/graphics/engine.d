@@ -24,7 +24,10 @@ import system.abstraction;
 import variables;
 import system.cleanup;
 import std.algorithm;
+import scripts.hbs;
+import std.file;
 
+int index = 0;
 void engineLoader()
 {
     systemSettings = loadSettingsFromConfigFile("conf/settings.conf");
@@ -67,8 +70,12 @@ void engineLoader()
                 break;
             case GameState.InGame:
                 gameInit();
+                //ubyte[] file = cast(ubyte[])read("test.hbs");
+                //loader(file);
+                //parser(file);
                 while (!WindowShouldClose())
                 {
+                    DrawFPS(10, 10);
                     if (luaReload) {
                         resetAllScriptValues();
                         int luaExecutionCode = luaInit(luaExec);
@@ -84,6 +91,8 @@ void engineLoader()
                     if (IsKeyPressed(KeyboardKey.KEY_F11)) {
                         ToggleFullscreen();
                     }
+                    luaEventLoop();
+                    //executer();
                     BeginDrawing();
                     ClearBackground(Colors.BLACK);
                     // main logic
@@ -95,7 +104,6 @@ void engineLoader()
                     EndMode2D();
                     //drawing dialogs
                     dialogLogic();
-                    luaEventLoop();
                     EndDrawing();
                 }
                 break;

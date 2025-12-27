@@ -28,33 +28,3 @@ void renderText(float alpha, immutable(char)* text)
             GetScreenHeight() / 2), 40, 0, Fade(Colors.WHITE, alpha)
     );
 }
-
-void helloScreen()
-{
-    debug
-    {
-        bool play = false;
-        debugWriteln("hello screen showing");
-        if (play == false) {
-            videoFinished = true;
-        }
-    } else {
-        fadeEffect(0.0f, true, (float alpha) {
-            renderText(alpha, "powered by\n\nHimmel Engine");
-        });
-
-        fadeEffect(2.0f, false, (float alpha) {
-            renderText(alpha, "powered by\n\nHimmel Engine");
-        });
-        /*
-        fadeEffect(0.0f, true, (float alpha) {
-            renderLogo(alpha, "atlus_logo.png".toStringz, true);
-        });
-        
-        fadeEffect(fadeAlpha, false, (float alpha) {
-            renderLogo(alpha, "atlus_logo.png".toStringz, true);
-        });
-        */
-        // Play Opening Video
-    }
-}

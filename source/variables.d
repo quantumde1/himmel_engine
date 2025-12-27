@@ -96,6 +96,7 @@ bool showDialog = false;
 
 bool isTextFullyDisplayed = false;
 
+bool pauseParser = false;
 
 /* strings */
 
