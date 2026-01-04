@@ -70,13 +70,13 @@ void engineLoader()
                 break;
             case GameState.InGame:
                 gameInit();
-                //ubyte[] file = cast(ubyte[])read("test.hbs");
-                //loader(file);
-                //parser(file);
+                ubyte[] file = cast(ubyte[])read("test2.hbs");
+                loader(file);
+                parser(file);
                 while (!WindowShouldClose())
                 {
                     DrawFPS(10, 10);
-                    if (luaReload) {
+                    /*if (luaReload) {
                         resetAllScriptValues();
                         int luaExecutionCode = luaInit(luaExec);
                         if (luaExecutionCode != EngineExitCodes.EXIT_OK) {
@@ -86,13 +86,13 @@ void engineLoader()
                             break;
                         }
                         luaReload = false;
-                    }
+                    }*/
                     SetExitKey(0);
                     if (IsKeyPressed(KeyboardKey.KEY_F11)) {
                         ToggleFullscreen();
                     }
-                    luaEventLoop();
-                    //executer();
+                    //luaEventLoop();
+                    executer();
                     BeginDrawing();
                     ClearBackground(Colors.BLACK);
                     // main logic
