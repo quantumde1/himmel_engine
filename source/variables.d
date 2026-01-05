@@ -149,6 +149,8 @@ int currentChoiceCharIndex = 0;
 
 int currentGameState = 1;
 
+int currentCommandIndex = 0;
+
 /* ubyte values */
 
 ubyte animationAlpha = 127;

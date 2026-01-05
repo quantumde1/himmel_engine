@@ -237,8 +237,33 @@ void parser(ref ubyte[] loadedScript) {
                 );
                 break;
             case OpCodes.DRAWBACKGROUND:
-                // <opcode> <scale> <X position> <Y position>
+                // <opcode> <scale> <X position> <Y position> <index>
                 debugWriteln("DrawBackground");
+                float backgroundScale = readUInt16(loadedScript, offsets[count]+sizes[count]-10)*scale; // begins with scale factor
+                int backgroundX = readUInt24(loadedScript, offsets[count]+sizes[count]-8); // i've taken uint24 because it has much bigger max value than uint16, but not that big as uint32 
+                int backgroundY = readUInt24(loadedScript, offsets[count]+sizes[count]-5); // same as previous
+                int indexOfBackground = readUInt16(loadedScript, offsets[count]+sizes[count]-2);
+                debugWriteln(
+                    "backgroundScale: ", backgroundScale,
+                    " backgroundX: ", backgroundX,
+                    " backgroundY: ", backgroundY,
+                    " index: ", indexOfBackground
+                );
+                commands ~= ReadyCommands(
+                    OpCodes.DRAWBACKGROUND,
+                    cast(char*)"",
+                    "",
+                    cast(char*)"",
+                    indexOfBackground,
+                    backgroundScale,
+                    Vector2(backgroundX, backgroundY),
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0, 0),
+                    "",
+                    ""
+                );
                 break;
             case OpCodes.UNDRAWBACKGROUND:
                 // <opcode> <index>
@@ -249,15 +274,64 @@ void parser(ref ubyte[] loadedScript) {
                 debugWriteln("UnloadBackground");
                 break;
             case OpCodes.LOADCHARACTER:
+                // <opcode> <path> <index>
                 debugWriteln("LoadCharacter");
+                string pathToCharacter = cast(string)(loadedScript[offsets[count]+1..(offsets[count]+sizes[count]-2)]); // We removing last two bytes because they contain index of background
+                int indexOfCharacter = readUInt16(loadedScript, offsets[count]+sizes[count]-2);
+                debugWriteln("Path to character: ", pathToCharacter);
+                debugWriteln("index of character: ", indexOfCharacter);
+                commands ~= ReadyCommands(
+                    OpCodes.LOADCHARACTER,
+                    cast(char*)"",
+                    "",
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0, 0),
+                    cast(char*)toStringz(pathToCharacter),
+                    indexOfCharacter,
+                    0.0f,
+                    Vector2(0, 0),
+                    "",
+                    ""
+                );
+                break;
                 break;
             case OpCodes.DRAWCHARACTER:
+                // <opcode> <scale> <X position> <Y position> <index>
                 debugWriteln("DrawCharacter");
+                float characterScale = readUInt16(loadedScript, offsets[count]+sizes[count]-10)*scale; // begins with scale factor
+                int characterX = readUInt24(loadedScript, offsets[count]+sizes[count]-8); // i've taken uint24 because it has much bigger max value than uint16, but not that big as uint32 
+                int characterY = readUInt24(loadedScript, offsets[count]+sizes[count]-5); // same as previous
+                int indexOfCharacter = readUInt16(loadedScript, offsets[count]+sizes[count]-2);
+                debugWriteln(
+                    "characterScale: ", characterScale,
+                    " characterX: ", characterX,
+                    " characterY: ", characterY,
+                    " index: ", indexOfCharacter
+                );
+                commands ~= ReadyCommands(
+                    OpCodes.DRAWCHARACTER,
+                    cast(char*)"",
+                    "",
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0.0, 0.0),
+                    cast(char*)"",
+                    indexOfCharacter,
+                    characterScale,
+                    Vector2(characterX, characterY),
+                    "",
+                    ""
+                );
                 break;
             case OpCodes.UNDRAWCHARACTER:
+                // <opcode> <index>
                 debugWriteln("UndrawBackground");
                 break;
             case OpCodes.UNLOADCHARACTER:
+                // <opcode> <index>
                 debugWriteln("UnloadCharacter");
                 break;
             default:
@@ -268,8 +342,6 @@ void parser(ref ubyte[] loadedScript) {
     offsets.length = 0;
     sizes.length = 0;
 }
-
-int currentCommandIndex = 0;
 
 // script executer.
 void executer() {
@@ -295,10 +367,36 @@ void executer() {
             break;
         case OpCodes.LOADBACKGROUND:
             debugWriteln(commands[currentCommandIndex].backgroundPath);
-            backgroundTextures.length = 1;
+            backgroundTextures.length += 1;
             backgroundTextures[commands[currentCommandIndex].backgroundIndex].texture = LoadTexture(
                 commands[currentCommandIndex].backgroundPath
             );
+            break;
+        case OpCodes.DRAWBACKGROUND:
+            backgroundTextures[commands[currentCommandIndex].backgroundIndex].drawTexture = true;
+            backgroundTextures[commands[currentCommandIndex].backgroundIndex].width = backgroundTextures[commands[currentCommandIndex].backgroundIndex].texture.width;
+            backgroundTextures[commands[currentCommandIndex].backgroundIndex].height = backgroundTextures[commands[currentCommandIndex].backgroundIndex].texture.height;
+            backgroundTextures[commands[currentCommandIndex].backgroundIndex].x = commands[currentCommandIndex].backgroundPosition.x;
+            backgroundTextures[commands[currentCommandIndex].backgroundIndex].y = commands[currentCommandIndex].backgroundPosition.y;
+            backgroundTextures[commands[currentCommandIndex].backgroundIndex].scale = commands[currentCommandIndex].backgroundScale;
+            break;
+        case OpCodes.LOADCHARACTER:
+            debugWriteln(commands[currentCommandIndex].characterPath);
+            characterTextures.length += 1;
+            characterTextures[commands[currentCommandIndex].characterIndex].texture = LoadTexture(
+                commands[currentCommandIndex].characterPath
+            );
+            break;
+        case OpCodes.DRAWCHARACTER:
+            characterTextures[commands[currentCommandIndex].characterIndex].drawTexture = true;
+            characterTextures[commands[currentCommandIndex].characterIndex].justDrawn = true;
+            int width = characterTextures[commands[currentCommandIndex].characterIndex].texture.width;
+            int height = characterTextures[commands[currentCommandIndex].characterIndex].texture.height;
+            characterTextures[commands[currentCommandIndex].characterIndex].width = width;
+            characterTextures[commands[currentCommandIndex].characterIndex].height = height;
+            characterTextures[commands[currentCommandIndex].characterIndex].x = commands[currentCommandIndex].characterPosition.x;
+            characterTextures[commands[currentCommandIndex].characterIndex].y = commands[currentCommandIndex].characterPosition.y;
+            characterTextures[commands[currentCommandIndex].characterIndex].scale = commands[currentCommandIndex].characterScale;
             break;
         default:
             break;

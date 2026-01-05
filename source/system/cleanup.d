@@ -1,6 +1,8 @@
 module system.cleanup;
 
 import std.stdio;
+//import std.conv;
+//import std.file;
 import variables;
 import raylib;
 import system.abstraction;
@@ -23,4 +25,5 @@ void unloadResourcesLogic()
     for (int i = 0; i < backgroundTextures.length; i++) {
         UnloadTexture(backgroundTextures[i].texture);
     }
+    //std.file.write("save.txt", currentCommandIndex.to!string);
 }

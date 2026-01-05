@@ -69,13 +69,16 @@ void engineLoader()
                 showMainMenu();
                 break;
             case GameState.InGame:
+                /*if (std.file.exists("save.txt")) {
+                    int savedCommandIndex = std.file.readText("save.txt").to!int;
+                    currentCommandIndex = savedCommandIndex;
+                }*/
                 gameInit();
                 ubyte[] file = cast(ubyte[])read("test2.hbs");
                 loader(file);
                 parser(file);
                 while (!WindowShouldClose())
                 {
-                    DrawFPS(10, 10);
                     /*if (luaReload) {
                         resetAllScriptValues();
                         int luaExecutionCode = luaInit(luaExec);
@@ -104,6 +107,7 @@ void engineLoader()
                     EndMode2D();
                     //drawing dialogs
                     dialogLogic();
+                    DrawFPS(10, 10);
                     EndDrawing();
                 }
                 break;
