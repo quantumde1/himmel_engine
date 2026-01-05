@@ -74,9 +74,11 @@ void engineLoader()
                     currentCommandIndex = savedCommandIndex;
                 }*/
                 gameInit();
-                ubyte[] file = cast(ubyte[])read("test2.hbs");
-                loader(file);
-                parser(file);
+                if (currentGameState == GameState.InGame) {
+                    ubyte[] file = cast(ubyte[])read("test2.hbs");
+                    loader(file);
+                    parser(file);
+                }
                 while (!WindowShouldClose())
                 {
                     /*if (luaReload) {

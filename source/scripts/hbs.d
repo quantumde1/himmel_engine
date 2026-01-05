@@ -71,6 +71,13 @@ uint readUInt32(ref ubyte[] bytes, size_t offset) {
     return result;
 }
 
+float readFloat16(ref ubyte[] bytes, size_t offset) {
+    size_t internalCurrentPosition = offset;
+    ubyte b0 = bytes[internalCurrentPosition];
+    ubyte b1 = bytes[internalCurrentPosition + 1];
+    return b0 + b1 / 100.0f;
+}
+
 int[] offsets; // data offsets in script
 int[] sizes; // sizes of data
 
@@ -240,6 +247,8 @@ void parser(ref ubyte[] loadedScript) {
                 // <opcode> <scale> <X position> <Y position> <index>
                 debugWriteln("DrawBackground");
                 float backgroundScale = readUInt16(loadedScript, offsets[count]+sizes[count]-10)*scale; // begins with scale factor
+                //float testScale = readFloat16(loadedScript, offsets[count]+sizes[count]-10)*scale;
+                //debugWriteln("float test: ", testScale);
                 int backgroundX = readUInt24(loadedScript, offsets[count]+sizes[count]-8); // i've taken uint24 because it has much bigger max value than uint16, but not that big as uint32 
                 int backgroundY = readUInt24(loadedScript, offsets[count]+sizes[count]-5); // same as previous
                 int indexOfBackground = readUInt16(loadedScript, offsets[count]+sizes[count]-2);
@@ -268,10 +277,42 @@ void parser(ref ubyte[] loadedScript) {
             case OpCodes.UNDRAWBACKGROUND:
                 // <opcode> <index>
                 debugWriteln("UndrawBackground");
+                int indexOfBackground = readUInt16(loadedScript, offsets[count]+sizes[count]-2);
+                commands ~= ReadyCommands(
+                    OpCodes.UNDRAWBACKGROUND,
+                    cast(char*)"",
+                    "",
+                    cast(char*)"",
+                    indexOfBackground,
+                    0.0f,
+                    Vector2(0, 0),
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0, 0),
+                    "",
+                    ""
+                );
                 break;
             case OpCodes.UNLOADBACKGROUND:
                 // <opcode> <index>
                 debugWriteln("UnloadBackground");
+                int indexOfBackground = readUInt16(loadedScript, offsets[count]+sizes[count]-2);
+                commands ~= ReadyCommands(
+                    OpCodes.UNLOADBACKGROUND,
+                    cast(char*)"",
+                    "",
+                    cast(char*)"",
+                    indexOfBackground,
+                    0.0f,
+                    Vector2(0, 0),
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0, 0),
+                    "",
+                    ""
+                );
                 break;
             case OpCodes.LOADCHARACTER:
                 // <opcode> <path> <index>
@@ -328,11 +369,43 @@ void parser(ref ubyte[] loadedScript) {
                 break;
             case OpCodes.UNDRAWCHARACTER:
                 // <opcode> <index>
-                debugWriteln("UndrawBackground");
+                debugWriteln("UndrawCharacter");
+                int indexOfCharacter = readUInt16(loadedScript, offsets[count]+sizes[count]-2);
+                commands ~= ReadyCommands(
+                    OpCodes.UNDRAWCHARACTER,
+                    cast(char*)"",
+                    "",
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0, 0),
+                    cast(char*)"",
+                    indexOfCharacter,
+                    0.0f,
+                    Vector2(0, 0),
+                    "",
+                    ""
+                );
                 break;
             case OpCodes.UNLOADCHARACTER:
                 // <opcode> <index>
                 debugWriteln("UnloadCharacter");
+                int indexOfCharacter = readUInt16(loadedScript, offsets[count]+sizes[count]-2);
+                commands ~= ReadyCommands(
+                    OpCodes.UNLOADCHARACTER,
+                    cast(char*)"",
+                    "",
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0, 0),
+                    cast(char*)"",
+                    indexOfCharacter,
+                    0.0f,
+                    Vector2(0, 0),
+                    "",
+                    ""
+                );
                 break;
             default:
                 debugWriteln("unknown: ", loadedScript[offsets[count]]);
@@ -397,6 +470,20 @@ void executer() {
             characterTextures[commands[currentCommandIndex].characterIndex].x = commands[currentCommandIndex].characterPosition.x;
             characterTextures[commands[currentCommandIndex].characterIndex].y = commands[currentCommandIndex].characterPosition.y;
             characterTextures[commands[currentCommandIndex].characterIndex].scale = commands[currentCommandIndex].characterScale;
+            break;
+        case OpCodes.UNDRAWBACKGROUND:
+            backgroundTextures[commands[currentCommandIndex].backgroundIndex].drawTexture = false;
+            break;
+        case OpCodes.UNLOADBACKGROUND:
+            backgroundTextures[commands[currentCommandIndex].backgroundIndex].drawTexture = false;
+            UnloadTexture(backgroundTextures[commands[currentCommandIndex].backgroundIndex].texture);
+            break;
+        case OpCodes.UNDRAWCHARACTER:
+            characterTextures[commands[currentCommandIndex].characterIndex].drawTexture = false;
+            break;
+        case OpCodes.UNLOADCHARACTER:
+            characterTextures[commands[currentCommandIndex].characterIndex].drawTexture = false;
+            UnloadTexture(backgroundTextures[commands[currentCommandIndex].characterIndex].texture);
             break;
         default:
             break;
