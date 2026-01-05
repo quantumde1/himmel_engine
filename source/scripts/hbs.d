@@ -8,6 +8,7 @@ import raylib;
 import std.conv;
 import variables;
 import std.algorithm;
+import graphics.playback;
 
 struct ReadyCommands {
     ubyte type;
@@ -381,7 +382,6 @@ void parser(ref ubyte[] loadedScript) {
                     ""
                 );
                 break;
-                break;
             case OpCodes.DRAWCHARACTER:
                 // <opcode> <scale> <X position> <Y position> <index>
                 debugWriteln("DrawCharacter");
@@ -450,6 +450,28 @@ void parser(ref ubyte[] loadedScript) {
                     0.0f,
                     Vector2(0, 0),
                     "",
+                    "",
+                    ""
+                );
+                break;
+            case OpCodes.PLAYVIDEO:
+                // format: <opcode> <text>
+                debugWriteln("PlayVideo");
+                string pathToVideo = cast(string)(loadedScript[offsets[count]+1..(offsets[count]+sizes[count])]);
+                debugWriteln("acquired path: ", pathToVideo);
+                commands ~= ReadyCommands(
+                    OpCodes.PLAYVIDEO, 
+                    cast(char*)"",
+                    "",
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0, 0),
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0, 0),
+                    pathToVideo,
                     "",
                     ""
                 );
@@ -548,6 +570,9 @@ void executer() {
         case OpCodes.UNLOADCHARACTER:
             characterTextures[commands[currentCommandIndex].characterIndex].drawTexture = false;
             UnloadTexture(backgroundTextures[commands[currentCommandIndex].characterIndex].texture);
+            break;
+        case OpCodes.PLAYVIDEO:
+            playVideo(commands[currentCommandIndex].videoPath);
             break;
         default:
             break;
