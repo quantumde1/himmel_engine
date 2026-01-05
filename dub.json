@@ -4,7 +4,6 @@
 	],
 	"copyright": "Copyright © 2025, quantumde1",
 	"dependencies": {
-		"bindbc-lua": "~>0.6.1",
 		"raylib-d": "~>5.5.1"
 	},
 	"description": "Engine on Dlang for visual novels",
@@ -33,20 +32,12 @@
 	],
 	"libs-posix": [
 		"raylib",
-		"lua-5.3",
 		"vlc"
 	],
 	"libs-windows": [
 		"raylib",
-		"lua53",
 		"vlc"
 	],
 	"license": "MIT License",
-	"name": "himmel-engine",
-	"subConfigurations": {
-		"bindbc-lua": "static"
-	},
-	"versions": [
-		"LUA_53"
-	]
+	"name": "himmel_engine"
 }

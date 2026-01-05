@@ -1,4 +1,4 @@
-module dialogs.dialogbox;
+module message.messagebox;
 
 import raylib;
 import std.string;
@@ -66,7 +66,7 @@ void draw9SliceTexture(Texture2D tex, Rectangle dest, int borderSize, Color tint
 
 // Main dialog display function
 void displayDialog(string[] pages, string[] choices, ref int selectedChoice, 
-                   int choicePage, Font dialogFont, bool* showDialog, 
+                   int choicePage, Font dialogFont, ref bool showDialog, 
                    ref float textSpeed, Texture2D circle, 
                    Texture2D dialogBackgroundTex, float scale) {
     pauseParser = true;
@@ -261,7 +261,7 @@ void displayDialog(string[] pages, string[] choices, ref int selectedChoice,
         currentPage = 0;
         textDisplayProgress = 0.0f;
         textFullyDisplayed = false;
-        *showDialog = false;
+        showDialog = false;
         pauseParser = false;
     }
 }

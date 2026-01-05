@@ -18,6 +18,7 @@ himmel-engine-test-*
 *.o
 *.obj
 *.lst
+*.old
 .ldc2_cache
 sky.sh
 a.out

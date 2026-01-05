@@ -1,7 +1,7 @@
 module scripts.hbs;
 
 import std.stdio;
-import system.abstraction;
+import system.debugwriteln;
 import std.file;
 import std.string;
 import raylib;

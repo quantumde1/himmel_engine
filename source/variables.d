@@ -3,8 +3,7 @@ module variables;
 
 import std.typecons;
 import raylib;
-import bindbc.lua;
-import system.abstraction;
+import system.debugwriteln;
 
 nothrow void resetAllScriptValues() {
     debugWriteln("Resetting all values!");
@@ -86,8 +85,6 @@ Music music;
 
 bool playAnimation = false;
 
-bool luaReload = true;
-
 bool videoFinished = false;
 
 bool isCameraMoving = false;
@@ -104,7 +101,7 @@ string[] messageGlobal;
 
 string[] choices;
 
-string luaExec;
+string hbsFirstExec;
 
 
 /* floats */
@@ -154,7 +151,3 @@ int currentCommandIndex = 0;
 /* ubyte values */
 
 ubyte animationAlpha = 127;
-
-/* lua */
-
-lua_State* L;

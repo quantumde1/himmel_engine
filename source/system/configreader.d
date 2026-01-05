@@ -1,4 +1,4 @@
-module system.config;
+module system.configreader;
 
 import std.stdio;
 import std.file;
@@ -6,7 +6,7 @@ import std.string;
 import std.range;
 import variables;
 import std.conv;
-import system.abstraction;
+import system.debugwriteln;
 
 nothrow string parseConf(string type, string filename) {
     try

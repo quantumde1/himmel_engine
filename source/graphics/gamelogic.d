@@ -1,13 +1,12 @@
 module graphics.gamelogic;
 
 import raylib;
-import bindbc.lua;
 import variables;
-import graphics.effects;
+import ui.effects;
 import std.string;
 import std.math;
-import dialogs.dialogbox;
-import system.abstraction;
+import message.messagebox;
+import system.debugwriteln;
 
 /** 
  * this module contains game logic, which was removed from engine.d for better readability.
@@ -21,7 +20,7 @@ void gameInit()
         currentGameState = GameState.Exit;
     } else {
         debugWriteln("Game initializing.");
-        luaExec = systemSettings.scriptPath;
+        hbsFirstExec = systemSettings.scriptPath;
     }
 }
 
@@ -70,7 +69,7 @@ void effectsLogic() {
             isCameraMoving = false;
         }
     }
-    playUIAnimation(framesUI, animationAlpha);
+    playInterfaceAnimation(framesUI, animationAlpha);
 }
 
 void backgroundLogic() {
@@ -83,7 +82,7 @@ void characterLogic() {
 
 void dialogLogic() {
     if (showDialog) {
-        displayDialog(messageGlobal, choices, selectedChoice, choicePage, textFont, &showDialog, typingSpeed, 
+        displayDialog(messageGlobal, choices, selectedChoice, choicePage, textFont, showDialog, typingSpeed, 
         circle, dialogBackgroundTex, scale);
     }
 }
