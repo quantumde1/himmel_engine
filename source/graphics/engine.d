@@ -69,15 +69,16 @@ void engineLoader()
                 showMainMenu();
                 break;
             case GameState.InGame:
-                /*if (std.file.exists("save.txt")) {
-                    int savedCommandIndex = std.file.readText("save.txt").to!int;
-                    currentCommandIndex = savedCommandIndex;
-                }*/
+                bool fromSave = false;
                 gameInit();
                 if (currentGameState == GameState.InGame) {
                     ubyte[] file = cast(ubyte[])read("test2.hbs");
                     loader(file);
                     parser(file);
+                }
+                if (std.file.exists("save.txt")) {
+                    int savedCommandIndex = std.file.readText("save.txt").to!int;
+                    saveLoader(savedCommandIndex);
                 }
                 while (!WindowShouldClose())
                 {

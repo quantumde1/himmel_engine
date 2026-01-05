@@ -86,6 +86,14 @@ int[] sizes; // sizes of data
 
 ReadyCommands[] commands;
 
+// Game can load from save using this function. It executes script right to index specified in save.txt.
+void saveLoader(int neededCommandIndex) {
+    while (currentCommandIndex < neededCommandIndex) {
+        pauseParser = false;
+        executer();
+    }
+}
+
 void loader(ref ubyte[] loadedScript) {
     /* Loads buffer with commands addresses into RAM
     first four bytes can be skipped, but they contains header(HBS) and padding byte
