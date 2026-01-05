@@ -7,6 +7,7 @@ import std.string;
 import raylib;
 import std.conv;
 import variables;
+import std.algorithm;
 
 struct ReadyCommands {
     ubyte type;
@@ -22,6 +23,7 @@ struct ReadyCommands {
     Vector2 characterPosition;
     string videoPath;
     string sfxPath;
+    string fontPath;
 }
 
 enum OpCodes {
@@ -41,6 +43,7 @@ enum OpCodes {
     UNLOADBACKGROUND = 0x13,
     UNDRAWCHARACTER = 0x14,
     UNLOADCHARACTER = 0x15,
+    SETFONT = 0x16,
     ENDCOMMAND = 0xFF,
 }
 
@@ -130,7 +133,8 @@ void parser(ref ubyte[] loadedScript) {
                 commands ~= ReadyCommands(
                     OpCodes.DIALOGBOX, 
                     cast(char*)"",
-                    text, cast(char*)"",
+                    text,
+                    cast(char*)"",
                     0,
                     0.0f,
                     Vector2(0, 0),
@@ -139,8 +143,31 @@ void parser(ref ubyte[] loadedScript) {
                     0.0f,
                     Vector2(0, 0),
                     "",
+                    "",
                     ""
                 ); // adds into array of already parsed bytecode. Moving from offset to end of line, skipping first byte because its a command byte.
+                break;
+            case OpCodes.SETFONT:
+                // format: <opcode> <text>
+                debugWriteln("SetFont");
+                string pathToFont = cast(string)(loadedScript[offsets[count]+1..(offsets[count]+sizes[count])]);
+                debugWriteln("acquired path: ", pathToFont);
+                commands ~= ReadyCommands(
+                    OpCodes.SETFONT, 
+                    cast(char*)"",
+                    "",
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0, 0),
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0, 0),
+                    "",
+                    "",
+                    pathToFont
+                );
                 break;
             case OpCodes.LOADMUSIC:
                 // format: <opcode> <path>
@@ -159,6 +186,7 @@ void parser(ref ubyte[] loadedScript) {
                     0,
                     0.0f,
                     Vector2(0, 0),
+                    "",
                     "",
                     ""
                 ); // same, and so on
@@ -179,6 +207,7 @@ void parser(ref ubyte[] loadedScript) {
                     0.0f,
                     Vector2(0, 0),
                     "",
+                    "",
                     ""
                 );
                 break;
@@ -198,6 +227,7 @@ void parser(ref ubyte[] loadedScript) {
                     0.0f,
                     Vector2(0, 0),
                     "",
+                    "",
                     ""
                 );
                 break;
@@ -205,7 +235,7 @@ void parser(ref ubyte[] loadedScript) {
                 // <opcode>
                 debugWriteln("UnloadMusic");
                 commands ~= ReadyCommands(
-                    OpCodes.STOPMUSIC,
+                    OpCodes.UNLOADMUSIC,
                     cast(char*)"",
                     "",
                     cast(char*)"",
@@ -216,6 +246,7 @@ void parser(ref ubyte[] loadedScript) {
                     0,
                     0.0f,
                     Vector2(0, 0),
+                    "",
                     "",
                     ""
                 );
@@ -239,6 +270,7 @@ void parser(ref ubyte[] loadedScript) {
                     0,
                     0.0f,
                     Vector2(0, 0),
+                    "",
                     "",
                     ""
                 );
@@ -271,6 +303,7 @@ void parser(ref ubyte[] loadedScript) {
                     0.0f,
                     Vector2(0, 0),
                     "",
+                    "",
                     ""
                 );
                 break;
@@ -291,6 +324,7 @@ void parser(ref ubyte[] loadedScript) {
                     0.0f,
                     Vector2(0, 0),
                     "",
+                    "",
                     ""
                 );
                 break;
@@ -310,6 +344,7 @@ void parser(ref ubyte[] loadedScript) {
                     0,
                     0.0f,
                     Vector2(0, 0),
+                    "",
                     "",
                     ""
                 );
@@ -333,6 +368,7 @@ void parser(ref ubyte[] loadedScript) {
                     indexOfCharacter,
                     0.0f,
                     Vector2(0, 0),
+                    "",
                     "",
                     ""
                 );
@@ -364,6 +400,7 @@ void parser(ref ubyte[] loadedScript) {
                     characterScale,
                     Vector2(characterX, characterY),
                     "",
+                    "",
                     ""
                 );
                 break;
@@ -384,6 +421,7 @@ void parser(ref ubyte[] loadedScript) {
                     0.0f,
                     Vector2(0, 0),
                     "",
+                    "",
                     ""
                 );
                 break;
@@ -403,6 +441,7 @@ void parser(ref ubyte[] loadedScript) {
                     indexOfCharacter,
                     0.0f,
                     Vector2(0, 0),
+                    "",
                     "",
                     ""
                 );
@@ -426,6 +465,21 @@ void executer() {
             messageGlobal[0] = commands[currentCommandIndex].message; //setting text
             showDialog = true;
             break;
+        case OpCodes.SETFONT:
+            int[] codepoints = new int[256];
+            foreach (i; 0 .. 95)
+            {
+                codepoints[i] = 32 + i;
+            }
+            
+            foreach (i; 0 .. 64)
+            {
+                codepoints[95 + i] = 0x410 + i;
+            }
+            
+            int fontSize = max(10, cast(int)(40 * scale));
+            textFont = LoadFontEx(toStringz(commands[currentCommandIndex].fontPath), fontSize, codepoints.ptr, cast(int)codepoints.length);
+            break;    
         case OpCodes.LOADMUSIC:
             music = LoadMusicStream(commands[currentCommandIndex].musicPath); // load music
             break;
@@ -444,6 +498,7 @@ void executer() {
             backgroundTextures[commands[currentCommandIndex].backgroundIndex].texture = LoadTexture(
                 commands[currentCommandIndex].backgroundPath
             );
+            SetTextureFilter(backgroundTextures[commands[currentCommandIndex].backgroundIndex].texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
             break;
         case OpCodes.DRAWBACKGROUND:
             backgroundTextures[commands[currentCommandIndex].backgroundIndex].drawTexture = true;
@@ -459,6 +514,7 @@ void executer() {
             characterTextures[commands[currentCommandIndex].characterIndex].texture = LoadTexture(
                 commands[currentCommandIndex].characterPath
             );
+            SetTextureFilter(characterTextures[commands[currentCommandIndex].characterIndex].texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
             break;
         case OpCodes.DRAWCHARACTER:
             characterTextures[commands[currentCommandIndex].characterIndex].drawTexture = true;
