@@ -51,8 +51,4 @@ You can see documentation on Himmel's [wiki](https://underlevel.ddns.net/git/qua
 
 ## License
 
-raylib([raylib.com](https://raylib.com)) uses zlib/libpng license
-
 Himmel Engine uses MIT license
-
-VLC([videolan.org](https://videolan.org)) uses LGPL license
