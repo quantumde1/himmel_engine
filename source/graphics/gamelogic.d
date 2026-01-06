@@ -1,11 +1,11 @@
 module graphics.gamelogic;
 
-import raylib;
+import aperture;
 import variables;
 import ui.effects;
 import std.string;
 import std.math;
-import message.messagebox;
+//import message.messagebox;
 import system.debugwriteln;
 
 /** 
@@ -39,15 +39,12 @@ void texturesLogic(TextureEngine[] textures) {
         }
 
         if (textures[i].alpha > 0.0f) {
-            float centeredX = textures[i].x - (textures[i].width * textures[i].scale / 2);
-            float centeredY = textures[i].y - (textures[i].height * textures[i].scale / 2);
             
             Color tint = textures[i].color;
             tint.a = cast(ubyte)(255 * textures[i].alpha);
             
-            DrawTextureEx(textures[i].texture,
-                Vector2(centeredX, centeredY),
-                0.0,
+            DrawTexture(textures[i].texture,
+                textures[i].x, textures[i].y,
                 textures[i].scale,
                 tint
             );
@@ -56,7 +53,7 @@ void texturesLogic(TextureEngine[] textures) {
 }
 
 void effectsLogic() {
-    UpdateMusicStream(music);
+    /*UpdateMusicStream(music);
     if (isCameraMoving) {
         float delta = GetFrameTime() * cameraMoveSpeed;
         camera.target.x += (cameraTargetX - camera.target.x) * delta;
@@ -68,7 +65,7 @@ void effectsLogic() {
             fabs(camera.zoom - cameraTargetZoom) < 0.5f) {
             isCameraMoving = false;
         }
-    }
+    }*/
     playInterfaceAnimation(framesUI, animationAlpha);
 }
 
@@ -82,7 +79,7 @@ void characterLogic() {
 
 void dialogLogic() {
     if (showDialog) {
-        displayDialog(messageGlobal, choices, selectedChoice, choicePage, textFont, showDialog, typingSpeed, 
-        circle, dialogBackgroundTex, scale);
+        //displayDialog(messageGlobal, choices, selectedChoice, choicePage, textFont, showDialog, typingSpeed, 
+        //circle, dialogBackgroundTex, scale);
     }
 }

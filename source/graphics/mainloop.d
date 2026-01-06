@@ -1,6 +1,6 @@
 module graphics.mainloop;
 
-import raylib;
+import aperture;
 
 //dlang imports
 import std.conv;
@@ -41,33 +41,26 @@ void mainLoop() {
                 }
                 while (!WindowShouldClose())
                 {
-                    SetExitKey(0);
-                    if (IsKeyPressed(KeyboardKey.KEY_F11)) {
-                        ToggleFullscreen();
-                    }
+                    PollWindowEvents();
+                    SetTargetFPS(60);
                     executer();
                     BeginDrawing();
                     ClearBackground(Colors.BLACK);
                     // main logic
-                    BeginMode2D(camera);
                     backgroundLogic();
                     characterLogic();
                     // effects logic
                     effectsLogic();
-                    EndMode2D();
                     //drawing dialogs
                     dialogLogic();
-                    DrawFPS(10, 10);
                     EndDrawing();
                 }
                 break;
             case GameState.Exit:
                 EndDrawing();
                 unloadResourcesLogic();
-                CloseAudioDevice();
                 CloseWindow();
                 return;
-
             default:
                 break;
         }

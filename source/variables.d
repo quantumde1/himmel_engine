@@ -2,7 +2,7 @@
 module variables;
 
 import std.typecons;
-import raylib;
+import aperture;
 import system.debugwriteln;
 
 nothrow void resetAllScriptValues() {
@@ -46,7 +46,7 @@ struct TextureEngine {
     float height;
     float x;
     float y;
-    Texture2D texture;
+    Texture texture;
     float scale;
     Color color = Colors.WHITE;
     float alpha = 0.0f;
@@ -67,19 +67,15 @@ enum EngineExitCodes {
     EXIT_OK = 0,
 }
 
-Camera2D camera;
-
-Camera2D oldCamera;
-
 TextureEngine[] characterTextures;
 
 TextureEngine[] backgroundTextures;
 
 SystemSettings systemSettings;
 
-Font textFont;
+//Font textFont;
 
-Music music;
+//Music music;
 
 /* booleans */
 
@@ -126,11 +122,11 @@ float scale = 1.0f;
 
 /* textures */
 
-Texture2D[] framesUI;
+Texture[] framesUI;
 
-Texture2D dialogBackgroundTex;
+Texture dialogBackgroundTex;
 
-Texture2D circle;
+Texture circle;
 
 /* integer values */
 

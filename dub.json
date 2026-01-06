@@ -31,11 +31,11 @@
 		"/Brepro"
 	],
 	"libs-posix": [
-		"raylib",
+		"aperture",
 		"vlc"
 	],
 	"libs-windows": [
-		"raylib",
+		"aperture",
 		"vlc"
 	],
 	"license": "MIT License",

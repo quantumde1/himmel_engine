@@ -1,10 +1,9 @@
 module ui.menu;
 
-import raylib;
+import aperture;
 import variables;
 import std.stdio;
 import system.debugwriteln;
-import graphics.playback;
 import graphics.gamelogic;
 import std.conv : to;
 

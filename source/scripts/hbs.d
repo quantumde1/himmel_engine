@@ -4,11 +4,11 @@ import std.stdio;
 import system.debugwriteln;
 import std.file;
 import std.string;
-import raylib;
+import aperture;
 import std.conv;
 import variables;
 import std.algorithm;
-import graphics.playback;
+//import graphics.playback;
 
 struct ReadyCommands {
     ubyte type;
@@ -485,6 +485,10 @@ void parser(ref ubyte[] loadedScript) {
     sizes.length = 0;
 }
 
+void playVideo(string t) {
+    return;
+}
+
 // script executer.
 void executer() {
     if (currentCommandIndex >= commands.length || pauseParser == true) return;
@@ -508,19 +512,18 @@ void executer() {
             }
             
             int fontSize = max(10, cast(int)(40 * scale));
-            textFont = LoadFontEx(toStringz(commands[currentCommandIndex].fontPath), fontSize, codepoints.ptr, cast(int)codepoints.length);
             break;    
         case OpCodes.LOADMUSIC:
-            music = LoadMusicStream(commands[currentCommandIndex].musicPath); // load music
+            //music = LoadMusicStream(commands[currentCommandIndex].musicPath); // load music
             break;
         case OpCodes.PLAYMUSIC:
-            PlayMusicStream(music); // play music
+            //PlayMusicStream(music); // play music
             break;
         case OpCodes.STOPMUSIC:
-            StopMusicStream(music); // stop music
+            //StopMusicStream(music); // stop music
             break;
         case OpCodes.UNLOADMUSIC:
-            UnloadMusicStream(music); // unload music
+            //UnloadMusicStream(music); // unload music
             break;
         case OpCodes.LOADBACKGROUND:
             debugWriteln(commands[currentCommandIndex].backgroundPath);
@@ -528,7 +531,7 @@ void executer() {
             backgroundTextures[commands[currentCommandIndex].backgroundIndex].texture = LoadTexture(
                 commands[currentCommandIndex].backgroundPath
             );
-            SetTextureFilter(backgroundTextures[commands[currentCommandIndex].backgroundIndex].texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
+            //SetTextureFilter(backgroundTextures[commands[currentCommandIndex].backgroundIndex].texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
             break;
         case OpCodes.DRAWBACKGROUND:
             backgroundTextures[commands[currentCommandIndex].backgroundIndex].drawTexture = true;
@@ -544,7 +547,7 @@ void executer() {
             characterTextures[commands[currentCommandIndex].characterIndex].texture = LoadTexture(
                 commands[currentCommandIndex].characterPath
             );
-            SetTextureFilter(characterTextures[commands[currentCommandIndex].characterIndex].texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
+            //SetTextureFilter(characterTextures[commands[currentCommandIndex].characterIndex].texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
             break;
         case OpCodes.DRAWCHARACTER:
             characterTextures[commands[currentCommandIndex].characterIndex].drawTexture = true;

@@ -1,6 +1,6 @@
 module ui.effects;
 
-import raylib;
+import aperture;
 import std.stdio;
 import variables;
 import std.string;
@@ -23,28 +23,28 @@ void fadeEffect(float alpha, bool fadeIn, void delegate(float alpha) renderer)
 
 void renderText(float alpha, immutable(char)* text)
 {
-    DrawTextEx(textFont, text,
+    /*DrawTextEx(textFont, text,
         Vector2(GetScreenWidth() / 2 - MeasureText(text, 40) / 2,
             GetScreenHeight() / 2), 40, 0, Fade(Colors.WHITE, alpha)
-    );
+    );*/
 }
 
 // these variables needed between loadAnimationFramesUI and playUIAnimation
 private int screenWidth;
 private int screenHeight;
 
-Texture2D[] loadInterfaceAnimation(const string fileDir, const string animationFileName)
+Texture[] loadInterfaceAnimation(const string fileDir, const string animationFileName)
 {
     screenWidth = systemSettings.defaultScreenWidth;
     screenHeight = systemSettings.defaultScreenHeight;
-    Texture2D[] frames;
+    Texture[] frames;
     uint frameIndex = 1;
     while (true)
     {
         string frameFileName = format("%s-%03d.png", animationFileName, frameIndex);
         if (std.file.exists(fileDir~"/"~frameFileName) == false) break;
         debug debugWriteln(frameFileName);
-        Texture2D texture = LoadTexture((fileDir~"/"~frameFileName).toStringz());
+        Texture texture = LoadTexture((fileDir~"/"~frameFileName).toStringz());
         frames ~= texture;
         debug debugWriteln("Loaded frame for UI ", frameIndex, " - ", frameFileName);
         frameIndex++;
@@ -53,7 +53,7 @@ Texture2D[] loadInterfaceAnimation(const string fileDir, const string animationF
     return frames;
 }
 
-void playInterfaceAnimation(Texture2D[] frames, ubyte alpha)
+void playInterfaceAnimation(Texture[] frames, ubyte alpha)
 {
     static float frameTime = 0.0f;
     
@@ -68,14 +68,14 @@ void playInterfaceAnimation(Texture2D[] frames, ubyte alpha)
         int frameWidth = frames[currentFrame].width;
         int frameHeight = frames[currentFrame].height;
         
-        DrawTexturePro(
+        /*DrawTexturePro(
             frames[currentFrame],
             Rectangle(0, 0, frameWidth, frameHeight),
             Rectangle(0, 0, screenWidth, screenHeight),
             Vector2(0, 0),
             0,
             Color(255, 255, 255, alpha)
-        );
+        );*/
     } else {
         frameTime = 0.0f;
         currentFrame = 0;

@@ -4,7 +4,7 @@ import std.stdio;
 //import std.conv;
 //import std.file;
 import variables;
-import raylib;
+import aperture;
 import system.debugwriteln;
 
 void unloadResourcesLogic()
@@ -16,7 +16,6 @@ void unloadResourcesLogic()
         UnloadTexture(framesUI[i]);
     }
     debugWriteln("unloading font");
-    UnloadFont(textFont);
     debugWriteln("unloading characters");
     for (int i = 0; i < characterTextures.length; i++) {
         UnloadTexture(characterTextures[i].texture);

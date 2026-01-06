@@ -1,7 +1,7 @@
 // quantumde1 developed software, licensed under MIT license.
 module system.entrypoint;
 
-import raylib;
+import aperture;
 
 //dlang imports
 import std.string;
@@ -31,27 +31,17 @@ void engineLoader()
     scale = min(cast(float)(screenWidth/baseWidth), cast(float)(screenHeight/baseHeight));
     debugWriteln("scale: ", scale);
     // Initialization
-    SetExitKey(0);
-    Image icon = LoadImage(systemSettings.iconPath.toStringz());
+    int argc;
+    char** argv;
     // Window and Audio Initialization
-    InitWindow(screenWidth, screenHeight, systemSettings.windowTitle.toStringz());
+    InitWindow(argc, argv, screenWidth, screenHeight, systemSettings.windowTitle.toStringz());
     if (systemSettings.defaultFullscreen == true) {
-        ToggleFullscreen();
+        //ToggleFullscreen();
     }
-    SetWindowIcon(icon);
-    UnloadImage(icon);
-    //ToggleFullscreen();
-    SetTargetFPS(60);
     //fallback font?
-    textFont = LoadFont(systemSettings.fallbackFont.toStringz());
     // Fade In and Out Effects
-    InitAudioDevice();
     helloScreen();
     ClearBackground(Colors.BLACK);
     EndDrawing();
-    camera.target = Vector2(screenWidth/2.0f, screenHeight/2.0f);
-    camera.offset = Vector2(screenWidth/2.0f, screenHeight/2.0f);
-    camera.rotation = 0.0f;
-    camera.zoom = 1.0f;
     mainLoop();
 }
