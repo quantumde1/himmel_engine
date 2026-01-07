@@ -74,6 +74,7 @@ void displayMessage() {
     }
     if (IsKeyPressed(KeyboardKey.KEY_ENTER)) {
         if (isTextFullyDisplayed == true) {
+            isTextFullyDisplayed = false;
             countSymbols = 0;
             pauseParser = false;
             showDialog = false;
