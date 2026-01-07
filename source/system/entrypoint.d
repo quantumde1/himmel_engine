@@ -43,6 +43,6 @@ void engineLoader()
     helloScreen();
     ClearBackground(Colors.BLACK);
     EndDrawing();
-    LoadFont(cast(char*)toStringz("res/output_tiles"));
+    LoadFont(cast(char*)toStringz("res/mono"));
     mainLoop();
 }
