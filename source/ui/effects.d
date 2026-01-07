@@ -7,28 +7,6 @@ import std.string;
 import system.debugwriteln;
 import std.file;
 
-void fadeEffect(float alpha, bool fadeIn, void delegate(float alpha) renderer)
-{
-    const float FadeIncrement = 0.02f;
-
-    while (fadeIn ? alpha < 2.0f : alpha > 0.0f)
-    {
-        alpha += fadeIn ? FadeIncrement : -FadeIncrement;
-        BeginDrawing();
-        ClearBackground(Colors.BLACK);
-        renderer(alpha);
-        EndDrawing();
-    }
-}
-
-void renderText(float alpha, immutable(char)* text)
-{
-    /*DrawTextEx(textFont, text,
-        Vector2(GetScreenWidth() / 2 - MeasureText(text, 40) / 2,
-            GetScreenHeight() / 2), 40, 0, Fade(Colors.WHITE, alpha)
-    );*/
-}
-
 // these variables needed between loadAnimationFramesUI and playUIAnimation
 private int screenWidth;
 private int screenHeight;
@@ -68,14 +46,14 @@ void playInterfaceAnimation(Texture[] frames, ubyte alpha)
         int frameWidth = frames[currentFrame].width;
         int frameHeight = frames[currentFrame].height;
         
-        /*DrawTexturePro(
+        DrawTexturePro(
             frames[currentFrame],
             Rectangle(0, 0, frameWidth, frameHeight),
             Rectangle(0, 0, screenWidth, screenHeight),
             Vector2(0, 0),
             0,
             Color(255, 255, 255, alpha)
-        );*/
+        );
     } else {
         frameTime = 0.0f;
         currentFrame = 0;

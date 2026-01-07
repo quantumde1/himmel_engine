@@ -495,8 +495,7 @@ void executer() {
     switch (commands[currentCommandIndex].type) {
         case OpCodes.DIALOGBOX:
             debugWriteln(commands[currentCommandIndex].message);
-            messageGlobal.length = 1; // initialization of array
-            messageGlobal[0] = commands[currentCommandIndex].message; //setting text
+            messageGlobal = commands[currentCommandIndex].message; //setting text
             showDialog = true;
             break;
         case OpCodes.SETFONT:
@@ -547,7 +546,6 @@ void executer() {
             characterTextures[commands[currentCommandIndex].characterIndex].texture = LoadTexture(
                 commands[currentCommandIndex].characterPath
             );
-            //SetTextureFilter(characterTextures[commands[currentCommandIndex].characterIndex].texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
             break;
         case OpCodes.DRAWCHARACTER:
             characterTextures[commands[currentCommandIndex].characterIndex].drawTexture = true;

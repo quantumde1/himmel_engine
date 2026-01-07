@@ -93,7 +93,7 @@ bool pauseParser = false;
 
 /* strings */
 
-string[] messageGlobal;
+string messageGlobal;
 
 string[] choices;
 

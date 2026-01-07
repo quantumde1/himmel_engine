@@ -16,6 +16,7 @@ void unloadResourcesLogic()
         UnloadTexture(framesUI[i]);
     }
     debugWriteln("unloading font");
+    UnloadFont();
     debugWriteln("unloading characters");
     for (int i = 0; i < characterTextures.length; i++) {
         UnloadTexture(characterTextures[i].texture);

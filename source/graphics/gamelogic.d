@@ -5,7 +5,7 @@ import variables;
 import ui.effects;
 import std.string;
 import std.math;
-//import message.messagebox;
+import message.messagebox;
 import system.debugwriteln;
 
 /** 
@@ -79,7 +79,6 @@ void characterLogic() {
 
 void dialogLogic() {
     if (showDialog) {
-        //displayDialog(messageGlobal, choices, selectedChoice, choicePage, textFont, showDialog, typingSpeed, 
-        //circle, dialogBackgroundTex, scale);
+        displayMessage();
     }
 }

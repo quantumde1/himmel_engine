@@ -43,6 +43,7 @@ void mainLoop() {
                 {
                     PollWindowEvents();
                     SetTargetFPS(60);
+                    UpdateInput();
                     executer();
                     BeginDrawing();
                     ClearBackground(Colors.BLACK);
