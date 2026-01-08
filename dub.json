@@ -29,11 +29,11 @@
 	],
 	"libs-posix": [
 		"aperture",
-		"vlc"
+		"vibration"
 	],
 	"libs-windows": [
 		"aperture",
-		"vlc"
+		"vibration"
 	],
 	"license": "MIT License",
 	"name": "himmel_engine"

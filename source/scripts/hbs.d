@@ -8,7 +8,7 @@ import aperture;
 import std.conv;
 import variables;
 import std.algorithm;
-//import graphics.playback;
+import vibration;
 
 struct ReadyCommands {
     ubyte type;
@@ -513,16 +513,16 @@ void executer() {
             int fontSize = max(10, cast(int)(40 * scale));
             break;    
         case OpCodes.LOADMUSIC:
-            //music = LoadMusicStream(commands[currentCommandIndex].musicPath); // load music
+            LoadMusic(commands[currentCommandIndex].musicPath);
             break;
         case OpCodes.PLAYMUSIC:
-            //PlayMusicStream(music); // play music
+            PlayMusic();
             break;
         case OpCodes.STOPMUSIC:
-            //StopMusicStream(music); // stop music
+            StopMusic(); // stop music
             break;
         case OpCodes.UNLOADMUSIC:
-            //UnloadMusicStream(music); // unload music
+            UnloadMusic(); // unload music
             break;
         case OpCodes.LOADBACKGROUND:
             debugWriteln(commands[currentCommandIndex].backgroundPath);

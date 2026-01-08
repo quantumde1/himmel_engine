@@ -6,11 +6,15 @@ import std.stdio;
 import variables;
 import aperture;
 import system.debugwriteln;
+import vibration;
 
 void unloadResourcesLogic()
 {
     debugWriteln("Exiting. See ya'!");
     EndDrawing();
+    debugWriteln("unloading music");
+    StopMusic();
+    UnloadMusic();
     debugWriteln("unloading animations");
     for (int i = 0; i < framesUI.length; i++) {
         UnloadTexture(framesUI[i]);
