@@ -45,7 +45,7 @@ void texturesLogic(TextureEngine[] textures) {
             
             DrawTexture(textures[i].texture,
                 textures[i].x, textures[i].y,
-                textures[i].scale,
+                textures[i].scale*scale,
                 tint
             );
         }

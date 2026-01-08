@@ -38,9 +38,7 @@ void engineLoader()
     if (systemSettings.defaultFullscreen == true) {
         //ToggleFullscreen();
     }
-    //fallback font?
-    // Fade In and Out Effects
-    helloScreen();
+    //fallback font preloaded in library now.
     ClearBackground(Colors.BLACK);
     EndDrawing();
     LoadFont(cast(char*)toStringz("res/mono"));

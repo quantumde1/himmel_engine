@@ -82,6 +82,6 @@ void displayMessage() {
             countSymbols =  cast(int)messageGlobal.length;
         }
     }
-    DrawTextWithFont(cast(char*)messageGlobal[0..countSymbols].toStringz(), 52, screenHeight/3-26, 0.9/scale, Colors.BLACK);
-    DrawTextWithFont(cast(char*)messageGlobal[0..countSymbols].toStringz(), 50, screenHeight/3-23, 0.9/scale, Colors.WHITE);
+    DrawTextWithFont(cast(char*)messageGlobal[0..countSymbols].toStringz(), 52, screenHeight/3-26, 0.9*scale, Colors.BLACK);
+    DrawTextWithFont(cast(char*)messageGlobal[0..countSymbols].toStringz(), 50, screenHeight/3-23, 0.9*scale, Colors.WHITE);
 }

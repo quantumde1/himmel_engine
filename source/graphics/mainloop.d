@@ -41,8 +41,8 @@ void mainLoop() {
                 }
                 while (!WindowShouldClose())
                 {
-                    PollWindowEvents();
                     SetTargetFPS(60);
+                    PollWindowEvents();
                     UpdateInput();
                     executer();
                     BeginDrawing();
