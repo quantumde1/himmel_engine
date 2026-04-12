@@ -91,6 +91,8 @@ bool isTextFullyDisplayed = false;
 
 bool pauseParser = false;
 
+bool mainLoopScript = false;
+
 /* strings */
 
 string messageGlobal;
@@ -143,6 +145,8 @@ int currentChoiceCharIndex = 0;
 int currentGameState = 1;
 
 int currentCommandIndex = 0;
+
+int[255] scriptVariables;
 
 /* ubyte values */
 

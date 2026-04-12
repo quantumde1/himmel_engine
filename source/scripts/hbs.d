@@ -45,6 +45,16 @@ enum OpCodes {
     UNDRAWCHARACTER = 0x14,
     UNLOADCHARACTER = 0x15,
     SETFONT = 0x16,
+    MAINLOOP = 0x17,
+    ENDLOOP = 0x18,
+    ADD = 0x19,
+    SUB = 0x20,
+    MUL = 0x21,
+    DIV = 0x22,
+    SET = 0x23,
+    PRINT = 0x24,
+    GOTO = 0x25,
+    LABEL = 0x26,
     ENDCOMMAND = 0xFF,
 }
 
@@ -108,7 +118,6 @@ void loader(ref ubyte[] loadedScript) {
     // Define variables.
     int currentOffset = 0;
     char* header = cast(char*)loadedScript[0..3]; // read header
-
     // debug.
     debugWriteln("Header: ", header.to!string);
 
@@ -140,7 +149,8 @@ void parser(ref ubyte[] loadedScript) {
                 string text = cast(string)(loadedScript[offsets[count]+1..(offsets[count]+sizes[count])]); // count +1 at offsets for skipping opcode
                 debugWriteln("acquired text: ", text);
                 commands ~= ReadyCommands(
-                    OpCodes.DIALOGBOX, 
+                    OpCodes.DIALOGBOX,
+                    
                     cast(char*)"",
                     text,
                     cast(char*)"",
@@ -163,6 +173,7 @@ void parser(ref ubyte[] loadedScript) {
                 debugWriteln("acquired path: ", pathToFont);
                 commands ~= ReadyCommands(
                     OpCodes.SETFONT, 
+                    
                     cast(char*)"",
                     "",
                     cast(char*)"",
@@ -185,6 +196,7 @@ void parser(ref ubyte[] loadedScript) {
                 debugWriteln("acquired path to music: ", pathToMusic);
                 commands ~= ReadyCommands(
                     OpCodes.LOADMUSIC,
+                    
                     cast(char*)toStringz(pathToMusic),
                     "",
                     cast(char*)"",
@@ -205,6 +217,7 @@ void parser(ref ubyte[] loadedScript) {
                 debugWriteln("PlayMusic");
                 commands ~= ReadyCommands(
                     OpCodes.PLAYMUSIC,
+                    
                     cast(char*)"",
                     "",
                     cast(char*)"",
@@ -225,6 +238,7 @@ void parser(ref ubyte[] loadedScript) {
                 debugWriteln("StopMusic");
                 commands ~= ReadyCommands(
                     OpCodes.STOPMUSIC,
+                    
                     cast(char*)"",
                     "",
                     cast(char*)"",
@@ -245,6 +259,7 @@ void parser(ref ubyte[] loadedScript) {
                 debugWriteln("UnloadMusic");
                 commands ~= ReadyCommands(
                     OpCodes.UNLOADMUSIC,
+                    
                     cast(char*)"",
                     "",
                     cast(char*)"",
@@ -269,6 +284,7 @@ void parser(ref ubyte[] loadedScript) {
                 debugWriteln("index of background: ", indexOfBackground);
                 commands ~= ReadyCommands(
                     OpCodes.LOADBACKGROUND,
+                    
                     cast(char*)"",
                     "",
                     cast(char*)toStringz(pathToBackground),
@@ -301,6 +317,7 @@ void parser(ref ubyte[] loadedScript) {
                 );
                 commands ~= ReadyCommands(
                     OpCodes.DRAWBACKGROUND,
+                    
                     cast(char*)"",
                     "",
                     cast(char*)"",
@@ -322,6 +339,7 @@ void parser(ref ubyte[] loadedScript) {
                 int indexOfBackground = readUInt16(loadedScript, offsets[count]+sizes[count]-2);
                 commands ~= ReadyCommands(
                     OpCodes.UNDRAWBACKGROUND,
+                    
                     cast(char*)"",
                     "",
                     cast(char*)"",
@@ -343,6 +361,7 @@ void parser(ref ubyte[] loadedScript) {
                 int indexOfBackground = readUInt16(loadedScript, offsets[count]+sizes[count]-2);
                 commands ~= ReadyCommands(
                     OpCodes.UNLOADBACKGROUND,
+                    
                     cast(char*)"",
                     "",
                     cast(char*)"",
@@ -367,6 +386,7 @@ void parser(ref ubyte[] loadedScript) {
                 debugWriteln("index of character: ", indexOfCharacter);
                 commands ~= ReadyCommands(
                     OpCodes.LOADCHARACTER,
+                    
                     cast(char*)"",
                     "",
                     cast(char*)"",
@@ -460,7 +480,7 @@ void parser(ref ubyte[] loadedScript) {
                 string pathToVideo = cast(string)(loadedScript[offsets[count]+1..(offsets[count]+sizes[count])]);
                 debugWriteln("acquired path: ", pathToVideo);
                 commands ~= ReadyCommands(
-                    OpCodes.PLAYVIDEO, 
+                    OpCodes.PLAYVIDEO,
                     cast(char*)"",
                     "",
                     cast(char*)"",
@@ -472,6 +492,26 @@ void parser(ref ubyte[] loadedScript) {
                     0.0f,
                     Vector2(0, 0),
                     pathToVideo,
+                    "",
+                    ""
+                );
+                break;
+            case OpCodes.MAINLOOP:
+                // format: <opcode> <text>
+                debugWriteln("MainLoopScript");
+                commands ~= ReadyCommands(
+                    OpCodes.MAINLOOP,
+                    cast(char*)"",
+                    "",
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0, 0),
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0, 0),
+                    "",
                     "",
                     ""
                 );
@@ -570,13 +610,89 @@ void executer() {
             break;
         case OpCodes.UNLOADCHARACTER:
             characterTextures[commands[currentCommandIndex].characterIndex].drawTexture = false;
-            UnloadTexture(backgroundTextures[commands[currentCommandIndex].characterIndex].texture);
+            UnloadTexture(characterTextures[commands[currentCommandIndex].characterIndex].texture);
             break;
         case OpCodes.PLAYVIDEO:
             playVideo(commands[currentCommandIndex].videoPath);
             break;
+        case OpCodes.MAINLOOP:
+            debugWriteln("mainloop enter");
+            mainLoopScript = true;
+            return;
         default:
             break;
     }
     currentCommandIndex = currentCommandIndex + 1;
+}
+
+int currentByte = 0;
+
+void executerMainLoop(ref ubyte[] loadedScript) {
+    switch (loadedScript[currentByte]) {
+        case OpCodes.SET:
+            debugWriteln("opcode SET mainloop");
+            ushort varIndex = readUInt16(loadedScript, currentByte + 1);
+            ushort value = readUInt16(loadedScript, currentByte + 3);
+            debugWriteln("values: ", varIndex, value);
+            scriptVariables[varIndex] = cast(int)value;
+            currentByte += 5;
+            break;
+            
+        case OpCodes.ADD:
+            debugWriteln("opcode ADD mainloop");
+            ushort varIndex = readUInt16(loadedScript, currentByte + 1);
+            ushort value = readUInt16(loadedScript, currentByte + 3);
+            debugWriteln("values: ", varIndex, value);
+            scriptVariables[varIndex] += cast(int)value;
+            currentByte += 5;
+            break;
+            
+        case OpCodes.SUB:
+            debugWriteln("opcode SUB mainloop");
+            ushort varIndex = readUInt16(loadedScript, currentByte + 1);
+            ushort value = readUInt16(loadedScript, currentByte + 3);
+            debugWriteln("values: ", varIndex, value);
+            scriptVariables[varIndex] -= cast(int)value;
+            currentByte += 5;
+            break;
+            
+        case OpCodes.MUL:
+            debugWriteln("opcode MUL mainloop");
+            ushort varIndex = readUInt16(loadedScript, currentByte + 1);
+            ushort value = readUInt16(loadedScript, currentByte + 3);
+            debugWriteln("values: ", varIndex, value);
+            scriptVariables[varIndex] *= cast(int)value;
+            currentByte += 5;
+            break;
+            
+        case OpCodes.DIV:
+            debugWriteln("opcode DIV mainloop");
+            ushort varIndex = readUInt16(loadedScript, currentByte + 1);
+            ushort value = readUInt16(loadedScript, currentByte + 3);
+            debugWriteln("values: ", varIndex, value);
+            scriptVariables[varIndex] /= cast(int)value;
+            currentByte += 5;
+            break;
+            
+        case OpCodes.PRINT:
+            debugWriteln("PRINT: ", scriptVariables[cast(int)readUInt16(loadedScript, currentByte + 1)]);
+            currentByte += 3;
+            break;
+
+        case OpCodes.GOTO:
+            currentByte = readUInt16(loadedScript, currentByte + 1);
+            break;
+
+        case OpCodes.ENDLOOP:
+            debugWriteln("endloop");
+            currentByte += 1;
+            currentCommandIndex += 1;
+            mainLoopScript = false;
+            break;
+
+        default:
+            debugWriteln("unknown opcode in main loop: ", loadedScript[currentByte]);
+            currentByte += 1;
+            break;
+    }
 }

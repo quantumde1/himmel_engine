@@ -35,6 +35,8 @@ void mainLoop() {
                     loader(file);
                     parser(file);
                 }
+
+                ubyte[] fileScene = cast(ubyte[])read(hbsFirstExec~".scene");
                 if (std.file.exists("save.txt")) {
                     int savedCommandIndex = std.file.readText("save.txt").to!int;
                     saveLoader(savedCommandIndex);
@@ -44,7 +46,11 @@ void mainLoop() {
                     SetTargetFPS(60);
                     PollWindowEvents();
                     UpdateInput();
-                    executer();
+                    if (mainLoopScript == false) {
+                        executer();
+                    } else {
+                        executerMainLoop(fileScene);
+                    }
                     BeginDrawing();
                     ClearBackground(Colors.BLACK);
                     // main logic
