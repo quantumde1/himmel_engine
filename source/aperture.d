@@ -165,6 +165,7 @@ extern (C) @nogc {
         void InitWindow(int argc, char** argv, int width, int height, const char* title);
         void DrawRectangle(float x, float y, float width, float height, Color color = Color(255, 255, 255, 255));
         Texture LoadTexture(const char* filename);
+        Texture LoadTextureFromMemory(ubyte* data, ulong data_size);
         void DrawTexture(Texture texture, float x, float y, float scale, Color tint = Color(255, 255, 255, 255));
         void DrawTexturePro(Texture texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint = Color(255, 255, 255, 255));
         void UnloadTexture(Texture texture);

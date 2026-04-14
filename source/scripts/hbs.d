@@ -9,6 +9,8 @@ import std.conv;
 import variables;
 import std.algorithm;
 import vibration;
+import system.uintreader;
+import system.hpf;
 
 struct ReadyCommands {
     ubyte type;
@@ -25,7 +27,17 @@ struct ReadyCommands {
     string videoPath;
     string sfxPath;
     string fontPath;
+    int archiveIndex;
+    int backgroundArchiveIndex;
+    int characterArchiveIndex;
+    int bgIndexInArchive;
+    int charIndexInArchive;
+    string archiveName;
 }
+
+//load_archive <index> <path(string)>
+//load_bg_from_memory <index_of_archive> <index_of_file> <index_for_attachment>
+//load_char_from_memory <index_of_archive> <index_of_file> <index_for_attachment>
 
 enum OpCodes {
     NOP = 0x00,
@@ -55,41 +67,11 @@ enum OpCodes {
     PRINT = 0x24,
     GOTO = 0x25,
     LABEL = 0x26,
+    LOADBACKGROUNDFROMMEMORY = 0x27,
+    LOADCHARACTERFROMMEMORY = 0x28,
+    LOADMUSICFROMMEMORY = 0x29,
+    LOADARCHIVE = 0x30,
     ENDCOMMAND = 0xFF,
-}
-
-ushort readUInt16(ref ubyte[] bytes, size_t offset) {
-    size_t internalCurrentPosition = offset;
-    ubyte b0 = bytes[internalCurrentPosition];
-    ubyte b1 = bytes[internalCurrentPosition + 1];
-    ushort result = b0 | (b1 << 8);
-    return result;
-}
-
-uint readUInt24(ref ubyte[] bytes, size_t offset) {
-    size_t internalCurrentPosition = offset;
-    uint b0 = bytes[internalCurrentPosition];
-    uint b1 = bytes[internalCurrentPosition + 1];
-    uint b2 = bytes[internalCurrentPosition + 2];
-    uint result = b0 | (b1 << 8) | (b2 << 16);
-    return result;
-}
-
-uint readUInt32(ref ubyte[] bytes, size_t offset) {
-    size_t internalCurrentPosition = offset;
-    uint b0 = bytes[internalCurrentPosition];
-    uint b1 = bytes[internalCurrentPosition + 1];
-    uint b2 = bytes[internalCurrentPosition + 2];
-    uint b3 = bytes[internalCurrentPosition + 3];
-    uint result = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
-    return result;
-}
-
-float readFloat16(ref ubyte[] bytes, size_t offset) {
-    size_t internalCurrentPosition = offset;
-    ubyte b0 = bytes[internalCurrentPosition];
-    ubyte b1 = bytes[internalCurrentPosition + 1];
-    return b0 + b1 / 100.0f;
 }
 
 int[] offsets; // data offsets in script
@@ -163,6 +145,12 @@ void parser(ref ubyte[] loadedScript) {
                     Vector2(0, 0),
                     "",
                     "",
+                    "",
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
                     ""
                 ); // adds into array of already parsed bytecode. Moving from offset to end of line, skipping first byte because its a command byte.
                 break;
@@ -172,8 +160,7 @@ void parser(ref ubyte[] loadedScript) {
                 string pathToFont = cast(string)(loadedScript[offsets[count]+1..(offsets[count]+sizes[count])]);
                 debugWriteln("acquired path: ", pathToFont);
                 commands ~= ReadyCommands(
-                    OpCodes.SETFONT, 
-                    
+                    OpCodes.SETFONT,
                     cast(char*)"",
                     "",
                     cast(char*)"",
@@ -186,7 +173,13 @@ void parser(ref ubyte[] loadedScript) {
                     Vector2(0, 0),
                     "",
                     "",
-                    pathToFont
+                    pathToFont,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    ""
                 );
                 break;
             case OpCodes.LOADMUSIC:
@@ -209,6 +202,12 @@ void parser(ref ubyte[] loadedScript) {
                     Vector2(0, 0),
                     "",
                     "",
+                    "",
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
                     ""
                 ); // same, and so on
                 break;
@@ -230,6 +229,12 @@ void parser(ref ubyte[] loadedScript) {
                     Vector2(0, 0),
                     "",
                     "",
+                    "",
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
                     ""
                 );
                 break;
@@ -251,6 +256,12 @@ void parser(ref ubyte[] loadedScript) {
                     Vector2(0, 0),
                     "",
                     "",
+                    "",
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
                     ""
                 );
                 break;
@@ -272,6 +283,12 @@ void parser(ref ubyte[] loadedScript) {
                     Vector2(0, 0),
                     "",
                     "",
+                    "",
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
                     ""
                 );
                 break;
@@ -297,6 +314,12 @@ void parser(ref ubyte[] loadedScript) {
                     Vector2(0, 0),
                     "",
                     "",
+                    "",
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
                     ""
                 );
                 break;
@@ -330,6 +353,12 @@ void parser(ref ubyte[] loadedScript) {
                     Vector2(0, 0),
                     "",
                     "",
+                    "",
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
                     ""
                 );
                 break;
@@ -352,6 +381,12 @@ void parser(ref ubyte[] loadedScript) {
                     Vector2(0, 0),
                     "",
                     "",
+                    "",
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
                     ""
                 );
                 break;
@@ -374,6 +409,12 @@ void parser(ref ubyte[] loadedScript) {
                     Vector2(0, 0),
                     "",
                     "",
+                    "",
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
                     ""
                 );
                 break;
@@ -399,6 +440,12 @@ void parser(ref ubyte[] loadedScript) {
                     Vector2(0, 0),
                     "",
                     "",
+                    "",
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
                     ""
                 );
                 break;
@@ -429,6 +476,12 @@ void parser(ref ubyte[] loadedScript) {
                     Vector2(characterX, characterY),
                     "",
                     "",
+                    "",
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
                     ""
                 );
                 break;
@@ -450,6 +503,12 @@ void parser(ref ubyte[] loadedScript) {
                     Vector2(0, 0),
                     "",
                     "",
+                    "",
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
                     ""
                 );
                 break;
@@ -471,6 +530,12 @@ void parser(ref ubyte[] loadedScript) {
                     Vector2(0, 0),
                     "",
                     "",
+                    "",
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
                     ""
                 );
                 break;
@@ -493,11 +558,17 @@ void parser(ref ubyte[] loadedScript) {
                     Vector2(0, 0),
                     pathToVideo,
                     "",
+                    "",
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
                     ""
                 );
                 break;
             case OpCodes.MAINLOOP:
-                // format: <opcode> <text>
+                // format: <opcode>
                 debugWriteln("MainLoopScript");
                 commands ~= ReadyCommands(
                     OpCodes.MAINLOOP,
@@ -513,7 +584,113 @@ void parser(ref ubyte[] loadedScript) {
                     Vector2(0, 0),
                     "",
                     "",
+                    "",
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
                     ""
+                );
+                break;
+            case OpCodes.LOADARCHIVE:
+                // format: <opcode> <index> <string>
+                debugWriteln("LoadArchive");
+                string archiveName = cast(string)(loadedScript[offsets[count]+1..(offsets[count]+sizes[count])-1]);
+                int archiveIndex = cast(int)loadedScript[(offsets[count]+sizes[count])-1];
+                debugWriteln(
+                    "archiveName: ", archiveName,
+                    "\narchiveIndex: ", archiveIndex
+                );
+                commands ~= ReadyCommands(
+                    OpCodes.LOADARCHIVE,
+                    cast(char*)"",
+                    "",
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0, 0),
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0, 0),
+                    "",
+                    "",
+                    "",
+                    archiveIndex,
+                    0,
+                    0,
+                    0,
+                    0,
+                    archiveName
+                );
+                break;
+            case OpCodes.LOADBACKGROUNDFROMMEMORY:
+                // format: <opcode> <index of archive> <index of file> <index for in-engine> 
+                debugWriteln("LoadBackgroundFromMemory");
+                int archiveIndex = cast(int)loadedScript[(offsets[count]+1)];
+                int fileIndex = cast(int)readUInt16(loadedScript, offsets[count]+2);
+                int backgroundIndex = cast(int)readUInt16(loadedScript, offsets[count]+4);
+                debugWriteln(
+                    "archiveIndex: ", archiveIndex,
+                    "\nfileIndex: ", fileIndex,
+                    "\nbackgroundIndex: ", backgroundIndex
+                );
+                commands ~= ReadyCommands(
+                    OpCodes.LOADBACKGROUNDFROMMEMORY,
+                    cast(char*)"",
+                    "",
+                    cast(char*)"",
+                    backgroundIndex,
+                    0.0f,
+                    Vector2(0, 0),
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0, 0),
+                    "",
+                    "",
+                    "",
+                    0,
+                    archiveIndex,
+                    0,
+                    fileIndex,
+                    0,
+                    ""
+                );
+                break;
+            case OpCodes.LOADCHARACTERFROMMEMORY:
+                // format: <opcode> <index of archive> <index of file> <index for in-engine>
+                debugWriteln("LoadCharacterFromMemory");
+                int archiveIndex = cast(int)loadedScript[(offsets[count]+1)];
+                int fileIndex = cast(int)readUInt16(loadedScript, offsets[count]+2);
+                int characterIndex = cast(int)readUInt16(loadedScript, offsets[count]+4);
+                debugWriteln(
+                    "archiveIndex: ", archiveIndex,
+                    "\nfileIndex: ", fileIndex,
+                    "\ncharacterIndex: ", characterIndex
+                );
+                commands ~= ReadyCommands(
+                    OpCodes.LOADCHARACTERFROMMEMORY,
+                    cast(char*)"",
+                    "",
+                    cast(char*)"",
+                    0,
+                    0.0f,
+                    Vector2(0, 0),
+                    cast(char*)"",
+                    characterIndex,
+                    0.0f,
+                    Vector2(0, 0),
+                    "",
+                    "",
+                    "",
+                    0,
+                    0,
+                    archiveIndex,
+                    0,
+                    fileIndex,
+                    "",
                 );
                 break;
             default:
@@ -619,6 +796,34 @@ void executer() {
             debugWriteln("mainloop enter");
             mainLoopScript = true;
             return;
+        case OpCodes.LOADARCHIVE:
+            int indexOfArchive = commands[currentCommandIndex].archiveIndex;
+            string archiveName = commands[currentCommandIndex].archiveName;
+            parsedChunks.length += 1;
+            archivesNames.length += 1;
+            parsedChunks[indexOfArchive] ~= parseArchive(archiveName);
+            archivesNames[indexOfArchive] ~= archiveName;
+            break;
+        case OpCodes.LOADBACKGROUNDFROMMEMORY:
+            int indexOfArchive = commands[currentCommandIndex].backgroundArchiveIndex;
+            int bgIndexInArchive = commands[currentCommandIndex].bgIndexInArchive;
+            ubyte[] backgroundFile = loadFileFromHPF(archivesNames[indexOfArchive], parsedChunks[indexOfArchive], bgIndexInArchive);
+            backgroundTextures.length += 1;
+            debugWriteln(backgroundFile.length);
+            backgroundTextures[commands[currentCommandIndex].backgroundIndex].texture = LoadTextureFromMemory(
+                backgroundFile.ptr, backgroundFile.length
+            );
+            break;
+        case OpCodes.LOADCHARACTERFROMMEMORY:
+            int indexOfArchive = commands[currentCommandIndex].characterArchiveIndex;
+            int charIndexInArchive = commands[currentCommandIndex].charIndexInArchive;
+            characterTextures.length += 1;
+            ubyte[] characterFile = loadFileFromHPF(archivesNames[indexOfArchive], parsedChunks[indexOfArchive], charIndexInArchive);
+            debugWriteln(characterFile.length);
+            characterTextures[commands[currentCommandIndex].characterIndex].texture = LoadTextureFromMemory(
+                characterFile.ptr, characterFile.length
+            );
+            break;
         default:
             break;
     }

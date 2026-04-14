@@ -18,6 +18,7 @@ import system.debugwriteln;
 import variables;
 import system.cleanup;
 import std.file;
+import system.hpf;
 
 void mainLoop() {
     while (true)

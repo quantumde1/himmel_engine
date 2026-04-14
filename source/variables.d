@@ -24,6 +24,11 @@ nothrow void resetAllScriptValues() {
 
 /* system */
 
+struct ParsedChunk {
+    int offset;
+    int length;
+}
+
 struct SystemSettings {
     string scriptPath;
     string menuScriptPath;
@@ -151,3 +156,8 @@ int[255] scriptVariables;
 /* ubyte values */
 
 ubyte animationAlpha = 127;
+
+/* archives */
+
+ParsedChunk[][] parsedChunks;
+string[] archivesNames;
