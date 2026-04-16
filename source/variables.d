@@ -29,6 +29,43 @@ struct ParsedChunk {
     int length;
 }
 
+enum OpCodes {
+    NOP = 0x00,
+    DIALOGBOX = 0x01,
+    LOADBACKGROUND = 0x02,
+    DRAWBACKGROUND = 0x03,
+    LOADCHARACTER = 0x04,
+    DRAWCHARACTER = 0x05,
+    PLAYVIDEO = 0x06,
+    LOADMUSIC = 0x07,
+    PLAYMUSIC = 0x08,
+    STOPMUSIC = 0x09,
+    UNLOADMUSIC = 0x10,
+    PLAYSFX = 0x11,
+    UNDRAWBACKGROUND = 0x12,
+    UNLOADBACKGROUND = 0x13,
+    UNDRAWCHARACTER = 0x14,
+    UNLOADCHARACTER = 0x15,
+    SETFONT = 0x16,
+    MAINLOOP = 0x17,
+    ENDLOOP = 0x18,
+    ADD = 0x19,
+    SUB = 0x20,
+    MUL = 0x21,
+    DIV = 0x22,
+    SET = 0x23,
+    PRINT = 0x24,
+    GOTO = 0x25,
+    ENDIF = 0x26,
+    LOADBACKGROUNDFROMMEMORY = 0x27,
+    LOADCHARACTERFROMMEMORY = 0x28,
+    LOADMUSICFROMMEMORY = 0x29,
+    LOADARCHIVE = 0x30,
+    IF = 0x31,
+    VARIABLESIF = 0x32,
+    ENDCOMMAND = 0xFF,
+}
+
 struct SystemSettings {
     string scriptPath;
     string menuScriptPath;
@@ -112,14 +149,6 @@ string hbsFirstExec;
 float baseWidth;
 
 float baseHeight;
-
-float cameraTargetX = 0;
-
-float cameraTargetY = 0;
-
-float cameraTargetZoom = 1.0f;
-
-float cameraMoveSpeed = 5.0f;
 
 float frameDuration = 0.016f;
 

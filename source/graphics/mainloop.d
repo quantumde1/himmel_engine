@@ -11,6 +11,7 @@ import ui.menu;
 
 //scripting imports
 import scripts.hbs;
+import scripts.hbsscene;
 
 //engine internal functions
 import system.configreader;

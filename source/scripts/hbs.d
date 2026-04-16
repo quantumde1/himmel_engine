@@ -39,41 +39,6 @@ struct ReadyCommands {
 //load_bg_from_memory <index_of_archive> <index_of_file> <index_for_attachment>
 //load_char_from_memory <index_of_archive> <index_of_file> <index_for_attachment>
 
-enum OpCodes {
-    NOP = 0x00,
-    DIALOGBOX = 0x01,
-    LOADBACKGROUND = 0x02,
-    DRAWBACKGROUND = 0x03,
-    LOADCHARACTER = 0x04,
-    DRAWCHARACTER = 0x05,
-    PLAYVIDEO = 0x06,
-    LOADMUSIC = 0x07,
-    PLAYMUSIC = 0x08,
-    STOPMUSIC = 0x09,
-    UNLOADMUSIC = 0x10,
-    PLAYSFX = 0x11,
-    UNDRAWBACKGROUND = 0x12,
-    UNLOADBACKGROUND = 0x13,
-    UNDRAWCHARACTER = 0x14,
-    UNLOADCHARACTER = 0x15,
-    SETFONT = 0x16,
-    MAINLOOP = 0x17,
-    ENDLOOP = 0x18,
-    ADD = 0x19,
-    SUB = 0x20,
-    MUL = 0x21,
-    DIV = 0x22,
-    SET = 0x23,
-    PRINT = 0x24,
-    GOTO = 0x25,
-    LABEL = 0x26,
-    LOADBACKGROUNDFROMMEMORY = 0x27,
-    LOADCHARACTERFROMMEMORY = 0x28,
-    LOADMUSICFROMMEMORY = 0x29,
-    LOADARCHIVE = 0x30,
-    ENDCOMMAND = 0xFF,
-}
-
 int[] offsets; // data offsets in script
 int[] sizes; // sizes of data
 
@@ -828,76 +793,4 @@ void executer() {
             break;
     }
     currentCommandIndex = currentCommandIndex + 1;
-}
-
-int currentByte = 0;
-
-void executerMainLoop(ref ubyte[] loadedScript) {
-    switch (loadedScript[currentByte]) {
-        case OpCodes.SET:
-            debugWriteln("opcode SET mainloop");
-            ushort varIndex = readUInt16(loadedScript, currentByte + 1);
-            ushort value = readUInt16(loadedScript, currentByte + 3);
-            debugWriteln("values: ", varIndex, value);
-            scriptVariables[varIndex] = cast(int)value;
-            currentByte += 5;
-            break;
-            
-        case OpCodes.ADD:
-            debugWriteln("opcode ADD mainloop");
-            ushort varIndex = readUInt16(loadedScript, currentByte + 1);
-            ushort value = readUInt16(loadedScript, currentByte + 3);
-            debugWriteln("values: ", varIndex, value);
-            scriptVariables[varIndex] += cast(int)value;
-            currentByte += 5;
-            break;
-            
-        case OpCodes.SUB:
-            debugWriteln("opcode SUB mainloop");
-            ushort varIndex = readUInt16(loadedScript, currentByte + 1);
-            ushort value = readUInt16(loadedScript, currentByte + 3);
-            debugWriteln("values: ", varIndex, value);
-            scriptVariables[varIndex] -= cast(int)value;
-            currentByte += 5;
-            break;
-            
-        case OpCodes.MUL:
-            debugWriteln("opcode MUL mainloop");
-            ushort varIndex = readUInt16(loadedScript, currentByte + 1);
-            ushort value = readUInt16(loadedScript, currentByte + 3);
-            debugWriteln("values: ", varIndex, value);
-            scriptVariables[varIndex] *= cast(int)value;
-            currentByte += 5;
-            break;
-            
-        case OpCodes.DIV:
-            debugWriteln("opcode DIV mainloop");
-            ushort varIndex = readUInt16(loadedScript, currentByte + 1);
-            ushort value = readUInt16(loadedScript, currentByte + 3);
-            debugWriteln("values: ", varIndex, value);
-            scriptVariables[varIndex] /= cast(int)value;
-            currentByte += 5;
-            break;
-            
-        case OpCodes.PRINT:
-            debugWriteln("PRINT: ", scriptVariables[cast(int)readUInt16(loadedScript, currentByte + 1)]);
-            currentByte += 3;
-            break;
-
-        case OpCodes.GOTO:
-            currentByte = readUInt16(loadedScript, currentByte + 1);
-            break;
-
-        case OpCodes.ENDLOOP:
-            debugWriteln("endloop");
-            currentByte += 1;
-            currentCommandIndex += 1;
-            mainLoopScript = false;
-            break;
-
-        default:
-            debugWriteln("unknown opcode in main loop: ", loadedScript[currentByte]);
-            currentByte += 1;
-            break;
-    }
 }

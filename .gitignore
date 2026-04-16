@@ -6,6 +6,7 @@ hpff/
 docs.json
 __dummy.html
 /himmel_engine
+*himmel_engine*
 himmel_engine.exe
 himmel_engine.pdb
 himmel_engine.so
