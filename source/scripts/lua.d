@@ -4,7 +4,7 @@ module scripts.lua;
 import bindbc.lua;
 import raylib;
 import variables;
-import graphics.effects;
+import ui.effects;
 import std.conv;
 import system.abstraction;
 import system.config;
@@ -688,6 +688,14 @@ extern (C) nothrow int luaL_drawTextureEx(lua_State *L) {
     return 0;
 }
 
+extern (C) nothrow int luaL_getMousePositionX(lua_State *L) {
+    lua_pushnumber(L, GetMousePosition().x);
+    return 1;
+}
+extern (C) nothrow int luaL_getMousePositionY(lua_State *L) {
+    lua_pushnumber(L, GetMousePosition().y);
+    return 1;
+}
 
 /* Register functions */
 
@@ -726,6 +734,8 @@ extern (C) nothrow void luaL_loader(lua_State* L)
     lua_register(L, "isKeyPressed", &luaL_isKeyPressed);
     lua_register(L, "isKeyDown", &luaL_isKeyDown);
     lua_register(L, "isMouseButtonPressed", &luaL_isMouseButtonPressed);
+    lua_register(L, "getMousePositionX", &luaL_getMousePositionX);
+    lua_register(L, "getMousePositionY", &luaL_getMousePositionY);
     lua_register(L, "setGameState", &luaL_setGameState);
 
     //raylib direct bindings

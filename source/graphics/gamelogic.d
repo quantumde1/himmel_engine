@@ -3,7 +3,7 @@ module graphics.gamelogic;
 import raylib;
 import bindbc.lua;
 import variables;
-import graphics.effects;
+import ui.effects;
 import std.string;
 import std.math;
 import dialogs.dialogbox;

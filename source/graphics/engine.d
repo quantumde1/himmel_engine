@@ -50,7 +50,7 @@ void engineLoader()
     textFont = LoadFont(systemSettings.fallbackFont.toStringz());
     // Fade In and Out Effects
     InitAudioDevice();
-    helloScreen();
+    //helloScreen();
     ClearBackground(Colors.BLACK);
     EndDrawing();
     camera.target = Vector2(screenWidth/2.0f, screenHeight/2.0f);
@@ -95,7 +95,10 @@ void engineLoader()
                     EndMode2D();
                     //drawing dialogs
                     dialogLogic();
-                    luaEventLoop();
+                    if (pauseParser == false) {
+                        //lua is up and running
+                        luaEventLoop();
+                    }
                     EndDrawing();
                 }
                 break;
